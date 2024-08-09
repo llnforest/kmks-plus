@@ -1,0 +1,41 @@
+package com.kmks.jianguan.service;
+
+import com.kmks.jianguan.domain.bo.*;
+import com.kmks.jianguan.domain.vo.*;
+
+/**
+ * @author Star
+ * @description: TODO
+ * @date 2024/5/7 10:29
+ */
+public interface IJgService {
+    A0221000001Vo a0221000001(A0221000001Bo bo, String zxzp, String xczp);
+
+    A0221000002Vo a0221000002(A0221000002Bo bo);
+
+    A0221000003Vo a0221000003(A0221000003Bo bo);
+
+    A0221000004Vo a0221000004(A0221000004Bo bo, String zxzp);
+
+    A0221000005Vo a0221000005(A0221000005Bo bo);
+
+    A0221000006Vo a0221000006(A0221000006Bo bo);
+
+    A0221000007Vo a0221000007(A0221000007Bo bo, String zxzp);
+
+    A0221000008Vo a0221000008(A0221000008Bo bo);
+
+    A0221000009Vo a0221000009(A0221000009Bo bo, String kszp);
+
+    A0221000010Vo a0221000010(A0221000010Bo bo);
+
+    A0221000011Vo a0221000011(A0221000011Bo bo);
+
+    A0221000012Vo a0221000012(A0221000012Bo bo, String kscgczp);
+
+    A0221000013Vo a0221000013(A0221000013Bo bo);
+
+    A0221000014Vo a0221000014(A0221000014Bo bo, String kszp);
+
+    A0221000015Vo a0221000015(A0221000015Bo bo);
+}

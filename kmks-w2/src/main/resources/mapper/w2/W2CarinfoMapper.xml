@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2CarinfoMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Carinfo" id="W2CarinfoResult">
+        <result property="xh" column="xh"/>
+        <result property="hpzl" column="hpzl"/>
+        <result property="hphm" column="hphm"/>
+        <result property="syzjcx" column="syzjcx"/>
+        <result property="cllx" column="cllx"/>
+        <result property="clpp" column="clpp"/>
+        <result property="ccdjrq" column="ccdjrq"/>
+        <result property="qzbfqz" column="qzbfqz"/>
+        <result property="fzjg" column="fzjg"/>
+        <result property="zt" column="zt"/>
+        <result property="ksczt" column="ksczt"/>
+        <result property="shr" column="shr"/>
+        <result property="ipdz" column="ipdz"/>
+        <result property="gkjmac" column="gkjmac"/>
+        <result property="gkjbh" column="gkjbh"/>
+        <result property="gkjdk" column="gkjdk"/>
+        <result property="cczdip" column="cczdip"/>
+        <result property="cczdmac" column="cczdmac"/>
+        <result property="cczdbh" column="cczdbh"/>
+        <result property="cczddk" column="cczddk"/>
+        <result property="sskcxh" column="sskcxh"/>
+    </resultMap>
+
+
+</mapper>

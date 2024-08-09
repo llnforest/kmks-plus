@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2GroupsTempMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2GroupsTemp" id="W2GroupsTempResult">
+        <result property="lsh" column="lsh"/>
+        <result property="zjhm" column="zjhm"/>
+        <result property="xm" column="xm"/>
+        <result property="xb" column="xb"/>
+        <result property="zkzmbh" column="zkzmbh"/>
+        <result property="ksyy" column="ksyy"/>
+        <result property="ksrq" column="ksrq"/>
+        <result property="kscx" column="kscx"/>
+        <result property="kscc" column="kscc"/>
+        <result property="xmmc" column="xmmc"/>
+        <result property="ksy1" column="ksy1"/>
+        <result property="ksy2" column="ksy2"/>
+        <result property="dlr" column="dlr"/>
+        <result property="jxmc" column="jxmc"/>
+        <result property="ksxm" column="ksxm"/>
+        <result property="yycs" column="yycs"/>
+        <result property="ksyybh" column="ksyybh"/>
+        <result property="sfyk" column="sfyk"/>
+        <result property="bcyykscs" column="bcyykscs"/>
+        <result property="glbm" column="glbm"/>
+        <result property="jbr" column="jbr"/>
+    </resultMap>
+
+
+</mapper>

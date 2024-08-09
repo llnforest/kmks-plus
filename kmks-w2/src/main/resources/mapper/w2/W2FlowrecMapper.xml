@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2FlowrecMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Flowrec" id="W2FlowrecResult">
+        <result property="id" column="id"/>
+        <result property="ksbh" column="ksbh"/>
+        <result property="ksxm" column="ksxm"/>
+        <result property="kszt" column="kszt"/>
+        <result property="kssj" column="kssj"/>
+        <result property="kskf" column="kskf"/>
+        <result property="kfdm" column="kfdm"/>
+        <result property="sbbh" column="sbbh"/>
+        <result property="kscs" column="kscs"/>
+        <result property="scbj" column="scbj"/>
+        <result property="msg" column="msg"/>
+        <result property="kcbh" column="kcbh"/>
+        <result property="zp" column="zp"/>
+        <result property="zpbs" column="zpbs"/>
+        <result property="zjhm" column="zjhm"/>
+        <result property="xyh" column="xyh"/>
+        <result property="gadm" column="gadm"/>
+        <result property="icode" column="icode"/>
+        <result property="imessage" column="imessage"/>
+        <result property="lsh" column="lsh"/>
+        <result property="xtlb" column="xtlb"/>
+        <result property="jkid" column="jkid"/>
+        <result property="upxml" column="upxml"/>
+        <result property="upstatus" column="upstatus"/>
+        <result property="upret" column="upret"/>
+        <result property="upjpgxml" column="upjpgxml"/>
+        <result property="jkjpgid" column="jkjpgid"/>
+        <result property="zpga" column="zpga"/>
+        <result property="kskm" column="kskm"/>
+        <result property="kchp" column="kchp"/>
+        <result property="kscj" column="kscj"/>
+        <result property="xm" column="xm"/>
+        <result property="ksy1" column="ksy1"/>
+        <result property="ksy2" column="ksy2"/>
+        <result property="ksysfzhm1" column="ksysfzhm1"/>
+        <result property="ksysfzhm2" column="ksysfzhm2"/>
+        <result property="addtime" column="addtime"/>
+        <result property="jkUpstatus" column="jk_upstatus"/>
+        <result property="jkJpgupstatus" column="jk_jpgupstatus"/>
+        <result property="judgeid" column="judgeid"/>
+        <result property="xmmc" column="xmmc"/>
+        <result property="curtime" column="curtime"/>
+        <result property="iYekao" column="i_yekao"/>
+        <result property="uptime" column="uptime"/>
+        <result property="bigzt" column="bigzt"/>
+        <result property="ykrq" column="ykrq"/>
+        <result property="flag" column="flag"/>
+    </resultMap>
+    <select id="getFlowListByDay" resultType="com.kmks.w2.domain.vo.W2FlowVo">
+        SELECT ID,XM,KSBH,KSXM,KSSJ,KSKF, KFDM,KSCS,XYH,KSZT,ZP,KCBH,XMMC,MSG,SCBJ,ICODE,IMESSAGE FROM W2_FLOWREC
+        WHERE KSBH=#{ksbh} AND  <![CDATA[ KSSJ >= TO_DATE('${ksrq} 00:00:00','yyyy-mm-dd HH24:MI:SS') AND KSSJ <= TO_DATE('${ksrq} 23:59:59','yyyy-mm-dd HH24:MI:SS') ]]> ORDER BY ID ASC
+    </select>
+
+</mapper>

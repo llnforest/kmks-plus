@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2GroupsMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Groups" id="W2GroupsResult">
+        <result property="xh" column="xh"/>
+        <result property="ksdd" column="ksdd"/>
+        <result property="kscc" column="kscc"/>
+        <result property="kskm" column="kskm"/>
+        <result property="kscx" column="kscx"/>
+        <result property="ksy" column="ksy"/>
+        <result property="xm" column="xm"/>
+        <result property="zjhm" column="zjhm"/>
+        <result property="ksrq" column="ksrq"/>
+        <result property="ksxm" column="ksxm"/>
+        <result property="xmmc" column="xmmc"/>
+        <result property="kchp" column="kchp"/>
+        <result property="dlr" column="dlr"/>
+        <result property="djrq" column="djrq"/>
+        <result property="lsh" column="lsh"/>
+        <result property="zkzh" column="zkzh"/>
+        <result property="ksyy" column="ksyy"/>
+        <result property="ksyybh" column="ksyybh"/>
+        <result property="sfyk" column="sfyk"/>
+        <result property="yyrq" column="yyrq"/>
+    </resultMap>
+
+
+</mapper>

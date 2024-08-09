@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysAuditLogMapper">
+
+    <resultMap type="com.ruoyi.system.domain.SysAuditLog" id="SysAuditLogResult">
+        <result property="auditId" column="audit_id"/>
+        <result property="username" column="username"/>
+        <result property="tableName" column="table_name"/>
+        <result property="tableComment" column="table_comment"/>
+        <result property="ipAddress" column="ip_address"/>
+        <result property="operationTime" column="operation_time"/>
+        <result property="operationType" column="operation_type"/>
+        <result property="auditContent" column="audit_content"/>
+        <result property="moduleName" column="module_name"/>
+        <result property="validCode" column="valid_code"/>
+    </resultMap>
+    <select id="statisticsItems" resultType="com.ruoyi.system.domain.vo.AuditLogAnalyseDto">
+        SELECT table_comment,module_name,operation_type,count(*) as count FROM SYS_AUDIT_LOG GROUP BY table_comment,module_name,operation_type order by TABLE_COMMENT;
+
+    </select>
+
+
+</mapper>

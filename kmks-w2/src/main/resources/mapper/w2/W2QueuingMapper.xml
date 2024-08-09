@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2QueuingMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Queuing" id="W2QueuingResult">
+        <result property="id" column="id"/>
+        <result property="ksbh" column="ksbh"/>
+        <result property="xm" column="xm"/>
+        <result property="zjhm" column="zjhm"/>
+        <result property="jxmc" column="jxmc"/>
+        <result property="kcbh" column="kcbh"/>
+        <result property="kchp" column="kchp"/>
+        <result property="rLine" column="r_line"/>
+        <result property="iLock" column="i_lock"/>
+        <result property="sign" column="sign"/>
+        <result property="kszt" column="kszt"/>
+        <result property="djc" column="djc"/>
+        <result property="sqks" column="sqks"/>
+        <result property="score" column="score"/>
+        <result property="sfyk" column="sfyk"/>
+        <result property="ksxm" column="ksxm"/>
+        <result property="wcxm" column="wcxm"/>
+        <result property="kscx" column="kscx"/>
+        <result property="kgname" column="kgname"/>
+        <result property="kg" column="kg"/>
+        <result property="sSafe" column="s_safe"/>
+        <result property="sSafeZjhm" column="s_safe_zjhm"/>
+        <result property="zkzh" column="zkzh"/>
+        <result property="ykxms" column="ykxms"/>
+        <result property="zkxms" column="zkxms"/>
+        <result property="bdxh" column="bdxh"/>
+        <result property="kscs" column="kscs"/>
+        <result property="ykcs" column="ykcs"/>
+        <result property="wcxms" column="wcxms"/>
+        <result property="kscj" column="kscj"/>
+        <result property="kssj" column="kssj"/>
+        <result property="cdxmbh" column="cdxmbh"/>
+        <result property="sfyz" column="sfyz"/>
+        <result property="kslx" column="kslx"/>
+        <result property="jxdm" column="jxdm"/>
+        <result property="ksrq" column="ksrq"/>
+        <result property="zt" column="zt"/>
+        <result property="sqsj" column="sqsj"/>
+        <result property="qxlx" column="qxlx"/>
+        <result property="kcxh" column="kcxh"/>
+        <result property="flag" column="flag"/>
+        <result property="jszt" column="jszt"/>
+        <result property="lsh" column="lsh"/>
+        <result property="zkxmdm" column="zkxmdm"/>
+        <result property="finger" column="finger"/>
+        <result property="zsfhg" column="zsfhg"/>
+        <result property="zcs" column="zcs"/>
+        <result property="kfxm" column="kfxm"/>
+        <result property="kcbs" column="kcbs"/>
+        <result property="fieldid" column="fieldid"/>
+        <result property="kg2" column="kg2"/>
+        <result property="kscc" column="kscc"/>
+        <result property="signcontent" column="signcontent"/>
+        <result property="ksyy" column="ksyy"/>
+        <result property="jbr" column="jbr"/>
+        <result property="glbm" column="glbm"/>
+        <result property="yycs" column="yycs"/>
+        <result property="bcyykscs" column="bcyykscs"/>
+        <result property="linecode" column="linecode"/>
+        <result property="xmkssj" column="xmkssj"/>
+        <result property="message" column="message"/>
+        <result property="iVoiceTimes" column="i_voice_times"/>
+        <result property="dVoiceDate" column="d_voice_date"/>
+        <result property="iVoiceReady" column="i_voice_ready"/>
+        <result property="cwcs" column="cwcs"/>
+        <result property="kskm" column="kskm"/>
+    </resultMap>
+
+    <select id="selectCarPersonList" resultMap="W2QueuingResult">
+        select kcbh,count(*) as count
+        from w2_queuing
+        where bdxh is not null and kszt in (0,1)
+        group by kcbh
+    </select>
+
+</mapper>

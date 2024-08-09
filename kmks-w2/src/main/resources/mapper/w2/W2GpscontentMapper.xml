@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2GpscontentMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Gpscontent" id="W2GpscontentResult">
+        <result property="timeid" column="timeid"/>
+        <result property="gpscon1" column="gpscon1"/>
+        <result property="gpscon2" column="gpscon2"/>
+        <result property="sigcon" column="sigcon"/>
+        <result property="kscon" column="kscon"/>
+        <result property="sendrq" column="sendrq"/>
+        <result property="carno" column="carno"/>
+        <result property="sfzhm" column="sfzhm"/>
+        <result property="djc" column="djc"/>
+        <result property="kcbh" column="kcbh"/>
+        <result property="lsh" column="lsh"/>
+        <result property="kchp" column="kchp"/>
+    </resultMap>
+    <sql id="Base_Column_List">timeid,gpscon1,gpscon2,sigcon,kscon,sendrq,carno,sfzhm,djc,kcbh,lsh,kchp</sql>
+    <select id="selectListByTable" resultMap="W2GpscontentResult">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        <choose>
+            <when test="tableMark == '' || tableMark == null">w2_gpscontent</when>
+            <otherwise>w2_gpscontent_his_${tableMark}</otherwise>
+        </choose>
+         where
+        sfzhm = #{sfzhm} and
+        carno = #{carno} and
+        sendrq between #{sendrqStart,jdbcType=NUMERIC} and #{sendrqEnd,jdbcType=NUMERIC}
+        order by sendrq asc
+    </select>
+
+
+</mapper>

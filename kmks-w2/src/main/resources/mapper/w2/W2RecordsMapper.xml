@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2RecordsMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Records" id="W2RecordsResult">
+        <result property="id" column="id"/>
+        <result property="xm" column="xm"/>
+        <result property="kcbh" column="kcbh"/>
+        <result property="zjhm" column="zjhm"/>
+        <result property="zkzh" column="zkzh"/>
+        <result property="kscx" column="kscx"/>
+        <result property="ksyy" column="ksyy"/>
+        <result property="yycs" column="yycs"/>
+        <result property="ksrq1" column="ksrq1"/>
+        <result property="kssj1" column="kssj1"/>
+        <result property="jssj1" column="jssj1"/>
+        <result property="kfxx1" column="kfxx1"/>
+        <result property="jgfs1" column="jgfs1"/>
+        <result property="ksy1" column="ksy1"/>
+        <result property="ksrq2" column="ksrq2"/>
+        <result property="kssj2" column="kssj2"/>
+        <result property="jssj2" column="jssj2"/>
+        <result property="kfxx2" column="kfxx2"/>
+        <result property="jgfs2" column="jgfs2"/>
+        <result property="ksy2" column="ksy2"/>
+        <result property="kscs" column="kscs"/>
+        <result property="sjjyw" column="sjjyw"/>
+        <result property="sfprint" column="sfprint"/>
+        <result property="ksjg" column="ksjg"/>
+        <result property="line" column="line"/>
+        <result property="ksbh" column="ksbh"/>
+        <result property="kscj1" column="kscj1"/>
+        <result property="scf1" column="scf1"/>
+        <result property="kscj2" column="kscj2"/>
+        <result property="scf2" column="scf2"/>
+        <result property="kscc" column="kscc"/>
+        <result property="czy" column="czy"/>
+        <result property="zt" column="zt"/>
+        <result property="ksxm" column="ksxm"/>
+        <result property="sqbs" column="sqbs"/>
+        <result property="sqrq" column="sqrq"/>
+        <result property="sqyy" column="sqyy"/>
+        <result property="sqr" column="sqr"/>
+        <result property="spr" column="spr"/>
+        <result property="sprq" column="sprq"/>
+        <result property="sqr1" column="sqr1"/>
+        <result property="sfqk" column="sfqk"/>
+        <result property="zjzp" column="zjzp"/>
+        <result property="jbzp" column="jbzp"/>
+        <result property="dycs" column="dycs"/>
+        <result property="flag" column="flag"/>
+        <result property="kcxh" column="kcxh"/>
+        <result property="ksrq" column="ksrq"/>
+        <result property="kfss1" column="kfss1"/>
+        <result property="kfss2" column="kfss2"/>
+        <result property="sszp" column="sszp"/>
+        <result property="sSafe" column="s_safe"/>
+        <result property="sSafeZjhm" column="s_safe_zjhm"/>
+        <result property="jxdm" column="jxdm"/>
+        <result property="lsh" column="lsh"/>
+        <result property="kchp" column="kchp"/>
+        <result property="jbr" column="jbr"/>
+        <result property="glbm" column="glbm"/>
+        <result property="bcyykscs" column="bcyykscs"/>
+        <result property="jkSszpstatus" column="jk_sszpstatus"/>
+        <result property="jxmc" column="jxmc"/>
+        <result property="sfyk" column="sfyk"/>
+        <result property="sZjmc" column="s_zjmc"/>
+        <result property="sXmhz" column="s_xmhz"/>
+        <result property="ykrq" column="ykrq"/>
+        <result property="ykflag" column="ykflag"/>
+        <result property="ykdjc" column="ykdjc"/>
+        <result property="line2" column="line2"/>
+        <result property="sCity" column="s_city"/>
+        <result property="iDiff" column="i_diff"/>
+        <result property="dcrk" column="dcrk"/>
+        <result property="ksxmdown" column="ksxmdown"/>
+        <result property="kskm" column="kskm"/>
+        <result property="hlSignUpload" column="hl_sign_upload"/>
+        <result property="cjupload" column="cjupload"/>
+        <result property="autojudge1" column="autojudge1"/>
+        <result property="autojudge2" column="autojudge2"/>
+        <result property="kszt" column="kszt"/>
+        <result property="totalNum" column="count(1)"/>
+    </resultMap>
+
+    <select id="getRecordCount" resultType="java.lang.Integer">
+        select count(id) from w2_records where instr(kfxx2,#{})>0 and
+        <if test="ew.sqlSegment != '' and ew.sqlSegment != null">
+            <if test="!ew.isEmptyOfWhere">
+                <where>
+                    ${ew.sqlSegment}
+                </where>
+            </if>
+            <if test="ew.isEmptyOfWhere">
+                ${ew.sqlSegment}
+            </if>
+        </if>
+    </select>
+
+    <select id="getRecordsCountPersonal" resultType="java.lang.Integer">
+        select count(id) from w2_records where length(kfxx1)>0  and
+        <if test="ew.sqlSegment != '' and ew.sqlSegment != null">
+            <if test="!ew.isEmptyOfWhere">
+                <where>
+                    ${ew.sqlSegment}
+                </where>
+            </if>
+            <if test="ew.isEmptyOfWhere">
+                ${ew.sqlSegment}
+            </if>
+        </if>
+    </select>
+
+
+    <select id="selectCountByGakfdm1" parameterType="String"  resultType="java.lang.Integer">
+       select count(id) from w2_records where instr(kfxx1, #{gakfdm})>0
+    </select>
+
+    <select id="selectCountByGakfdm2" parameterType="String"  resultType="java.lang.Integer">
+       select count(id) from w2_records where instr(kfxx2, #{gakfdm})>0
+    </select>
+
+    <select id="selectCountByKfxx1" parameterType="String"  resultType="java.lang.Integer">
+      select count(id) from w2_records where  length(kfxx1)>0
+    </select>
+
+    <select id="selectCountByKfxx2"  resultType="java.lang.Integer">
+      select count(id) from w2_records where  length(kfxx2)>0
+    </select>
+
+    <select id="selectSfzByZjhm" resultType="java.lang.String">
+      select sfz.ydbj from w2_records rd left join w2_sfzinfo sfz on rd.zjhm = sfz.zjhm
+    </select>
+
+</mapper>

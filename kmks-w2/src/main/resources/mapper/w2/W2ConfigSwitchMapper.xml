@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2ConfigSwitchMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2ConfigSwitch" id="W2ConfigSwitchResult">
+        <result property="id" column="id"/>
+        <result property="projectcode" column="projectcode"/>
+        <result property="deviceip" column="deviceip"/>
+        <result property="deviceport" column="deviceport"/>
+        <result property="deviceusername" column="deviceusername"/>
+        <result property="devicepassword" column="devicepassword"/>
+        <result property="channeltype" column="channeltype"/>
+        <result property="devicechannel" column="devicechannel"/>
+        <result property="protocol" column="protocol"/>
+        <result property="vendortype" column="vendortype"/>
+        <result property="bitstreamtype" column="bitstreamtype"/>
+    </resultMap>
+
+
+</mapper>

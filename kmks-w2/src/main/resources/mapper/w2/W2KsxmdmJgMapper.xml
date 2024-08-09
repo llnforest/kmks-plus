@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2KsxmdmJgMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2KsxmdmJg" id="W2KsxmdmJgResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="kskm" column="kskm"/>
+        <result property="custxh" column="custxh"/>
+        <result property="kmtime1" column="kmtime1"/>
+        <result property="kmtime2" column="kmtime2"/>
+        <result property="kmtime3" column="kmtime3"/>
+    </resultMap>
+
+    <resultMap type="com.kmks.w2.domain.vo.W2KsxmdmJgVo" id="W2KsxmdmJgVoResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="kskm" column="kskm"/>
+        <result property="custxh" column="custxh"/>
+        <result property="kmtime1" column="kmtime1"/>
+        <result property="kmtime2" column="kmtime2"/>
+        <result property="kmtime3" column="kmtime3"/>
+    </resultMap>
+
+    <select id="getAllKsxmByStatistics" parameterType="java.lang.String" resultMap="W2KsxmdmJgVoResult">
+    select id,name from w2_ksxmdm_jg where kskm = #{kskm} and id &gt;&lt; 10000 and id &gt;&lt; 30000
+    </select>
+
+    <select id="getTotalKfCodeReport" parameterType="String" resultType="KfCodeReport">
+    select gakfdm,kfmc,ksxm,'' xmmc,0 num1,0 num2,0 num,0 nums1,0 nums2, 0 nums,0 bl1,0 bl2, 0 bl,0 TotalRatio from w2_ksxmkfdm_jg where flag=1 and  kskm=#{kskm}
+    </select>
+
+    <select id="getNameByW2KsxmdmJg" parameterType="String" resultType="String">
+    select name from w2_ksxmdm_jg where   kskm = #{kskm} and custxh = #{custxh}
+    </select>
+
+
+    <select id="listKsxmdmJgByLogNew" resultType="W2KsxmdmJgVo">
+          select jg.name name,jg.id id,count(*) counts from W2_KSXMDM_JG jg left join  w2_flowlog fg on jg.id=fg.gadm GROUP by jg.id,jg.name
+    </select>
+
+
+</mapper>

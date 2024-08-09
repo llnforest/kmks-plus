@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.GhSafepeopleMapper">
+
+    <resultMap type="com.kmks.w2.domain.GhSafepeople" id="GhSafepeopleResult">
+        <result property="sName" column="s_name"/>
+        <result property="sZjhm" column="s_zjhm"/>
+        <result property="sZp" column="s_zp"/>
+        <result property="sZpUrl" column="s_zp_url"/>
+        <result property="iZt" column="i_zt"/>
+        <result property="kcbh" column="kcbh"/>
+        <result property="kchp" column="kchp"/>
+    </resultMap>
+
+
+</mapper>

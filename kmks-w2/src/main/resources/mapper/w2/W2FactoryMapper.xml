@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2FactoryMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Factory" id="W2FactoryResult">
+        <result property="xh" column="xh"/>
+        <result property="kcmc" column="kcmc"/>
+        <result property="kkcx" column="kkcx"/>
+        <result property="glbm" column="glbm"/>
+        <result property="fzjg" column="fzjg"/>
+        <result property="kcdddh" column="kcdddh"/>
+    </resultMap>
+
+
+</mapper>

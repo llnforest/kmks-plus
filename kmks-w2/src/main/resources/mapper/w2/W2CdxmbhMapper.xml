@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2CdxmbhMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Cdxmbh" id="W2CdxmbhResult">
+        <result property="nid" column="nid"/>
+        <result property="paramdm" column="paramdm"/>
+        <result property="paramname" column="paramname"/>
+        <result property="msg" column="msg"/>
+        <result property="kszt" column="kszt"/>
+        <result property="zxip" column="zxip"/>
+        <result property="portms" column="portms"/>
+        <result property="mdm" column="mdm"/>
+        <result property="sbxh" column="sbxh"/>
+        <result property="gadm" column="gadm"/>
+        <result property="kskm" column="kskm"/>
+        <result property="xmipaddress" column="xmipaddress"/>
+        <result property="xmipport" column="xmipport"/>
+        <result property="xmipuser" column="xmipuser"/>
+        <result property="xmippwd" column="xmippwd"/>
+        <result property="xmipchanel" column="xmipchanel"/>
+        <result property="syzt" column="syzt"/>
+        <result property="xh" column="xh"/>
+        <result property="zzcs" column="zzcs"/>
+    </resultMap>
+    <select id="listCdxmbhByLogNew" resultType="EquipmentBean">
+       select jg.sbxh sbxh ,count(*) counts,jg.paramdm paramdm,jg.paramname from w2_cdxmbh jg left join  w2_flowlog fg on jg.sbxh=fg.sbbh GROUP by jg.sbxh,jg.paramdm,jg.PARAMNAME
+    </select>
+
+
+</mapper>

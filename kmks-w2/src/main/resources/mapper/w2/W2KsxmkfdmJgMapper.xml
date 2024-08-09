@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2KsxmkfdmJgMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2KsxmkfdmJg" id="W2KsxmkfdmJgResult">
+        <result property="id" column="id"/>
+        <result property="ksxmdm" column="ksxmdm"/>
+        <result property="gakfdm" column="gakfdm"/>
+        <result property="gakfmc" column="gakfmc"/>
+        <result property="kfmc" column="kfmc"/>
+        <result property="kf" column="kf"/>
+        <result property="ksxm" column="ksxm"/>
+        <result property="kskm" column="kskm"/>
+        <result property="sBeizhu2" column="s_beizhu2"/>
+        <result property="ksxmxh" column="ksxmxh"/>
+        <result property="flag" column="flag"/>
+    </resultMap>
+
+
+</mapper>

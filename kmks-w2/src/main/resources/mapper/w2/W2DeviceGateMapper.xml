@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2DeviceGateMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2DeviceGate" id="W2DeviceGateResult">
+        <result property="gateId" column="gate_id"/>
+        <result property="gateName" column="gate_name"/>
+        <result property="gateIp" column="gate_ip"/>
+        <result property="gateMac" column="gate_mac"/>
+        <result property="remark" column="remark"/>
+        <result property="gateStatus" column="gate_status"/>
+    </resultMap>
+
+
+</mapper>

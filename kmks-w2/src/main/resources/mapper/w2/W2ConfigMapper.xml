@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2ConfigMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Config" id="W2ConfigResult">
+        <result property="lIncode" column="l_incode"/>
+        <result property="iFlag" column="i_flag"/>
+        <result property="sFlag" column="s_flag"/>
+        <result property="sName" column="s_name"/>
+        <result property="iValue" column="i_value"/>
+        <result property="sValue" column="s_value"/>
+        <result property="sBeizhu" column="s_beizhu"/>
+    </resultMap>
+
+
+    <select id="isStandard" resultType="java.lang.Integer">
+        select s_value from w2_config where i_flag=1 and i_value=99
+    </select>
+
+</mapper>

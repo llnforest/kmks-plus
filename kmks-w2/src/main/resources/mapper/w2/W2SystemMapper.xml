@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2SystemMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2System" id="W2SystemResult">
+        <result property="nid" column="nid"/>
+        <result property="type" column="type"/>
+        <result property="paramdm" column="paramdm"/>
+        <result property="paramname" column="paramname"/>
+        <result property="bz" column="bz"/>
+        <result property="paramtype" column="paramtype"/>
+        <result property="jxqc" column="jxqc"/>
+        <result property="maxdm" column="maxdm"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       nid,type,paramdm,paramname,bz,paramtype,jxqc,maxdm
+    </sql>
+
+    <select id="selectVoByIdAndType" parameterType="java.lang.Long" resultType="com.kmks.w2.domain.vo.W2SystemVo">
+        select
+        <include refid="Base_Column_List"/>
+        from w2_system where type = '3' and nid = #{nid}
+    </select>
+
+    <update id="updateVoByIdAndType" parameterType="W2System">
+        update w2_system
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="nid != null">nid = #{nid},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="paramdm != null">paramdm = #{paramdm},</if>
+            <if test="paramname != null">paramname = #{paramname},</if>
+            <if test="bz != null">bz = #{bz},</if>
+            <if test="paramtype != null">paramtype = #{paramtype},</if>
+            <if test="jxqc != null">jxqc = #{jxqc},</if>
+            <if test="maxdm != null">maxdm = #{maxdm},</if>
+        </trim>
+        where type = '3' and nid = #{nid}
+    </update>
+
+
+</mapper>

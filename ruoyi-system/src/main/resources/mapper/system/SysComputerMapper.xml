@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysComputerMapper">
+
+    <resultMap type="com.ruoyi.system.domain.SysComputer" id="SysComputerResult">
+        <result property="id" column="id"/>
+        <result property="computerName" column="computer_name"/>
+        <result property="computerLocation" column="computer_location"/>
+        <result property="ip" column="ip"/>
+        <result property="mac" column="mac"/>
+        <result property="remarks" column="remarks"/>
+    </resultMap>
+
+
+</mapper>

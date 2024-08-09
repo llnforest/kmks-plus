@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2KcxxMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Kcxx" id="W2KcxxResult">
+        <result property="id" column="id"/>
+        <result property="kch" column="kch"/>
+        <result property="cph" column="cph"/>
+        <result property="kcmc" column="kcmc"/>
+        <result property="kscx" column="kscx"/>
+        <result property="zt" column="zt"/>
+        <result property="xmxh" column="xmxh"/>
+        <result property="line" column="line"/>
+        <result property="czip" column="czip"/>
+        <result property="cuser" column="cuser"/>
+        <result property="cpwd" column="cpwd"/>
+        <result property="zxip" column="zxip"/>
+        <result property="zuser" column="zuser"/>
+        <result property="zpwd" column="zpwd"/>
+        <result property="fourip" column="fourip"/>
+        <result property="fouruser" column="fouruser"/>
+        <result property="fourpwd" column="fourpwd"/>
+        <result property="carMac" column="car_mac"/>
+        <result property="carVersion" column="car_version"/>
+        <result property="carIp" column="car_ip"/>
+        <result property="ksbh" column="ksbh"/>
+        <result property="mdzt" column="mdzt"/>
+        <result property="mdrs" column="mdrs"/>
+        <result property="zc" column="zc"/>
+        <result property="lxbs" column="lxbs"/>
+        <result property="msg" column="msg"/>
+        <result property="fieldid" column="fieldid"/>
+        <result property="fieldname" column="fieldname"/>
+        <result property="fieldstatus" column="fieldstatus"/>
+        <result property="signcheck" column="signcheck"/>
+        <result property="allline" column="allline"/>
+        <result property="curline" column="curline"/>
+        <result property="xm" column="xm"/>
+        <result property="zkxms" column="zkxms"/>
+        <result property="jxmc" column="jxmc"/>
+        <result property="djc" column="djc"/>
+        <result property="rLine" column="r_line"/>
+        <result property="kgname" column="kgname"/>
+        <result property="sSafe" column="s_safe"/>
+        <result property="message" column="message"/>
+        <result property="ipadddress" column="ipadddress"/>
+        <result property="macaddress" column="macaddress"/>
+        <result property="checkResult1" column="check_result1"/>
+        <result property="checkResult2" column="check_result2"/>
+        <result property="checkResult3" column="check_result3"/>
+        <result property="carCamera1Ip" column="car_camera1_ip"/>
+        <result property="carCamera2Ip" column="car_camera2_ip"/>
+        <result property="carCamera3Ip" column="car_camera3_ip"/>
+        <result property="carGps1Port" column="car_gps1_port"/>
+        <result property="carGps1Baud" column="car_gps1_baud"/>
+        <result property="carGps2Port" column="car_gps2_port"/>
+        <result property="carGps2Baud" column="car_gps2_baud"/>
+        <result property="carSignalPort" column="car_signal_port"/>
+        <result property="carSignalBaud" column="car_signal_baud"/>
+        <result property="carVoiceType" column="car_voice_type"/>
+        <result property="carVoiceSpeed" column="car_voice_speed"/>
+        <result property="gpsXOffset" column="gps_x_offset"/>
+        <result property="gpsYOffset" column="gps_y_offset"/>
+        <result property="checkTime" column="check_time"/>
+        <result property="checkTime1" column="check_time1"/>
+        <result property="sStarttime" column="s_starttime"/>
+        <result property="sEndtime" column="s_endtime"/>
+        <result property="zjhm" column="zjhm"/>
+        <result property="gateway" column="gateway"/>
+        <result property="ccdjrq" column="ccdjrq"/>
+        <result property="clxh" column="clxh"/>
+        <result property="zdfc" column="zdfc"/>
+        <result property="carModelRelation" column="car_model_relation"/>
+        <result property="carFieldRelation" column="car_field_relation"/>
+    </resultMap>
+
+
+</mapper>

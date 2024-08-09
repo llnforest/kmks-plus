@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysSafeLogMapper">
+
+    <resultMap type="com.ruoyi.system.domain.SysSafeLog" id="SysSafeLogResult">
+        <result property="id" column="id"/>
+        <result property="userNo" column="user_no"/>
+        <result property="userName" column="user_name"/>
+        <result property="userIp" column="user_ip"/>
+        <result property="category" column="category"/>
+        <result property="operation" column="operation"/>
+        <result property="state" column="state"/>
+        <result property="content" column="content"/>
+        <result property="mac" column="mac"/>
+        <result property="code" column="code"/>
+        <result property="hostName" column="host_name"/>
+        <result property="ywtpye" column="ywtpye"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="queryListState" resultType="SysSafeLogStatVo">
+       select CATEGORY,COUNT(*) as counts from KMKSPLUS.SYS_SAFE_LOG s group by CATEGORY;
+    </select>
+</mapper>

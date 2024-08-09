@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kmks.w2.mapper.W2CheckcarMapper">
+
+    <resultMap type="com.kmks.w2.domain.W2Checkcar" id="W2CheckcarResult">
+        <result property="sCarno" column="s_carno"/>
+        <result property="sTime" column="s_time"/>
+        <result property="sValue" column="s_value"/>
+        <result property="sNote" column="s_note"/>
+        <result property="dtFs" column="dt_fs"/>
+    </resultMap>
+
+
+</mapper>
