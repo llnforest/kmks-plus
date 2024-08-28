@@ -66,7 +66,6 @@
 
     <el-table v-loading="loading" :data="configSwitchList" @selection-change="handleSelectionChange"  @row-click="rowClick" @row-contextmenu="rightClick">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="ID" align="center" prop="id" width="70"/>
       <el-table-column label="项目代码" align="center" prop="projectcode" min-width="80"/>
       <el-table-column label="设备IP" align="center" prop="deviceip" min-width="120"/>
       <el-table-column label="设备端口" align="center" prop="deviceport" min-width="80"/>
@@ -322,7 +321,6 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        id: undefined,
         projectcode: undefined,
         deviceip: undefined,
         deviceport: undefined,
@@ -348,7 +346,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
+      this.ids = selection.map(item => item.projectcode)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -362,7 +360,7 @@ export default {
     handleUpdate(row) {
       this.loading = true;
       this.reset();
-      const id = row.id || this.ids
+      const id = row.projectcode || this.ids
       getConfigSwitch(id).then(response => {
         this.loading = false;
         this.form = response.data;
@@ -375,17 +373,9 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
-          if (this.form.id != null) {
-            updateConfigSwitch(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            }).finally(() => {
-              this.buttonLoading = false;
-            });
-          } else {
+          if (this.form.projectcode != null) {
             addConfigSwitch(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
+              this.$modal.msgSuccess("操作成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -397,7 +387,7 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
+      const ids = row.projectcode || this.ids;
       this.$modal.confirm('是否确认删除项目监控编号为"' + ids + '"的数据项？').then(() => {
         this.loading = true;
         return delConfigSwitch(ids);

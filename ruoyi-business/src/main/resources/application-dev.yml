@@ -41,27 +41,28 @@ spring:
       # 设置默认的数据源或者数据源组,默认值即为 master
       primary: master
       # 严格模式 匹配不到数据源则报错
-      strict: true
+      strict: false
       datasource:
-        # 主库数据源
+        # 主库数据源（业务库）
         master:
           type: ${spring.datasource.type}
           driverClassName: oracle.jdbc.OracleDriver
           url: jdbc:oracle:thin:@//localhost:1521/orcl.26.26.1
           username: kmksplus
 #          password: ghgd_admin12345
+          #password: mpw:MGPFCxVGPGv/nTD20QwyCA==
           password: mpw:MGPFCxVGPGv/nTD20QwyCA==
-#          password: mpw:MGPFCxVGPGv/nTD20QwyCA==
           hikari:
             connectionTestQuery: SELECT 1 FROM DUAL
-        # 从库数据源
+        # 从库数据源（参数库）
         param:
           type: ${spring.datasource.type}
           driverClassName: oracle.jdbc.OracleDriver
           url: jdbc:oracle:thin:@//localhost:1521/orcl.26.26.1
           username: kmksparam
           #          password: ghgd_admin12345
-          password: mpw:MGPFCxVGPGv/nTD20QwyCA==
+          #password: mpw:MGPFCxVGPGv/nTD20QwyCA==
+          password: mpw:MGPFCxVGPGv/nTD20QwyCB==
           hikari:
             connectionTestQuery: SELECT 1 FROM DUAL
       hikari:
@@ -79,7 +80,6 @@ spring:
         maxLifetime: 900000
         # 连接测试query（配置检测连接是否有效）
         connectionTestQuery: SELECT 1
-
 --- # redis 单机配置(单机与集群只能开启一个另一个需要注释掉)
 spring:
   redis:

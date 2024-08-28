@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
  * @author Lynn
  * @date 2023-03-21
  */
-@DS("param")
 @RequiredArgsConstructor
 @Service
 public class W2KfconfigServiceImpl implements IW2KfconfigService {
@@ -63,6 +62,7 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
     /**
      * 查询评判参数列表
      */
+    @DS("param")
     @Override
     public List<W2KfconfigVo> queryList(W2KfconfigBo bo) {
         LambdaQueryWrapper<W2Kfconfig> lqw = buildQueryWrapper(bo);
@@ -149,7 +149,6 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
         // 删除缓存
         RedisKfConfigData.deleteKfConfigData();
         // 重置缓存
-        W2KfconfigBo kfconfigBo = new W2KfconfigBo();
         List<W2KfconfigVo> w2KfVos = queryList(new W2KfconfigBo());
         Map<String, W2KfconfigVo> dataMap = w2KfVos.stream()
                 .filter(v->StringUtils.isNotBlank(v.getGakfdm()))

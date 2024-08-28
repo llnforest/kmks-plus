@@ -20,6 +20,7 @@ import com.kmks.w2.domain.bo.W2RecordsBo;
 import com.kmks.w2.domain.vo.W2RecordsVo;
 import com.ruoyi.common.barcode.BarcodeUtil;
 import com.ruoyi.common.config.WebServiceConfig;
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.service.DictService;
 import com.ruoyi.common.helper.LoginHelper;
 import com.ruoyi.common.utils.DateUtils;
@@ -27,7 +28,7 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.report.JasperReportUtil;
 import com.ruoyi.common.webservice.WebServiceUtil;
-import io.netty.util.internal.StringUtil;
+import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
@@ -66,13 +67,13 @@ public class W2RecordsController extends BaseController {
 
     private final IW2KfconfigService iw2KfconfigService;
 
-    private final IW2ConfigService iW2ConfigService;
-
     private final WebService webService;
     @Autowired
     private ConfigProperties configProperties;
 
     private final WebServiceConfig webServiceConfig;
+
+    private final ISysConfigService configService;
 
     /**
      * 查询成绩管理列表
@@ -234,7 +235,10 @@ public class W2RecordsController extends BaseController {
 
         //扣分项
         handleKf(parameterMap,w2RecordsVo.getKfxx1(),"kfx");
-        iW2ConfigService.setReportConfigInfo(parameterMap);
+        parameterMap.put("title",dictService.getDictLabel("sys_kskm",w2RecordsVo.getKskm()) + configService.selectConfigByKey(CacheNames.PRINT_SCORE_TITLE));
+        parameterMap.put("ksdd",configService.selectConfigByKey(CacheNames.SCHOOL_NAME));
+        parameterMap.put("kskm",dictService.getDictLabel("sys_kskm",w2RecordsVo.getKskm()) + "考试");
+        parameterMap.put("bkkskm",dictService.getDictLabel("sys_kskm",w2RecordsVo.getKskm()) + "补考");
 
 
         // 补考参数设置
@@ -269,7 +273,7 @@ public class W2RecordsController extends BaseController {
         parameterMap.put("ksImg2",webService.downUpInfo(String.format("$CZ;3002;%s;%s;%s", w2RecordsVo.getZjhm(),w2RecordsVo.getKsrq1(),"4")));
         parameterMap.put("ksImg3",webService.downUpInfo(String.format("$CZ;3002;%s;%s;%s", w2RecordsVo.getZjhm(),w2RecordsVo.getKsrq1(),"5")));
 //        webService.downUpInfo("$CZ;3002;211022198511034902;2019-09-16 00:00:00;4");
-        String jasperPath = JasperReportUtil.getJasperFileDir(configProperties.getPrintTpl());
+        String jasperPath = JasperReportUtil.getJasperFileDir(configService.selectConfigByKey(CacheNames.PRINT_SCORE_TEMPLATE));
         JasperReportUtil.exportToPdf(jasperPath,parameterMap,null, ServletUtils.getResponse());
 
     }

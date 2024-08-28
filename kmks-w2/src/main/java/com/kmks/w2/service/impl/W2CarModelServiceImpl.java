@@ -86,6 +86,7 @@ public class W2CarModelServiceImpl implements IW2CarModelService {
         lqw.like(StringUtils.isNotBlank(bo.getModelname()), W2CarModel::getModelname, bo.getModelname());
         lqw.eq(StringUtils.isNotBlank(bo.getModeltype()), W2CarModel::getModeltype, bo.getModeltype());
         lqw.eq(StringUtils.isNotBlank(bo.getState()), W2CarModel::getState, bo.getState());
+        lqw.eq(StringUtils.isNotBlank(bo.getState1()), W2CarModel::getState1, bo.getState1());
         lqw.eq(StringUtils.isNotBlank(bo.getCph()), W2CarModel::getCph, bo.getCph());
         lqw.eq(bo.getRelationId()!= null,W2CarModel::getRelationId, bo.getRelationId());
         return lqw;

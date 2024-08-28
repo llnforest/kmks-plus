@@ -2,8 +2,10 @@ package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.kmks.w2.domain.W2ConfigSwitch;
+import com.kmks.w2.domain.W2KsxmdmJg;
 import com.kmks.w2.domain.bo.W2ConfigSwitchBo;
 import com.kmks.w2.domain.vo.W2ConfigSwitchVo;
+import com.kmks.w2.hcnet.service.HCNetService;
 import com.kmks.w2.mapper.W2ConfigSwitchMapper;
 import com.kmks.w2.service.IW2ConfigSwitchService;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -11,6 +13,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.utils.bean.BeanHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -72,10 +75,15 @@ public class W2ConfigSwitchServiceImpl implements IW2ConfigSwitchService {
     public Boolean insertByBo(W2ConfigSwitchBo bo) {
         W2ConfigSwitch add = BeanUtil.toBean(bo, W2ConfigSwitch.class);
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setId(add.getId());
+        LambdaQueryWrapper<W2ConfigSwitch> eq = Wrappers.lambdaQuery(W2ConfigSwitch.class).eq(W2ConfigSwitch::getProjectcode, add.getProjectcode());
+        boolean flag;
+        if(baseMapper.exists(eq)){
+            flag = baseMapper.updateById(add) > 0;
+        }else{
+            flag = baseMapper.insert(add) > 0;
         }
+        HCNetService hcNetService = BeanHelper.getBean(HCNetService.class);
+        hcNetService.resetData();
         return flag;
     }
 
@@ -104,6 +112,8 @@ public class W2ConfigSwitchServiceImpl implements IW2ConfigSwitchService {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
+        HCNetService hcNetService = BeanHelper.getBean(HCNetService.class);
+        hcNetService.resetData();
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 

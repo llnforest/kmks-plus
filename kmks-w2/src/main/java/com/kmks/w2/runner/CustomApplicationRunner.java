@@ -64,7 +64,7 @@ public class CustomApplicationRunner implements ApplicationRunner {
         log.info("-----------4.设置核心和非常规功能及警员操作---------");
         menuService.initMenuOperator();
 
-        log.info("-----------3.同步监管时间-------------------");
+        log.info("-----------5.同步监管时间-------------------");
         try{
             A0221000006Bo a0221000006Bo = new A0221000006Bo();
             a0221000006Bo.setKsxtxh(configService.selectConfigByKey(CacheNames.SYSTEM_KEY));

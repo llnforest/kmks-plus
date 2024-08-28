@@ -63,11 +63,16 @@ public class W2FieldmapBo implements Serializable {
     private String pointcount;
 
     /**
+     * 语音备注
+     */
+    private String state;
+
+    /**
      * 状态
      */
     @NotBlank(message = "状态不能为空", groups = { AddGroup.class, EditGroup.class })
     @Column(value = "状态")
-    private String state;
+    private String state1;
 
     /**
      * 线路

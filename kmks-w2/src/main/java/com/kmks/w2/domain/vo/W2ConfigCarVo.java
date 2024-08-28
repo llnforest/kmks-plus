@@ -21,11 +21,6 @@ public class W2ConfigCarVo {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * ID
-     */
-    @ExcelProperty(value = "ID")
-    private Long id;
 
     /**
      * 车号

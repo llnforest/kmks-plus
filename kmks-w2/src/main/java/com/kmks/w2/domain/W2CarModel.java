@@ -44,6 +44,10 @@ public class W2CarModel{
      */
     private String state;
     /**
+     * 状态
+     */
+    private String state1;
+    /**
      * $column.columnComment
      */
     private String scode;

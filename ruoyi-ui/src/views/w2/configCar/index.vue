@@ -69,7 +69,7 @@
       <el-table-column label="车号" align="center" prop="carno" />
       <el-table-column label="合码器设备号" align="center" prop="deviceno" />
       <el-table-column label="合码器输出口" align="center" prop="deviceoutputno" />
-      <el-table-column label="解码通道" align="center" prop="videochannel" />
+      <el-table-column label="动态解码通道" align="center" prop="videochannel" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width" v-if="false">
         <template slot-scope="scope">
           <el-button
@@ -126,8 +126,8 @@
         <el-form-item label="合码器输出口" prop="deviceoutputno">
           <el-input v-model="form.deviceoutputno" placeholder="请输入合码器输出口" />
         </el-form-item>
-        <el-form-item label="解码通道" prop="videochannel">
-          <el-input v-model="form.videochannel" placeholder="请输入解码通道" />
+        <el-form-item label="动态解码通道" prop="videochannel">
+          <el-input v-model="form.videochannel" placeholder="请输入动态解码通道" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -227,7 +227,7 @@ export default {
           { required: true, message: "合码器输出口不能为空", trigger: "blur" }
         ],
         videochannel: [
-          { required: true, message: "解码通道不能为空", trigger: "blur" }
+          { required: true, message: "动态解码通道不能为空", trigger: "blur" }
         ]
       }
     };
@@ -278,7 +278,6 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        id: undefined,
         carno: undefined,
         deviceno: undefined,
         deviceoutputno: undefined,
@@ -298,7 +297,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
+      this.ids = selection.map(item => item.carno)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -312,7 +311,7 @@ export default {
     handleUpdate(row) {
       this.loading = true;
       this.reset();
-      const id = row.id || this.ids
+      const id = row.carno || this.ids
       getConfigCar(id).then(response => {
         this.loading = false;
         this.form = response.data;
@@ -325,17 +324,9 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
-          if (this.form.id != null) {
-            updateConfigCar(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            }).finally(() => {
-              this.buttonLoading = false;
-            });
-          } else {
+          if (this.form.carno != null) {
             addConfigCar(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
+              this.$modal.msgSuccess("操作成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -347,7 +338,7 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
+      const ids = row.carno || this.ids;
       this.$modal.confirm('是否确认删除车辆合码器编号为"' + ids + '"的数据项？').then(() => {
         this.loading = true;
         return delConfigCar(ids);

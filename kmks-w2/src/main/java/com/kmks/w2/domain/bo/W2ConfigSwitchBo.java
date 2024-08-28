@@ -21,11 +21,6 @@ import com.ruoyi.common.core.domain.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 public class W2ConfigSwitchBo extends BaseEntity {
 
-    /**
-     * ID
-     */
-    @NotNull(message = "ID不能为空", groups = { EditGroup.class })
-    private Long id;
 
     /**
      * 项目代码

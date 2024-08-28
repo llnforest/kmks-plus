@@ -26,13 +26,9 @@ public class W2ConfigDevice {
     private static final long serialVersionUID=1L;
 
     /**
-     * ID
-     */
-    @TableId
-    private Long id;
-    /**
      * 设备号
      */
+    @TableId("deviceno")
     private Long deviceno;
     /**
      * 设备IP地址

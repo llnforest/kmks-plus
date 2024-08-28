@@ -29,7 +29,6 @@ import java.util.Collection;
  * @author lynn
  * @date 2024-04-23
  */
-@DS("param")
 @RequiredArgsConstructor
 @Service
 public class W2KsxmkfdmJgServiceImpl implements IW2KsxmkfdmJgService {

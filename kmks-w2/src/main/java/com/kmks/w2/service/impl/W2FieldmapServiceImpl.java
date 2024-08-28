@@ -73,6 +73,7 @@ public class W2FieldmapServiceImpl implements IW2FieldmapService {
         lqw.eq(StringUtils.isNotBlank(bo.getFieldtype()), W2Fieldmap::getFieldtype, bo.getFieldtype());
         lqw.eq(StringUtils.isNotBlank(bo.getPointcount()), W2Fieldmap::getPointcount, bo.getPointcount());
         lqw.eq(StringUtils.isNotBlank(bo.getState()), W2Fieldmap::getState, bo.getState());
+        lqw.eq(StringUtils.isNotBlank(bo.getState1()), W2Fieldmap::getState1, bo.getState1());
         lqw.eq(StringUtils.isNotBlank(bo.getLineno()), W2Fieldmap::getLineno, bo.getLineno());
         lqw.eq(StringUtils.isNotBlank(bo.getScode()), W2Fieldmap::getScode, bo.getScode());
 

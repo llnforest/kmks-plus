@@ -16,13 +16,21 @@ public class LogUtils {
     public static final Marker tcp = MarkerFactory.getMarker("TCP");
 
     public static final Marker server = MarkerFactory.getMarker("SERVER");
+    public static final Marker hc = MarkerFactory.getMarker("HC");
 
+    // 车载TCP
     public static void tcp(String s, Object... arguments) {
         log.info(tcp, s, arguments);
     }
 
+    // 监管服务
     public static void server(String s, Object... arguments) {
         log.info(server, s, arguments);
+    }
+
+    // 海康服务
+    public static void hc(String s, Object... arguments) {
+        log.info(hc, s, arguments);
     }
 
     /**

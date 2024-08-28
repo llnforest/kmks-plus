@@ -25,15 +25,11 @@ public class W2ConfigCar {
 
     private static final long serialVersionUID=1L;
 
-    /**
-     * ID
-     */
-    @TableId
-    private Long id;
 
     /**
      * 车号
      */
+    @TableId("carno")
     private String carno;
     /**
      * 合码器设备号

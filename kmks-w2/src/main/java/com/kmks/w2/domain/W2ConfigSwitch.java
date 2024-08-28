@@ -27,13 +27,9 @@ public class W2ConfigSwitch {
     private static final long serialVersionUID=1L;
 
     /**
-     * ID
-     */
-    @TableId
-    private Long id;
-    /**
      * 项目代码
      */
+    @TableId("projectcode")
     private String projectcode;
     /**
      * 设备IP

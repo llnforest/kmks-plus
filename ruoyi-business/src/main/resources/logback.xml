@@ -65,7 +65,7 @@
             <!-- 日志文件名格式 -->
             <fileNamePattern>${log.path}/error/sys-error.%d{yyyy-MM-dd}.log</fileNamePattern>
             <!-- 日志最大的历史 60天 -->
-            <maxHistory>3</maxHistory>
+            <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
@@ -105,7 +105,7 @@
         <file>${log.path}/tcp/tcp.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/tcp/tcp-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>360</maxHistory>
+            <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
@@ -115,7 +115,7 @@
             <Marker>TCP</Marker>
         </filter>
     </appender>
-    <!-- finance异步输出 -->
+    <!-- 车载tcp异步输出 -->
     <appender name="async_tcp" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
@@ -125,12 +125,12 @@
         <appender-ref ref="file_tcp"/>
     </appender>
 
-    <!-- 针对车载TCP日志的文件输出 -->
+    <!-- 针对监管服务日志的文件输出 -->
     <appender name="file_server" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.path}/server/server.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log.path}/server/server-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>360</maxHistory>
+            <maxHistory>7</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>${log.pattern}</pattern>
@@ -140,7 +140,7 @@
             <Marker>SERVER</Marker>
         </filter>
     </appender>
-    <!-- finance异步输出 -->
+    <!-- 监管服务异步输出 -->
     <appender name="async_server" class="ch.qos.logback.classic.AsyncAppender">
         <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
         <discardingThreshold>0</discardingThreshold>
@@ -148,6 +148,31 @@
         <queueSize>512</queueSize>
         <!-- 添加附加的appender,最多只能添加一个 -->
         <appender-ref ref="file_server"/>
+    </appender>
+
+    <!-- 针对海康合码器日志的文件输出 -->
+    <appender name="file_hc" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/hc/hc.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/hc/hc-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="com.ruoyi.common.filter.LogMarkerFilter">
+            <!-- 过滤的Marker -->
+            <Marker>HC</Marker>
+        </filter>
+    </appender>
+    <!-- 海康服务异步输出 -->
+    <appender name="async_hc" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 不丢失日志.默认的,如果队列的80%已满,则会丢弃TRACT、DEBUG、INFO级别的日志 -->
+        <discardingThreshold>0</discardingThreshold>
+        <!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+        <queueSize>512</queueSize>
+        <!-- 添加附加的appender,最多只能添加一个 -->
+        <appender-ref ref="file_hc"/>
     </appender>
 
     <!--系统操作日志-->
@@ -158,6 +183,7 @@
         <appender-ref ref="file_console" />
         <appender-ref ref="async_tcp"/>
         <appender-ref ref="async_server"/>
+        <appender-ref ref="async_hc"/>
     </root>
 
 </configuration>

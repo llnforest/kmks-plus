@@ -2,14 +2,17 @@ package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.kmks.w2.domain.W2ConfigCar;
+import com.kmks.w2.domain.W2ConfigDevice;
 import com.kmks.w2.domain.bo.W2ConfigCarBo;
 import com.kmks.w2.domain.vo.W2ConfigCarVo;
+import com.kmks.w2.hcnet.service.HCNetService;
 import com.kmks.w2.mapper.W2ConfigCarMapper;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.domain.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.utils.bean.BeanHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.kmks.w2.service.IW2ConfigCarService;
@@ -71,10 +74,15 @@ public class W2ConfigCarServiceImpl implements IW2ConfigCarService {
     public Boolean insertByBo(W2ConfigCarBo bo) {
         W2ConfigCar add = BeanUtil.toBean(bo, W2ConfigCar.class);
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setCarno(add.getCarno());
+        LambdaQueryWrapper<W2ConfigCar> eq = Wrappers.lambdaQuery(W2ConfigCar.class).eq(W2ConfigCar::getCarno, add.getCarno());
+        boolean flag;
+        if(baseMapper.exists(eq)){
+            flag = baseMapper.updateById(add) > 0;
+        }else{
+            flag = baseMapper.insert(add) > 0;
         }
+        HCNetService hcNetService = BeanHelper.getBean(HCNetService.class);
+        hcNetService.resetData();
         return flag;
     }
 
@@ -112,6 +120,8 @@ public class W2ConfigCarServiceImpl implements IW2ConfigCarService {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
+        HCNetService hcNetService = BeanHelper.getBean(HCNetService.class);
+        hcNetService.resetData();
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 }

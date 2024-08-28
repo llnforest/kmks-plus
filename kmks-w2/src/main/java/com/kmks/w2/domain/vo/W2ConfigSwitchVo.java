@@ -21,11 +21,6 @@ public class W2ConfigSwitchVo {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * ID
-     */
-    @ExcelProperty(value = "ID")
-    private Long id;
 
     /**
      * 项目代码

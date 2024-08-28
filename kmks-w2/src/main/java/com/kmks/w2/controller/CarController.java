@@ -203,6 +203,7 @@ public class CarController extends BaseController {
         // 获取车模数据并转数据结构
         W2CarModelBo w2CarModelBo = new W2CarModelBo();
         w2CarModelBo.setRelationId(w2KcxxVo.getCarModelRelation());
+        w2CarModelBo.setState1("1");
         List<W2CarModelVo> vos = carModelService.queryList(w2CarModelBo);
 
         List<CarModelDto> collect = vos.stream().map(vo -> new CarModelDto(vo.getModelname(), vo.getModeltype(), vo.getPointdata(), vo.getState(), vo.getScode())).collect(Collectors.toList());
@@ -226,6 +227,7 @@ public class CarController extends BaseController {
         // 获取场地地图数据并转数据结构
         W2FieldmapBo w2FieldmapBo = new W2FieldmapBo();
         w2FieldmapBo.setRelationId(w2KcxxVo.getCarFieldRelation());
+        w2FieldmapBo.setState1("1");
         List<W2FieldmapVo> vos = fieldmapService.queryList(w2FieldmapBo);
         List<FieldMapDto> fieldMapDtos = vos.stream().map(vo->new FieldMapDto(vo.getFieldname(), vo.getFieldid(),vo.getFieldtype(),vo.getPointcount(),vo.getPointdata(),vo.getPointposition(),vo.getLineno(),vo.getState(),vo.getScode())).collect(Collectors.toList());
         return R.ok(fieldMapDtos);

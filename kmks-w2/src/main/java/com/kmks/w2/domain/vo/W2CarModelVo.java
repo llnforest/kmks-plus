@@ -43,8 +43,13 @@ public class W2CarModelVo {
     /**
      * 状态
      */
-    @ExcelProperty(value = "状态")
     private String state;
+
+    /**
+     * 状态
+     */
+    @ExcelProperty(value = "状态")
+    private String state1;
 
     /**
      * $column.columnComment

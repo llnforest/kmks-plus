@@ -49,6 +49,21 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/lib/arcsoft-sdk-face-3.0.0.0.jar</systemPath>
         </dependency>
+        <!--海康sdk-->
+        <dependency>
+            <groupId>com.sum.jar</groupId>
+            <artifactId>jna</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/jna.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sum.jar.examples</groupId>
+            <artifactId>exmaples</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/examples.jar</systemPath>
+        </dependency>
 
     </dependencies>
 

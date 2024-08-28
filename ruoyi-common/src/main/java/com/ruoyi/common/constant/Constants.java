@@ -88,6 +88,10 @@ public interface Constants {
     String REGISTER_TYPE = "2";
 
     String AES_KEY = "ghgd___12345ghgd";
+    /**
+     * 数据库密码加密
+     */
+    String DB_AES_KEY = "Ghgd.123456789##";
 
 }
 

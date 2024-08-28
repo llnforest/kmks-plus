@@ -25,6 +25,8 @@ public interface CacheNames {
      */
     String SYS_CONFIG = "sys_config";
 
+    String SYS_JK_JG_API = "sys.jk.jg.api";
+
     /**
      * 路线配置
      */
@@ -65,18 +67,65 @@ public interface CacheNames {
     String SCHOOL_NAME = "sys.config.school.name";
 
     /**
-     * 人脸识别方式键名
+     * 人脸识别方式
      **/
-    String FACE_KEY = "sys.config.face.recognize";
+    String FACE_KEY = "sys.face.recognize.type";
 
-    String PROJECT_IDS_KEY = "sys.config.projects.ids";
+    /**
+     * 人脸识别相似度
+     **/
+    String FACE_SCORE = "sys.face.score";
+
+    /**
+     * 人脸识别图片存储地址
+     **/
+    String FACE_STORAGE_PATH = "sys.face.storagePath";
+
+    /**
+     * 人脸识别后是否保留图片
+     **/
+    String FACE_SAVE_IMG = "sys.face.img.save";
+
+    /**
+     * 【虹软】人脸识别引擎地址
+     **/
+    String FACE_ARCFACE_ENGINE_PATH = "sys.arcFace.enginePath";
+
+    /**
+     * 【虹软】人脸识别appId
+     **/
+    String FACE_ARCFACE_APPID = "sys.arcFace.appId";
+
+    /**
+     * 【虹软】人脸识别sdkKey
+     **/
+    String FACE_ARCFACE_SDK_KEY = "sys.arcFace.sdkKey";
+
+    /**
+     * 【虹软】人脸识别sdkKey
+     **/
+    String FILE_UPLOAD_PATH = "sys.file.upload.path";
+
     String PROJECT_IDS_EXPECT_KEY = "sys.config.projects.expect";
 
-    String SYSTEM_KEY = "sys.config.ksxtxh";
+    String SYSTEM_KEY = "jg.ksxtxh";
 
     String MAX_BDXH_KEY = "max_bdxh";
 
-    String QUALIFIED_SCORE_KEY = "sys.config.qualified.score";
+    /**
+     * 及格分数
+    **/
+    String QUALIFIED_K2_SCORE_KEY = "sys.k2.qualified.score";
+    String QUALIFIED_K3_SCORE_KEY = "sys.k3.qualified.score";
+
+    /**
+     * 成绩单打印模板
+     **/
+    String PRINT_SCORE_TEMPLATE = "sys.jk.template.print.name";
+    /**
+     * 成绩单抬头
+     **/
+    String PRINT_SCORE_TITLE = "sys.jk.template.print.title";
 
     /**
      * 科目键名
@@ -90,6 +139,55 @@ public interface CacheNames {
      * 分车状态
      **/
     String SPLIT_STATUS = "sys.auto.split.car";
+
+    /**
+     * 合码器SDK位置
+     **/
+    String HC_OPEN = "sys.hc.open";
+
+    /**
+     * 合码器SDK位置
+    **/
+    String HC_SDK_PATH = "sys.hc.sdk.path";
+    /**
+     * 合码器轨迹照片存储位置
+    **/
+    String HC_trajectory_path = "hc.trajectory.path";
+//---------------------安全参数------------------------
+    /**
+     * 系统最大会话并发数
+    **/
+    String SAFE_VISITED_MAX = "safe.visited.max";
+    /**
+     * 系统最大会话并发数
+    **/
+    String SAFE_VISITED_USER_HIGH = "safe.visited.user.high";
+    /**
+     * 系统最大会话并发数
+    **/
+    String SAFE_VISITED_CLIENT_STARTTIME = "safe.visited.client.starttime";
+    /**
+     * 系统最大会话并发数
+    **/
+    String SAFE_VISITED_CLIENT_ENDTIME = "safe.visited.client.endtime";
+    /**
+     * 账户长期未使用
+     **/
+    String SAFE_DAY_NO_LOGIN = "safe.day.no.login";
+    /**
+     * 用户访问失败阀值
+     **/
+    String SAFE_VISITED_USER_NUMBER = "safe.visited.user.number";
+    /**
+     * 终端访问失败阀值
+     **/
+    String SAFE_VISITED_CLIENT_NUMBER = "safe.visited.client.number";
+    /**
+     * 终端访问失败阀值
+     **/
+    String SAFE_FINISH_NO_OPERATE = "safe.finish.no.operate";
+
+
 
 
 

@@ -284,7 +284,6 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        id: undefined,
         deviceno: undefined,
         deviceip: undefined,
         deviceport: undefined,
@@ -305,7 +304,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.id)
+      this.ids = selection.map(item => item.deviceno)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -319,7 +318,7 @@ export default {
     handleUpdate(row) {
       this.loading = true;
       this.reset();
-      const id = row.id || this.ids
+      const id = row.deviceno || this.ids
       getConfigDevice(id).then(response => {
         this.loading = false;
         this.form = response.data;
@@ -332,17 +331,9 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.buttonLoading = true;
-          if (this.form.id != null) {
-            updateConfigDevice(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            }).finally(() => {
-              this.buttonLoading = false;
-            });
-          } else {
+          if (this.form.deviceno != null) {
             addConfigDevice(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
+              this.$modal.msgSuccess("操作成功");
               this.open = false;
               this.getList();
             }).finally(() => {
@@ -354,7 +345,7 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const ids = row.id || this.ids;
+      const ids = row.deviceno || this.ids;
       this.$modal.confirm('是否确认删除设备合码器编号为"' + ids + '"的数据项？').then(() => {
         this.loading = true;
         return delConfigDevice(ids);

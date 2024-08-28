@@ -2,8 +2,10 @@ package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.kmks.w2.domain.W2ConfigDevice;
+import com.kmks.w2.domain.W2ConfigSwitch;
 import com.kmks.w2.domain.bo.W2ConfigDeviceBo;
 import com.kmks.w2.domain.vo.W2ConfigDeviceVo;
+import com.kmks.w2.hcnet.service.HCNetService;
 import com.kmks.w2.mapper.W2ConfigDeviceMapper;
 import com.kmks.w2.service.IW2ConfigDeviceService;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -11,6 +13,7 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.utils.bean.BeanHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -71,10 +74,15 @@ public class W2ConfigDeviceServiceImpl implements IW2ConfigDeviceService {
     public Boolean insertByBo(W2ConfigDeviceBo bo) {
         W2ConfigDevice add = BeanUtil.toBean(bo, W2ConfigDevice.class);
         validEntityBeforeSave(add);
-        boolean flag = baseMapper.insert(add) > 0;
-        if (flag) {
-            bo.setDeviceno(add.getDeviceno());
+        LambdaQueryWrapper<W2ConfigDevice> eq = Wrappers.lambdaQuery(W2ConfigDevice.class).eq(W2ConfigDevice::getDeviceno, add.getDeviceno());
+        boolean flag;
+        if(baseMapper.exists(eq)){
+            flag = baseMapper.updateById(add) > 0;
+        }else{
+            flag = baseMapper.insert(add) > 0;
         }
+        HCNetService hcNetService = BeanHelper.getBean(HCNetService.class);
+        hcNetService.resetData();
         return flag;
     }
 
@@ -103,6 +111,8 @@ public class W2ConfigDeviceServiceImpl implements IW2ConfigDeviceService {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
+        HCNetService hcNetService = BeanHelper.getBean(HCNetService.class);
+        hcNetService.resetData();
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 

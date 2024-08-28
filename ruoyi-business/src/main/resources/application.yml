@@ -12,9 +12,6 @@ ruoyi:
   addressEnabled: true
   # 缓存懒加载
   cacheLazy: false
-jg:
-  # 监管接口地址
-  url: http://127.0.0.1:8008/common/api
 captcha:
   # 页面 <参数设置> 可开启关闭 验证码校验
   # 验证码类型 math 数组计算 char 字符验证
@@ -235,7 +232,7 @@ xss:
 # 全局线程池相关配置
 thread-pool:
   # 是否开启线程池
-  enabled: false
+  enabled: true
   # 队列最大长度
   queueCapacity: 128
   # 线程池维护线程所允许的空闲时间
@@ -264,15 +261,3 @@ netty:
   tcp:
     enabled: true
     port: 64401
---- # 虹软人脸识别
-arcFace:
-  # 人脸识别引擎地址
-  enginePath: D:\kmksService\commonEnv\arcFace\WIN64
-  # 人脸识别appId
-  appId: 6AQm9T34mbT7cZLZX9J7eVXUBo2djCKD4iGPsLwLX6Xc
-  # 人脸识别sdkKey
-  sdkKey: FVdQaWJG63LexNiqLAdBvBo3eyQzpUzaAabK43NrNYUL
-  # 相似度
-  score: 0.6
-  # 图片存储地址
-  storagePath: D:\kmksService\file\arcFace\img\

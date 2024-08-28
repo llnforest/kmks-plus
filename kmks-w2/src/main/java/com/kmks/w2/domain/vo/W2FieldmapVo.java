@@ -55,8 +55,13 @@ public class W2FieldmapVo {
     /**
      * 状态
      */
-    @ExcelProperty(value = "状态")
     private String state;
+
+    /**
+     * 状态
+     */
+    @ExcelProperty(value = "状态")
+    private String state1;
 
     /**
      * 线路

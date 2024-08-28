@@ -89,8 +89,8 @@ public class FaceServiceImpl implements IFaceService {
      * @return {@link Boolean}
      */
     private Boolean hrFaceRecognize(MultipartFile zjzp, MultipartFile jbzp){
-        String zjzpPath = FaceConfig.storagePath+ RandomUtil.randomString(12)+".jpg";
-        String jbzpPath = FaceConfig.storagePath+RandomUtil.randomString(12)+".jpg";
+        String zjzpPath = configService.selectConfigByKey(CacheNames.FACE_STORAGE_PATH) + RandomUtil.randomString(12)+".jpg";
+        String jbzpPath = configService.selectConfigByKey(CacheNames.FACE_STORAGE_PATH) +RandomUtil.randomString(12)+".jpg";
         File zjzpSource1 = FileUtil.MultipartFileConvertToFile(zjzpPath, zjzp);
         File jbzpSource2 = FileUtil.MultipartFileConvertToFile(jbzpPath, jbzp);
         Boolean similar = similar(zjzpSource1, jbzpSource2);
@@ -106,12 +106,12 @@ public class FaceServiceImpl implements IFaceService {
      * @return {@link Boolean}
      */
     private Boolean hrFaceRecognize(String zjzp, String jbzp){
-        String zjzpPath = FaceConfig.storagePath+ RandomUtil.randomString(12)+".jpg";
-        String jbzpPath = FaceConfig.storagePath+RandomUtil.randomString(12)+".jpg";
+        String zjzpPath = configService.selectConfigByKey(CacheNames.FACE_STORAGE_PATH) + RandomUtil.randomString(12)+".jpg";
+        String jbzpPath = configService.selectConfigByKey(CacheNames.FACE_STORAGE_PATH) + RandomUtil.randomString(12)+".jpg";
         File zjzpSource1 = FileUtil.base64ConvertToFile(zjzp, zjzpPath);
         File jbzpSource2 = FileUtil.base64ConvertToFile(jbzp, jbzpPath);
         Boolean similar = similar(zjzpSource1, jbzpSource2);
-        FileUtil.deleteImage(zjzpPath,jbzpPath);
+        if(configService.selectConfigByKey(CacheNames.FACE_SAVE_IMG).equals("1")) FileUtil.deleteImage(zjzpPath,jbzpPath);
         return similar;
     }
 
@@ -123,10 +123,10 @@ public class FaceServiceImpl implements IFaceService {
      * @return {@link Boolean}
      */
     private Boolean similar(File file1, File file2) {
-        FaceEngine faceEngine = new FaceEngine(FaceConfig.enginePath);
+        FaceEngine faceEngine = new FaceEngine(configService.selectConfigByKey(CacheNames.FACE_ARCFACE_ENGINE_PATH));
         try {
             //激活引擎
-            int errorCode = faceEngine.activeOnline(FaceConfig.appId, FaceConfig.sdkKey);
+            int errorCode = faceEngine.activeOnline(configService.selectConfigByKey(CacheNames.FACE_ARCFACE_APPID), configService.selectConfigByKey(CacheNames.FACE_ARCFACE_SDK_KEY));
 
             if (errorCode != ErrorInfo.MOK.getValue() && errorCode != ErrorInfo.MERR_ASF_ALREADY_ACTIVATED.getValue()) {
                 return closeEngineFailure(faceEngine, "引擎激活失败:" + errorCode);
@@ -200,7 +200,7 @@ public class FaceServiceImpl implements IFaceService {
             //引擎卸载
             closeEngine(faceEngine);
 
-            return similarScore >= FaceConfig.score;
+            return similarScore >= Float.parseFloat(configService.selectConfigByKey(CacheNames.FACE_SCORE));
         } catch (Exception e) {
             return closeEngineFailure(faceEngine, e.getMessage());
         }

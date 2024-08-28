@@ -46,7 +46,8 @@ public class SysConfigServiceImpl implements ISysConfigService, ConfigService {
             .like(StringUtils.isNotBlank(config.getConfigKey()), SysConfig::getConfigKey, config.getConfigKey())
             .between(params.get("beginTime") != null && params.get("endTime") != null,
                 SysConfig::getCreateTime, params.get("beginTime"), params.get("endTime"))
-            .orderByDesc(SysConfig::getCreateTime);
+            .orderByAsc(SysConfig::getSort)
+            .orderByAsc(SysConfig::getCreateTime);
         Page<SysConfig> page = baseMapper.selectPage(pageQuery.build(), lqw);
         return TableDataInfo.build(page);
     }

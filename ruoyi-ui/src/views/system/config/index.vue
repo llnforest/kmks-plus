@@ -1,6 +1,16 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
+      <el-form-item label="参数类别" prop="configType">
+        <el-select v-model="queryParams.configType" placeholder="参数类别" clearable>
+          <el-option
+            v-for="dict in dict.type.system_config_type"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="参数名称" prop="configName">
         <el-input
           v-model="queryParams.configName"
@@ -18,16 +28,6 @@
           style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="系统内置" prop="configType">
-        <el-select v-model="queryParams.configType" placeholder="系统内置" clearable>
-          <el-option
-            v-for="dict in dict.type.sys_yes_no"
-            :key="dict.value"
-            :label="dict.label"
-            :value="dict.value"
-          />
-        </el-select>
       </el-form-item>
       <el-form-item label="创建时间">
         <el-date-picker
@@ -104,17 +104,19 @@
 
     <el-table v-loading="loading" :data="configList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="参数主键" align="center" prop="configId" />
-      <el-table-column label="参数名称" align="center" prop="configName" :show-overflow-tooltip="true" />
-      <el-table-column label="参数键名" align="center" prop="configKey" :show-overflow-tooltip="true" />
-      <el-table-column label="参数键值" align="center" prop="configValue" />
-      <el-table-column label="系统内置" align="center" prop="configType">
+      <el-table-column label="参数主键" align="center" prop="configId" min-width="70"/>
+      <el-table-column label="参数类别" align="center" prop="configType" min-width="120">
         <template slot-scope="scope">
-          <dict-tag :options="dict.type.sys_yes_no" :value="scope.row.configType"/>
+          <dict-tag :options="dict.type.system_config_type" :value="scope.row.configType"/>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="参数名称" align="left" prop="configName" :show-overflow-tooltip="true"  min-width="200"/>
+      <el-table-column label="参数键名" align="left" prop="configKey" :show-overflow-tooltip="true"  min-width="150"/>
+      <el-table-column label="参数键值" align="left" prop="configValue" :show-overflow-tooltip="true"  min-width="200"/>
+
+      <el-table-column label="备注" align="left" prop="remark" :show-overflow-tooltip="true"  min-width="200"/>
+      <el-table-column label="排序" align="center" prop="sort" min-width="50"/>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="170">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
@@ -145,6 +147,16 @@
     <!-- 添加或修改参数配置对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="参数类别" prop="configType">
+          <el-select v-model="form.configType" placeholder="请选择参数类别">
+            <el-option
+              v-for="dict in dict.type.system_config_type"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="参数名称" prop="configName">
           <el-input v-model="form.configName" placeholder="请输入参数名称" />
         </el-form-item>
@@ -154,14 +166,8 @@
         <el-form-item label="参数键值" prop="configValue">
           <el-input v-model="form.configValue" placeholder="请输入参数键值" />
         </el-form-item>
-        <el-form-item label="系统内置" prop="configType">
-          <el-radio-group v-model="form.configType">
-            <el-radio
-              v-for="dict in dict.type.sys_yes_no"
-              :key="dict.value"
-              :label="dict.value"
-            >{{dict.label}}</el-radio>
-          </el-radio-group>
+        <el-form-item label="显示排序" prop="orderNum">
+          <el-input-number v-model="form.sort" controls-position="right" :min="0" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -180,7 +186,7 @@ import { listConfig, getConfig, delConfig, addConfig, updateConfig, refreshCache
 
 export default {
   name: "Config",
-  dicts: ['sys_yes_no'],
+  dicts: ['system_config_type'],
   data() {
     return {
       // 遮罩层
@@ -253,8 +259,9 @@ export default {
         configName: undefined,
         configKey: undefined,
         configValue: undefined,
-        configType: "Y",
-        remark: undefined
+        configType: "2",
+        remark: undefined,
+        sort:1
       };
       this.resetForm("form");
     },

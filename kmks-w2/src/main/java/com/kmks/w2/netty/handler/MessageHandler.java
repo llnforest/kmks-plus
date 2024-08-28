@@ -7,6 +7,7 @@ import com.kmks.w2.domain.gateDto.FaceRecognizeBo;
 import com.kmks.w2.domain.vo.W2KcxxVo;
 import com.kmks.w2.domain.vo.W2QueuingVo;
 import com.kmks.w2.domain.vo.W2RecordsVo;
+import com.kmks.w2.hcnet.service.HCNetService;
 import com.kmks.w2.service.ICarService;
 import com.kmks.w2.service.IFaceService;
 import com.kmks.w2.service.IW2KcxxService;
@@ -14,6 +15,7 @@ import com.kmks.w2.utils.TcpUtils;
 import com.kmks.w2.websocket.map.DispatchDataMap;
 import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.enums.OsdNumberEnum;
 import com.ruoyi.common.exception.api.FailException;
 import com.ruoyi.common.utils.JsonUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -43,6 +45,8 @@ public class MessageHandler {
     private final ICarService carService;
     private final IFaceService faceService;
 
+    private final HCNetService hcNetService;
+
 
     private String delimiter = "\\|";
 
@@ -65,6 +69,14 @@ public class MessageHandler {
         try {
             W2KcxxVo w2KcxxVo = carService.carOnLine(message[1]);
             TcpUtils.response(channel,message[0],true,new ArrayList<>());
+
+            //发送至合码器
+            //考车信息
+            hcNetService.refreshOSD(w2KcxxVo.getKch(),"考车信息："+w2KcxxVo.getKch()+"号车 "+w2KcxxVo.getCph(), OsdNumberEnum.CARINFO);
+            //考试证型
+            hcNetService.refreshOSD(w2KcxxVo.getKch(),"考试证型："+w2KcxxVo.getKscx(), OsdNumberEnum.CERT);
+            //考试状态
+            hcNetService.refreshOSD(w2KcxxVo.getKch(),"考试状态：考车上线", OsdNumberEnum.STATUS);
 
             Map<String, DispatchCenterDto> dispatchCenterMap = TcpUtils.getDispatchCenterMap();
             //已存在上线车辆
@@ -158,6 +170,21 @@ public class MessageHandler {
             dispatchCenterDto.setKscs(queuingVo.getDjc());
             dispatchCenterDto.setKsxm(queuingVo.getXm());
             dispatchCenterDto.setZjhm(queuingVo.getZjhm());
+            //发送至合码器
+            //考生姓名
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考生姓名："+queuingVo.getXm(), OsdNumberEnum.NAME);
+            //证件号码
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"证件号码："+queuingVo.getZjhm(), OsdNumberEnum.IDCARD);
+            //考试状态
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试状态：申请考试", OsdNumberEnum.STATUS);
+            //考试项目
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试项目：-", OsdNumberEnum.PROJECT);
+            //考试成绩
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试成绩：-", OsdNumberEnum.SCORE);
+            //考试扣分
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试扣分：-", OsdNumberEnum.DISCOUNT);
+            //速度里程
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"速度里程：-", OsdNumberEnum.DISCOUNT);
 
             TcpUtils.response(channel,message[0],true,new ArrayList<>(Arrays.asList(StringUtils.isBlank(queuingVo.getJxmc())?"":queuingVo.getJxmc(),queuingVo.getKscx(),String.valueOf(queuingVo.getDjc()),queuingVo.getKsxm(),queuingVo.getSfyk(),String.valueOf(queuingVo.getScore()),queuingVo.getRLine() == null?"":String.valueOf(queuingVo.getRLine()),"1",StringUtils.isBlank(queuingVo.getLsh())?"":queuingVo.getLsh(),"",StringUtils.isBlank(queuingVo.getKg())?"":queuingVo.getKg(),queuingVo.getKskm(),"0")));
         }catch (FailException e){
@@ -184,6 +211,13 @@ public class MessageHandler {
             // 同步调度中心数据
             DispatchCenterDto dispatchCenterDto = handleInitTcp(message[1],"考试开始");
             W2QueuingVo queuingVo = carService.startExam(message[1],message[2],message[3],message[4],message[5]);
+            //发送至合码器
+            //考试状态
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试状态：考试开始", OsdNumberEnum.STATUS);
+            //成绩次数
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试成绩："+queuingVo.getScore()+" 第"+queuingVo.getDjc()+"次", OsdNumberEnum.SCORE);
+            //考试扣分
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试扣分："+(100l-queuingVo.getScore()), OsdNumberEnum.DISCOUNT);
 
             TcpUtils.response(channel,message[0],true,new ArrayList<>(Arrays.asList(checkBit)));
         }catch (FailException e){
@@ -211,6 +245,10 @@ public class MessageHandler {
             DispatchCenterDto dispatchCenterDto = handleInitTcp(message[1],"考试结束");
             W2QueuingVo queuingVo = carService.finishExam(message[1],message[2],message[3],message[4],message[5],message[6]);
 
+            //发送至合码器
+            //考试状态
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试状态：考试结束", OsdNumberEnum.STATUS);
+
             dispatchCenterDto.setKsfs(queuingVo.getScore());
             dispatchCenterDto.setKscj(String.valueOf(queuingVo.getKscj()));
 
@@ -225,8 +263,8 @@ public class MessageHandler {
      * 项目开始
      *
      * 格式 指令标志;车辆编号;时间;身份证;项目名称;项目ID;照片;速度;校验
-     * 格式 2004;02;2024-04-25 10:11:11;220681199211100013;倒车入库;21;zp;18;checkBit
-     * 指令 $CZ;2004;02;2024-04-25 10:11:11;220681199211100013;倒车入库;21;zp;18;checkBit
+     * 格式 2004;02;2024-04-25 10:11:11;220681199211100013;倒车入库;2502;zp;18;checkBit
+     * 指令 $CZ;2004;02;2024-04-25 10:11:11;220681199211100013;倒车入库;2502;zp;18;checkBit
      *
      * 回复：$ZX;2004;结果标志;校验
      * 指令：$ZX;2004;1;checkBit
@@ -241,6 +279,15 @@ public class MessageHandler {
             DispatchCenterDto dispatchCenterDto = handleInitTcp(message[1],"项目开始");
             String dqxm = carService.startProgram(message[1],message[2],message[3],message[5],message[6],message[7]);
 
+
+            //发送至合码器
+            //考试状态
+            hcNetService.refreshOSD(message[1],"考试状态：项目开始", OsdNumberEnum.STATUS);
+            //考试项目
+            hcNetService.refreshOSD(message[1],"考试项目："+dqxm, OsdNumberEnum.PROJECT);
+
+            // 切换场地摄像头
+            hcNetService.dynamicDecode(message[1],message[5]);
 
             dispatchCenterDto.setDqxm(dqxm);
 
@@ -270,6 +317,10 @@ public class MessageHandler {
             DispatchCenterDto dispatchCenterDto = handleInitTcp(message[1],"项目结束");
             W2QueuingVo queuingVo = carService.finishProgram(message[1],message[2],message[3],message[5],message[6],message[7]);
 
+            //发送至合码器
+            //考试状态
+            hcNetService.refreshOSD(message[1],"考试状态：项目结束", OsdNumberEnum.STATUS);
+
             TcpUtils.response(channel,message[0],true,new ArrayList<>(Arrays.asList(checkBit)));
         }catch (FailException e){
             handleException(channel,message,e,checkBit);
@@ -297,6 +348,11 @@ public class MessageHandler {
 
             W2QueuingVo queuingVo = carService.deductPoint(message[1],message[2],message[3],message[5],message[6],message[9],message[10],message[11]);
 
+            //发送至合码器
+            //成绩次数
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试成绩："+queuingVo.getScore()+" 第"+queuingVo.getDjc()+"次", OsdNumberEnum.SCORE);
+            //考试扣分
+            hcNetService.refreshOSD(queuingVo.getKcbh(),"考试扣分："+(100l-queuingVo.getScore()), OsdNumberEnum.DISCOUNT);
 
             TcpUtils.response(channel,message[0],true,new ArrayList<>(Arrays.asList(checkBit)));
         }catch (FailException e){
@@ -455,6 +511,14 @@ public class MessageHandler {
     public void cz8888(Channel channel, String[] message) {
         // 同步调度中心数据
         try{
+            //发送至合码器
+            //速度里程
+            hcNetService.refreshOSD(message[1],"速度："+message[5]+"里程："+message[4], OsdNumberEnum.SPEED);
+            //考试时间
+            hcNetService.refreshOSD(message[1],"考试时间："+message[2], OsdNumberEnum.TIME);
+            //上传照片
+            hcNetService.setVideoPicture(message[1]);
+
             DispatchCenterDto dispatchCenterDto = TcpUtils.getDispatchCenterDto(message[1]);
             dispatchCenterDto.setLc(message[4]);
             dispatchCenterDto.setCs(message[5]);

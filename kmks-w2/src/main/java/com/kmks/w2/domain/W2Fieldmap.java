@@ -53,6 +53,10 @@ public class W2Fieldmap  implements Serializable {
      */
     private String state;
     /**
+     * 状态
+     */
+    private String state1;
+    /**
      * 线路
      */
     private String lineno;

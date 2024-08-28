@@ -4,13 +4,14 @@ import cn.dev33.satoken.SaManager;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.kmks.w2.domain.bo.W2ConfigBo;
 import com.ruoyi.common.constant.CacheConstants;
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.exception.user.UserException;
 import com.ruoyi.common.utils.*;
 import com.ruoyi.common.utils.redis.CacheUtils;
 import com.ruoyi.common.utils.redis.RedisUtils;
+import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysSafeLogService;
 import com.ruoyi.system.service.ISysUserBlackService;
 import com.ruoyi.system.service.SysLoginService;
@@ -31,10 +32,10 @@ import java.util.*;
 @Slf4j
 @Service
 public class SafeLoginService {
-    private final IW2ConfigService iw2ConfigService;
     private final ISysSafeLogService safeLogService;
     private final SysLoginService sysLoginService;
     private final ISysUserBlackService blackService;
+    private final ISysConfigService configService;
 
     /**
      * @return boolean
@@ -52,8 +53,8 @@ public class SafeLoginService {
         }
 
         //判断同时在线会话数
-        if(RedisUtils.keys(CacheConstants.ONLINE_SINGLE_KEY+"*").size() > Integer.valueOf(getSafeConfig("29"))){
-            throw new UserException("login.lock.max", getSafeConfig("29"));
+        if(RedisUtils.keys(CacheConstants.ONLINE_SINGLE_KEY+"*").size() > Integer.valueOf(configService.selectConfigByKey(CacheNames.SAFE_VISITED_MAX))){
+            throw new UserException("login.lock.max", configService.selectConfigByKey(CacheNames.SAFE_VISITED_MAX));
         }
 
         //1、判断是否在黑名单中
@@ -71,14 +72,14 @@ public class SafeLoginService {
             dayTimes = 0;
             RedisUtils.setAtomicValue(limitKey,dayTimes,Duration.ofDays(1));
         }
-        if(dayTimes >= Long.valueOf(getSafeConfig("26"))){
+        if(dayTimes >= Long.valueOf(configService.selectConfigByKey(CacheNames.SAFE_VISITED_USER_HIGH))){
             throw new UserException("login.lock.rate.username",parameterMap.get("username"));
         }
         RedisUtils.incrAtomicValue(limitKey);
 
         //3、验证用户登录时间段
         //登录时间段验证
-        String timeRange = getSafeConfig("12") + "-" + getSafeConfig("13");
+        String timeRange = configService.selectConfigByKey(CacheNames.SAFE_VISITED_CLIENT_STARTTIME) + "-" + configService.selectConfigByKey(CacheNames.SAFE_VISITED_CLIENT_ENDTIME);
         if(!CompareTimeUtils.timeIsInRound(DateUtils.dateTimeNow("HH:mm"),timeRange,"HH:mm")){
             throw new UserException("user.invalid.time.range");
         }
@@ -87,8 +88,8 @@ public class SafeLoginService {
         String lastLoginKey = CacheConstants.LAST_LOGIN_KEY + parameterMap.get("username");
         if(RedisUtils.isExistsObject(lastLoginKey)){
             long days = (long)(System.currentTimeMillis() - (long)RedisUtils.getCacheObject(lastLoginKey))/24/60/60/1000;
-            if(days > Integer.valueOf(getSafeConfig("27"))){
-                throw new UserException("login.lock.last.time",getSafeConfig("27"));
+            if(days > Integer.valueOf(configService.selectConfigByKey(CacheNames.SAFE_DAY_NO_LOGIN))){
+                throw new UserException("login.lock.last.time",configService.selectConfigByKey(CacheNames.SAFE_DAY_NO_LOGIN));
             }
         }
 
@@ -106,15 +107,11 @@ public class SafeLoginService {
         //加入登录日志
         sysLoginService.recordLogininfor(username, Constants.LOGIN_FAIL, ex.getMessage());
 
-        //获取驾考参数配置
-        W2ConfigBo w2ConfigBo = new W2ConfigBo();
-        w2ConfigBo.setIFlag(2L);
-
         //只增加ip 错误次数
-        checkErrorTimes(ServletUtils.getClientIP(),Integer.valueOf(getSafeConfig("10")),"2");
+        checkErrorTimes(ServletUtils.getClientIP(),Integer.valueOf(configService.selectConfigByKey(CacheNames.SAFE_VISITED_USER_NUMBER)),"2");
         if(ex instanceof UserException){
             //增加ip 错误次数  以及 账户次数
-            checkErrorTimes(username,Integer.valueOf(getSafeConfig("11")),"1");
+            checkErrorTimes(username,Integer.valueOf(configService.selectConfigByKey(CacheNames.SAFE_VISITED_CLIENT_NUMBER)),"1");
         }
     }
 
@@ -157,42 +154,10 @@ public class SafeLoginService {
         log.info("添加安全日志");
     }
 
-    /**
-     * @Description 获取安全配置
-     * @Param []
-     * @return java.util.Map<java.lang.Long,java.lang.String>
-     * @Author lynn 9:22 2023/3/6
-    **/
-    public Map<String,String> getSafeConfigMap(){
-        String key = CacheConstants.LOGIN_SAFE_CONFIG_KEY;
-        Map<String,String> map = new HashMap<>();
-        if(RedisUtils.isExistsObject(key)){
-            map = RedisUtils.getCacheMap(key);
-        }else{
-            //获取驾考参数配置
-            W2ConfigBo w2ConfigBo = new W2ConfigBo();
-            w2ConfigBo.setIFlag(2L);
-            map = iw2ConfigService.getCodeValueMap(w2ConfigBo);
-            RedisUtils.setCacheMap(key,map,Duration.ofMinutes(1));
-        }
-        return map;
-    }
-
-    /**
-     * @Description 获取对应的安全参数
-     * @Param [code]
-     * @return java.lang.String
-     * @Author lynn 9:25 2023/3/6
-    **/
-    public String getSafeConfig(String code){
-        Map<String,String> configMap = getSafeConfigMap();
-        return configMap.get(code);
-    }
-
     public Boolean checkLongTimeUnOperate(HttpServletRequest request){
         String auth = StringUtils.trimToEmpty(request.getHeader(SaManager.getConfig().getTokenName()));
         if(StringUtils.isNotBlank(auth)){
-            if(CacheUtils.get(CacheConstants.ACCOUNT_OPERATE_TIME,auth) != null && (long)CacheUtils.get(CacheConstants.ACCOUNT_OPERATE_TIME,auth) - DateUtil.current() < Long.valueOf(getSafeConfig("1"))*60*1000){
+            if(CacheUtils.get(CacheConstants.ACCOUNT_OPERATE_TIME,auth) != null && (long)CacheUtils.get(CacheConstants.ACCOUNT_OPERATE_TIME,auth) - DateUtil.current() < Long.valueOf(configService.selectConfigByKey(CacheNames.SAFE_FINISH_NO_OPERATE))*60*1000){
                 CacheUtils.put(CacheConstants.ACCOUNT_OPERATE_TIME,auth, DateUtil.current());
                 return true;
             }else{

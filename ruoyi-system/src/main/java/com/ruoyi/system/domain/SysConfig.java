@@ -64,11 +64,11 @@ public class SysConfig extends BaseEntity {
     private String configValue;
 
     /**
-     * 系统内置（Y是 N否）
+     * 参数类别
      */
-    @ExcelProperty(value = "系统内置", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(dictType = "sys_yes_no")
-    @Column(value = "系统内置")
+    @ExcelProperty(value = "参数类别", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "system_config_type")
+    @Column(value = "参数类别")
     private String configType;
 
     /**
@@ -76,5 +76,11 @@ public class SysConfig extends BaseEntity {
      */
     @Column(value = "备注")
     private String remark;
+
+    /**
+     * 排序
+     */
+    @Column(value = "排序")
+    private Long sort;
 
 }

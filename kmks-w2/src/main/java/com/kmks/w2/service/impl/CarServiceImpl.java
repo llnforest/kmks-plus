@@ -2,6 +2,7 @@ package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.kmks.jianguan.domain.bo.*;
 import com.kmks.jianguan.domain.vo.*;
@@ -26,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -148,7 +148,7 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2QueuingVo}
      */
     @Override
-//    @Transactional("masterTransactionManager")
+    @DSTransactional
     public W2QueuingVo applyExam(String kcbh, String kssj,String zjhm,String kskm,String zp){
         // 验证车辆排队等基础信息
         W2QueuingVo queuingVo = judgeCarAndQueuing(kcbh, zjhm);
@@ -228,7 +228,7 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2QueuingVo}
      */
     @Override
-//    @Transactional("masterTransactionManager")
+    @DSTransactional
     public W2QueuingVo startExam(String kcbh, String kssj, String zjhm, String zp,String speed){
         // 验证车辆排队等基础信息
         W2QueuingVo queuingVo = judgeCarAndQueuing(kcbh, zjhm);
@@ -252,7 +252,7 @@ public class CarServiceImpl implements ICarService {
      * @return {@link String}
      */
     @Override
-//    @Transactional
+    @DSTransactional
     public String startProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed){
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
@@ -268,7 +268,7 @@ public class CarServiceImpl implements ICarService {
         if(a0221000010Bo.getKskm().equals("2")){
             a0221000010Bo.setSbbh(cdxmConfig.getSbxh());
         }else{
-            String lineDm = lineconfigService.getLineDm(Long.valueOf(fieldId));
+            String lineDm = lineconfigService.getLineDm(queuingInfo.getRLine());
             a0221000010Bo.setKsxl(lineDm);
         }
         a0221000010Bo.setKssj(LocalDateTime.parse(kssj,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -301,7 +301,7 @@ public class CarServiceImpl implements ICarService {
 
 
     @Override
-//    @Transactional
+    @DSTransactional
     public W2QueuingVo finishProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed){
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
@@ -315,7 +315,7 @@ public class CarServiceImpl implements ICarService {
         if(a0221000013Bo.getKskm().equals("2")){
             a0221000013Bo.setSbbh(cdxmConfig.getSbxh());
         }else{
-            String lineDm = lineconfigService.getLineDm(Long.valueOf(fieldId));
+            String lineDm = lineconfigService.getLineDm(queuingInfo.getRLine());
             a0221000013Bo.setKsxl(lineDm);
         }
         a0221000013Bo.setJssj(LocalDateTime.parse(kssj,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
@@ -365,7 +365,7 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2QueuingVo}
      */
     @Override
-//    @Transactional
+    @DSTransactional
     public W2QueuingVo finishExam(String kcbh, String kssj, String zjhm, String score, String zp, String speed){
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
@@ -391,7 +391,13 @@ public class CarServiceImpl implements ICarService {
         W2RecordsVo recordsInfo = getRecordsInfo(queuingInfo.getKcbh(), queuingInfo.getZjhm());
         recordsInfo.setKszt("2");
         //评判考试结果
-        Long qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_SCORE_KEY));
+        Long qualifiedScore = 0l;
+        if(queuingInfo.getKskm().equals("2")){
+            qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_K2_SCORE_KEY));
+        }else{
+            qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_K3_SCORE_KEY));
+        }
+
         if(recordsInfo.getKscs() == 1l){
             recordsInfo.setJssj1(DateUtil.parse(kssj));
             if(recordsInfo.getJgfs1() >= qualifiedScore){
@@ -442,7 +448,7 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2QueuingVo}
      */
     @Override
-//    @Transactional
+    @DSTransactional
     public W2QueuingVo deductPoint(String kcbh, String kssj, String zjhm, String fieldId, String kfdm, String kfType, String zp, String speed){
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);

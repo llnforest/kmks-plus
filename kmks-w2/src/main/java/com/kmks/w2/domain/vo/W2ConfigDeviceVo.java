@@ -22,11 +22,6 @@ public class W2ConfigDeviceVo {
     private static final long serialVersionUID = 1L;
 
     /**
-     * ID
-     */
-    @ExcelProperty(value = "ID")
-    private Long id;
-    /**
      * 设备号
      */
     @ExcelProperty(value = "设备号")
