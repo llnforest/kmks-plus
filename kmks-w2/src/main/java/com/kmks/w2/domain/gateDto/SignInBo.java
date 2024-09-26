@@ -26,6 +26,6 @@ public class SignInBo {
     @NotBlank(message = "证件照片不能为空", groups = { AddGroup.class})
     String zjzp;
 
-    @NotBlank(message = "考试科目不能为空", groups = { AddGroup.class})
+//    @NotBlank(message = "考试科目不能为空", groups = { AddGroup.class})
     String kskm;
 }

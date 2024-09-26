@@ -2,11 +2,15 @@ package com.kmks.w2.domain.dto;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.kmks.w2.domain.vo.W2KcxxVo;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -21,33 +25,41 @@ public class SplitCarDto {
     private static final long serialVersionUID = 1L;
 
 
+    /**
+     * 考车号对应数据Map
+     */
+    private Map<String, Integer> kchMap;
 
     /**
-     * 考车编号
+     * 车牌号码List
      */
-    private String kcbh;
+    private List<String> cphList;
 
     /**
-     * 车牌号码
+     * 分车人数
      */
-    private String kchp;
-
-    /**
-     * 线路
-     */
-    private Long rLine = 0L;
+    private Long splitNum;
 
 
     /**
-     * 分车状态
+     * 线路配置
      */
-    private String zt;
+    private Map<String, Long> lineConfigMap;
 
     /**
-     * 报到序号
-     */
-    private Long bdxh;
+     * 考车信息Map
+     **/
+    private Map<String, W2KcxxVo> kcxxMap;
 
+    /**
+     * 考官证件号
+     **/
+    private String kgzjh;
+
+    /**
+     * 考试场次
+     **/
+    private Long kscc;
 
 
 }

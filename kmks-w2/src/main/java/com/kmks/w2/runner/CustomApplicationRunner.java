@@ -3,10 +3,8 @@ package com.kmks.w2.runner;
 import com.kmks.jianguan.domain.bo.A0221000006Bo;
 import com.kmks.jianguan.domain.vo.A0221000006Vo;
 import com.kmks.jianguan.service.IJgService;
-import com.kmks.w2.service.IW2CdxmbhService;
-import com.kmks.w2.service.IW2KfconfigService;
-import com.kmks.w2.service.IW2LineconfigService;
-import com.kmks.w2.service.IW2QueuingService;
+import com.kmks.w2.service.*;
+import com.kmks.w2.service.impl.supervise.SuperviseHandler;
 import com.kmks.w2.utils.RedisUtil;
 import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.utils.bean.BeanHelper;
@@ -45,10 +43,18 @@ public class CustomApplicationRunner implements ApplicationRunner {
 
     private final ISysMenuService menuService;
 
+    private final IW2FlowlogService flowlogService;
+
+    private final IW2GpscontentService gpscontentService;
+
+    private final SuperviseHandler superviseHandler;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("-----------自定义初始化参数-------------");
-        log.info("-----------1.更新报到序号---------------------");
+        log.info("-----------1.今日之前的数据备份，更新报到序号---------------------");
+        flowlogService.syncToHistory();
+        queuingService.syncToHistory();
         RedisUtil.setMaxBdxh(queuingService.getMaxBdxh());
         log.info("报到序号:{}", RedisUtil.getMaxBdxh());
 
@@ -65,26 +71,10 @@ public class CustomApplicationRunner implements ApplicationRunner {
         menuService.initMenuOperator();
 
         log.info("-----------5.同步监管时间-------------------");
-        try{
-            A0221000006Bo a0221000006Bo = new A0221000006Bo();
-            a0221000006Bo.setKsxtxh(configService.selectConfigByKey(CacheNames.SYSTEM_KEY));
-            A0221000006Vo a0221000006Vo = jgService.a0221000006(a0221000006Bo);
-            log.info("同步公安网时间：{}",a0221000006Vo.getSj().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-    //         设置系统时间，例如2023年1月1日12时0分0秒
-            try {
-                String commandDate = "cmd /c date "+a0221000006Vo.getSj().format(DateTimeFormatter.ISO_LOCAL_DATE);
-                Process processDate = Runtime.getRuntime().exec(commandDate);
-                processDate.waitFor();
-                String commandTime = "cmd /c time "+a0221000006Vo.getSj().format(DateTimeFormatter.ISO_LOCAL_TIME);
-                Process processTime = Runtime.getRuntime().exec(commandTime);
-                processTime.waitFor();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }catch (Exception exception){
-            log.info("自动同步监管时间失败");
-        }
+        superviseHandler.service().syncTime();
 
+        log.info("-----------6.检查轨迹备份表-------------------");
+        gpscontentService.checkAndCreateTable();
 
     }
 }

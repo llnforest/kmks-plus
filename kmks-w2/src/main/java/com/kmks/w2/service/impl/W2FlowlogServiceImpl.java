@@ -2,12 +2,13 @@ package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
-import com.kmks.w2.domain.W2Records;
+import com.kmks.w2.domain.*;
 import com.kmks.w2.domain.bo.AnalyseKfdmBo;
 import com.kmks.w2.domain.bo.W2FlowBo;
 import com.kmks.w2.domain.vo.AnalyseKfdmVo;
 import com.kmks.w2.domain.vo.W2FlowVo;
 import com.kmks.w2.domain.vo.W2RecordsVo;
+import com.kmks.w2.mapper.W2FlowrecMapper;
 import com.kmks.w2.mapper.W2RecordsMapper;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -17,7 +18,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.kmks.w2.domain.W2Flowlog;
 import com.kmks.w2.mapper.W2FlowlogMapper;
 import com.kmks.w2.service.IW2FlowlogService;
 
@@ -38,6 +38,8 @@ import java.util.stream.Collectors;
 public class W2FlowlogServiceImpl implements IW2FlowlogService {
 
     private final W2FlowlogMapper baseMapper;
+    
+    private final W2FlowrecMapper flowrecMapper;
 
     private final W2RecordsMapper recordsMapper;
 
@@ -201,5 +203,25 @@ public class W2FlowlogServiceImpl implements IW2FlowlogService {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
+    }
+
+    /**
+     * 考试过程明细数据同步到历史记录
+     * 当日之前的信息
+     */
+    @Override
+    public void syncToHistory(){
+        List<W2Flowrec> flowlogs = flowrecMapper.selectList(
+                Wrappers.lambdaQuery(W2Flowrec.class)
+                                .lt(W2Flowrec::getYkrq,DateUtil.today())
+        );
+        List<W2Flowlog> W2QueuhisList = flowlogs.stream()
+                .map(v -> BeanUtil.toBean(v, W2Flowlog.class))
+                .collect(Collectors.toList());
+        baseMapper.insertBatch(W2QueuhisList);
+        flowrecMapper.delete(
+                Wrappers.lambdaQuery(W2Flowrec.class)
+                        .lt(W2Flowrec::getYkrq,DateUtil.today())
+        );
     }
 }

@@ -78,11 +78,13 @@ public class HcCommandController extends BaseController {
 
     @RequestMapping("/text")
     public R<Void> text(){
-        if("192.50.62.120".contains("192.50.62.120")){
-            log.info("true");
-        }else{
-            log.info("false");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("106_6","106");
+        map.put("6_6","6");
+        if(map.containsKey("6_6")){
+            log.info("ok");
         }
+
 //        HCNetTool.load();
 //        HCNetTool.init();
 //        HCNetTool.login("192.168.1.200",(short) 8000,"admin","ghgd12345");
@@ -120,8 +122,8 @@ public class HcCommandController extends BaseController {
 //        }
 ////        HCNetTool.setImgInfo();
 //        HCNetTool.showImg();
-//
-//
+
+
 //        HCNetTool.logout();
 //        return R.ok();
 //    }

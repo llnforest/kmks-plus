@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CdxxEnum {
-    A0221000001(A0221000001Bo.class,"02-21-000001","查询类"),
+    A17C01(A0221000001Bo.class,"02-21-000001","查询类"),
     A0221000002(A0221000002Bo.class,"02-21-000002","查询类"),
     A0221000003(A0221000003Bo.class,"02-21-000003","查询类"),
     A0221000004(A0221000004Bo.class,"02-21-000004","写入类"),

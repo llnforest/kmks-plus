@@ -51,7 +51,7 @@ public class FileUtil {
             byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
 
             // 创建目标文件
-//            existsOrCreatePath(outputFilePath);
+            existsOrCreatePath(outputFilePath);
             File outputFile = new File(outputFilePath);
 
             // 将解码后的数据写入文件
@@ -67,6 +67,12 @@ public class FileUtil {
         return null;
     }
 
+    /**
+     * 将图像路径转换为base64
+     *
+     * @param imagePath 图像路径
+     * @return {@link String}
+     */
     public static String convertImageToBase64(String imagePath){
         try {
             Path path = Paths.get(imagePath);
@@ -134,8 +140,8 @@ public class FileUtil {
     private static void existsOrCreatePath(String filePath) throws IOException {
         // 检查目录是否存在，不存在则创建
         Path path = Paths.get(filePath);
-        if (!Files.exists(path)) {
-            Files.createDirectories(path);
+        if (!Files.exists(path.getParent())) {
+            Files.createDirectories(path.getParent());
         }
     }
 }

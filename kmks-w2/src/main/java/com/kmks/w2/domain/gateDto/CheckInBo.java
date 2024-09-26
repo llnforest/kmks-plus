@@ -38,7 +38,6 @@ public class CheckInBo {
     @NotBlank(message = "鉴别照片不能为空", groups = { AddGroup.class})
     String jbzp;
 
-    @NotBlank(message = "考试科目不能为空", groups = { AddGroup.class})
     String kskm;
 
 }

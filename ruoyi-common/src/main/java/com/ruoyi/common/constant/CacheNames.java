@@ -25,7 +25,15 @@ public interface CacheNames {
      */
     String SYS_CONFIG = "sys_config";
 
+    /**
+     * 上传监管接口服务API
+     */
     String SYS_JK_JG_API = "sys.jk.jg.api";
+
+    /**
+     * 接入监管专网类型
+     */
+    String SYS_JK_JG_TYPE = "sys.jk.jg.type";
 
     /**
      * 路线配置
@@ -54,7 +62,7 @@ public interface CacheNames {
 
     /**
      * 科目键名
-    **/
+     **/
     String COURSE_KEY = "sys.config.course";
 
     /**
@@ -108,13 +116,12 @@ public interface CacheNames {
 
     String PROJECT_IDS_EXPECT_KEY = "sys.config.projects.expect";
 
-    String SYSTEM_KEY = "jg.ksxtxh";
 
     String MAX_BDXH_KEY = "max_bdxh";
 
     /**
      * 及格分数
-    **/
+     **/
     String QUALIFIED_K2_SCORE_KEY = "sys.k2.qualified.score";
     String QUALIFIED_K3_SCORE_KEY = "sys.k3.qualified.score";
 
@@ -147,28 +154,35 @@ public interface CacheNames {
 
     /**
      * 合码器SDK位置
-    **/
+     **/
     String HC_SDK_PATH = "sys.hc.sdk.path";
     /**
      * 合码器轨迹照片存储位置
-    **/
+     **/
     String HC_trajectory_path = "hc.trajectory.path";
+
+    /**
+     * 文件位置键名
+     **/
+    String FILE_PATH_KEY = "sys.file.path";
+
+    String SYS_CONFIG_NEED_FEE = "sys.config.isNeedFee";
 //---------------------安全参数------------------------
     /**
      * 系统最大会话并发数
-    **/
+     **/
     String SAFE_VISITED_MAX = "safe.visited.max";
     /**
      * 系统最大会话并发数
-    **/
+     **/
     String SAFE_VISITED_USER_HIGH = "safe.visited.user.high";
     /**
      * 系统最大会话并发数
-    **/
+     **/
     String SAFE_VISITED_CLIENT_STARTTIME = "safe.visited.client.starttime";
     /**
      * 系统最大会话并发数
-    **/
+     **/
     String SAFE_VISITED_CLIENT_ENDTIME = "safe.visited.client.endtime";
     /**
      * 账户长期未使用
@@ -187,8 +201,35 @@ public interface CacheNames {
      **/
     String SAFE_FINISH_NO_OPERATE = "safe.finish.no.operate";
 
+    //----------------------监管服务参数--------------------------------
+    /**
+     * 接口序列号
+     **/
+    String JG_COMMON_JKXLH = "jg.common.jkxlh";
 
 
+    String JG_COMMON_KSXTXH = "jg.common.ksxtxh";
+
+    /**
+     * 系统类别  接口提供者的业务类别代码，默认为“17”
+     **/
+    String JG_OLD_XTLB = "jg.old.xtlb";
+
+
+    /**
+     * 考试地点代号
+     **/
+    String JG_OLD_KSDD = "jg.old.ksdd";
+
+    /**
+     * 考场序号
+     **/
+    String JG_OLD_KCXH = "jg.old.kcxh";
+
+    /**
+     * 管理部门
+     **/
+    String JG_OLD_GLBM = "jg.old.glbm";
 
 
 }

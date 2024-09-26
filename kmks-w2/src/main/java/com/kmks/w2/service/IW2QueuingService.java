@@ -1,6 +1,7 @@
 package com.kmks.w2.service;
 
 import com.kmks.w2.domain.bo.W2KcxxBo;
+import com.kmks.w2.domain.bo.W2RecordsBo;
 import com.kmks.w2.domain.dto.SplitCarDto;
 import com.kmks.w2.domain.vo.W2KcxxVo;
 import com.kmks.w2.domain.vo.W2QueuingVo;
@@ -70,7 +71,7 @@ public interface IW2QueuingService {
     /**
      * 取消考试
      */
-    Boolean cancelExam(String[] ids);
+    Boolean cancelExam(String ids);
 
     /**
      * 换车
@@ -94,5 +95,7 @@ public interface IW2QueuingService {
 
     Long getMaxBdxh();
 
-    Map<String, SplitCarDto> splitCar();
+    void handleImportData(List<W2QueuingBo> queuingBos, List<W2RecordsBo> recordsBos);
+
+    void syncToHistory();
 }

@@ -96,7 +96,7 @@ public class W2KcddController extends BaseController {
      */
     @SaCheckPermission("w2:kcdd:cancel")
     @PutMapping("/cancel/{ids}")
-    public R<Void> cancel(@NotEmpty(message = "主键不能为空") @PathVariable("ids") String[] ids){
+    public R<Void> cancel(@NotEmpty(message = "主键不能为空") @PathVariable("ids") String ids){
         return toAjax(iw2QueuingService.cancelExam(ids));
     }
 

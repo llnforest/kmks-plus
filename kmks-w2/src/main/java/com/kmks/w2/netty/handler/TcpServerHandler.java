@@ -29,7 +29,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
         try {
-            this.tcpMessageDecoder.handleMessage(msg, ctx);
+            this.tcpMessageDecoder.handleMessage(msg,ctx);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

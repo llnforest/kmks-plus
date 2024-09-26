@@ -27,12 +27,14 @@
             <when test="tableMark == '' || tableMark == null">w2_gpscontent</when>
             <otherwise>w2_gpscontent_his_${tableMark}</otherwise>
         </choose>
-         where
+        where
         sfzhm = #{sfzhm} and
         carno = #{carno} and
         sendrq between #{sendrqStart,jdbcType=NUMERIC} and #{sendrqEnd,jdbcType=NUMERIC}
         order by sendrq asc
     </select>
-
+    <insert id="insertRawSQL">
+        ${sql}
+    </insert>
 
 </mapper>

@@ -32,6 +32,14 @@ public class R<T> implements Serializable {
 
     private T data;
 
+    public static <T> R<T> is(Boolean bool, String msg) {
+        return bool ? ok(msg) : fail(msg);
+    }
+
+    public static <T> R<T> is(Boolean bool) {
+        return bool ? ok() : fail();
+    }
+
     public static <T> R<T> ok() {
         return restResult(null, SUCCESS, "操作成功");
     }
@@ -47,6 +55,7 @@ public class R<T> implements Serializable {
     public static <T> R<T> ok(String msg, T data) {
         return restResult(data, SUCCESS, msg);
     }
+
     public static <T> R<T> ok(int code, T data) {
         return restResult(data, code, "操作成功");
     }
@@ -85,7 +94,7 @@ public class R<T> implements Serializable {
     /**
      * 返回警告消息
      *
-     * @param msg 返回内容
+     * @param msg  返回内容
      * @param data 数据对象
      * @return 警告消息
      */

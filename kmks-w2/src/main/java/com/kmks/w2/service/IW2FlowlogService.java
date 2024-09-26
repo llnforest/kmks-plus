@@ -50,4 +50,6 @@ public interface IW2FlowlogService {
      * 校验并批量删除考试过程信息信息
      */
     Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid);
+
+    void syncToHistory();
 }

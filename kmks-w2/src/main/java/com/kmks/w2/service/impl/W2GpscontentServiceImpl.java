@@ -1,6 +1,7 @@
 package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import com.ruoyi.common.utils.BeanCopyUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -16,6 +17,7 @@ import com.kmks.w2.domain.W2Gpscontent;
 import com.kmks.w2.mapper.W2GpscontentMapper;
 import com.kmks.w2.service.IW2GpscontentService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -36,7 +38,7 @@ public class W2GpscontentServiceImpl implements IW2GpscontentService {
      * 查询轨迹数据
      */
     @Override
-    public W2GpscontentVo queryById(Long timeid){
+    public W2GpscontentVo queryById(Long timeid) {
         return baseMapper.selectVoById(timeid);
     }
 
@@ -65,6 +67,28 @@ public class W2GpscontentServiceImpl implements IW2GpscontentService {
     @Override
     public <T> List<T> queryListByTable(W2GpscontentBo bo, Class<T> clazz) {
         return BeanCopyUtils.copyList(baseMapper.selectListByTable(bo), clazz);
+    }
+
+    /**
+     * 插入原始sql
+     *
+     * @param sql sql
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean insertRawSql(String sql) {
+        return baseMapper.insertRawSQL(sql) > 0;
+    }
+
+    /**
+     * 创建轨迹表
+     */
+    @Override
+    public void checkAndCreateTable() {
+        String tableName = DateUtil.format(new Date(), "yyyyMM");
+        if (baseMapper.checkTableExists(tableName) == 0) {
+            baseMapper.createTable(tableName);
+        }
     }
 
     private LambdaQueryWrapper<W2Gpscontent> buildQueryWrapper(W2GpscontentBo bo) {
@@ -112,7 +136,7 @@ public class W2GpscontentServiceImpl implements IW2GpscontentService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(W2Gpscontent entity){
+    private void validEntityBeforeSave(W2Gpscontent entity) {
         //TODO 做一些数据校验,如唯一约束
     }
 
@@ -121,7 +145,7 @@ public class W2GpscontentServiceImpl implements IW2GpscontentService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;

@@ -330,12 +330,13 @@
                 <artifactId>kmks-jianguan</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
-            <!-- websocket模块 -->
+            <!-- 驾考老监管模块 -->
             <dependency>
                 <groupId>com.ruoyi</groupId>
-                <artifactId>kmks-websocket</artifactId>
+                <artifactId>kmks-jianguanold</artifactId>
                 <version>${ruoyi-vue-plus.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -352,6 +353,7 @@
         <module>ruoyi-sms</module>
         <module>kmks-w2</module>
         <module>kmks-jianguan</module>
+        <module>kmks-jianguanold</module>
     </modules>
     <packaging>pom</packaging>
 

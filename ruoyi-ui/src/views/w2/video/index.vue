@@ -430,7 +430,7 @@ export default {
           for(var item of response.data[name]){
             sub.push({
               value:item.gakfdm,
-              label:item.kfmc+((item.value != "" && item.value != "0")?item.value+item.beizhu:"")+",扣"+item.kf+"分"
+              label:item.gakfdm+"："+item.gakfmc+",扣"+item.kf+"分"
             })
           }
           this.kfdmOptions.push({

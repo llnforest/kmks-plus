@@ -40,7 +40,7 @@ public class SysConfigController extends BaseController {
      */
     @SaCheckPermission("system:config:list")
     @GetMapping("/list")
-    @Log(title = "参数管理", businessType = BusinessType.QUERY,remark = "查询列表")
+    @Log(title = "参数管理", businessType = BusinessType.QUERY, remark = "查询列表")
     public TableDataInfo<SysConfig> list(SysConfig config, PageQuery pageQuery) {
         return configService.selectPageConfigList(config, pageQuery);
     }
@@ -61,9 +61,10 @@ public class SysConfigController extends BaseController {
      */
     @SaIgnore
     @GetMapping("/getFrontConfigMap")
-    public R<Map<String,String>> getFrontConfigMap() {
+    public R<Map<String, String>> getFrontConfigMap() {
         Map<String, String> map = new HashMap<>();
-        map.put("course",configService.selectConfigByKey(CacheNames.COURSE_KEY));
+        map.put("course", configService.selectConfigByKey(CacheNames.COURSE_KEY));
+        map.put("jgType", configService.selectConfigByKey(CacheNames.SYS_JK_JG_TYPE));
         return R.ok(map);
     }
 

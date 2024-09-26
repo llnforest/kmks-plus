@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class MessageDecoder extends ByteToMessageDecoder {
@@ -15,7 +17,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
             int length = in.readableBytes();
             byte[] bytes = new byte[length];
             in.readBytes(bytes);
-            String message = new String(bytes);
+            String message = new String(bytes, Charset.forName("GBK"));
             // 判断结尾是否时回车，解决半包问题
             if (!message.endsWith("\r\n")) {
                 in.resetReaderIndex();

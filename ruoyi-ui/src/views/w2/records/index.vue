@@ -61,8 +61,10 @@
       </el-form-item>
       <el-form-item label="结果" prop="ksjg">
         <el-select v-model="queryParams.ksjg" placeholder="请选择结果" clearable>
+          <el-option label="待考" value="0"></el-option>
           <el-option label="合格" value="1,3"></el-option>
           <el-option label="不合格" value="2,4"></el-option>
+          <el-option label="考试中" value="5"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="路线" prop="line">
@@ -89,7 +91,8 @@
           :disabled="single"
           @click="handleDetail"
           v-hasPermi="['w2:records:detail']"
-        >过程明细</el-button>
+        >过程明细
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -100,7 +103,8 @@
           :disabled="single"
           @click="handleVideo"
           v-hasPermi="['w2:records:video']"
-        >视频回放</el-button>
+        >视频回放
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -111,7 +115,8 @@
           :disabled="single"
           @click="handlePrint"
           v-hasPermi="['w2:records:print']"
-        >打印</el-button>
+        >打印
+        </el-button>
       </el-col>
 
 
@@ -124,7 +129,8 @@
           :disabled="single"
           @click="handleExportGps"
           v-hasPermi="['w2:records:exportGps']"
-        >轨迹导出</el-button>
+        >轨迹导出
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -134,7 +140,8 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['w2:records:export']"
-        >页面导出</el-button>
+        >页面导出
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -145,14 +152,17 @@
           :disabled="single"
           @click="handleResetExam"
           v-hasPermi="['w2:records:resetRecord']"
-        >误判重考</el-button>
+        >误判重考
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="recordsList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
-      <el-table-column type="selection" width="55" align="center" />
+    <el-table v-loading="loading" :data="recordsList" @selection-change="handleSelectionChange" @row-click="rowClick"
+              @row-contextmenu="rightClick">
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="ID" align="center" prop="id" v-if="false"/>
+      <el-table-column label="流水号" align="center" prop="lsh" min-width="90" v-if="isJgType(2)"/>
       <el-table-column label="证件号码" align="center" prop="zjhm" min-width="160"/>
       <el-table-column label="考生姓名" align="center" prop="xm" min-width="80"/>
       <el-table-column label="考车编号" align="center" prop="kcbh" min-width="80"/>
@@ -171,7 +181,7 @@
           <dict-tag :options="dict.type.record_ksjg" :value="scope.row.ksjg"/>
         </template>
       </el-table-column>
-      <el-table-column label="预约次数" align="center" prop="yycs" min-width="80" />
+      <el-table-column label="预约次数" align="center" prop="yycs" min-width="80"/>
       <el-table-column label="考试日期1" align="center" prop="ksrq1" width="90">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.ksrq1, '{y}-{m}-{d}') }}</span>
@@ -183,6 +193,7 @@
         </template>
       </el-table-column>
       <el-table-column label="分数1" align="center" prop="jgfs1" min-width="60"/>
+      <el-table-column label="考官1" align="center" prop="ksy1" min-width="60" v-if="isJgType(2)"/>
       <el-table-column label="考试日期2" align="center" prop="ksrq2" min-width="90">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.ksrq2, '{y}-{m}-{d}') }}</span>
@@ -194,10 +205,11 @@
         </template>
       </el-table-column>
       <el-table-column label="分数2" align="center" prop="jgfs2" min-width="60"/>
+      <el-table-column label="考官2" align="center" prop="ksy2" min-width="60" v-if="isJgType(2)"/>
       <el-table-column label="考试次数" align="center" prop="kscs" min-width="80"/>
-<!--      <el-table-column label="效验码" align="center" prop="sjjyw" />-->
+      <!--      <el-table-column label="效验码" align="center" prop="sjjyw" />-->
 
-<!--      <el-table-column label="路线" align="center" prop="line" min-width="70" v-has-course="3"/>-->
+      <!--      <el-table-column label="路线" align="center" prop="line" min-width="70" v-has-course="3"/>-->
       <el-table-column label="路线" align="center" prop="line" min-width="70" v-if="isCourse(3)"/>
     </el-table>
 
@@ -240,15 +252,15 @@
     </div>
 
     <!-- 明细对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="1000px"  append-to-body>
+    <el-dialog :title="title" :visible.sync="open" width="1000px" append-to-body>
       <div>
         <el-table v-loading="loading" :data="processList" height="500">
           <el-table-column label="姓名" align="center" prop="xm" min-width="80"/>
           <el-table-column label="第几次" align="center" prop="kscs" min-width="60"/>
-          <el-table-column label="考试项目" align="center" prop="xmmc" min-width="200"  show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{scope.row.ksxm == null? '':scope.row.ksxm+'-'}}{{scope.row.xmmc}}
-          </template>
+          <el-table-column label="考试项目" align="center" prop="xmmc" min-width="200" show-overflow-tooltip>
+            <template slot-scope="scope">
+              {{ scope.row.ksxm == null ? '' : scope.row.ksxm + '-' }}{{ scope.row.xmmc }}
+            </template>
           </el-table-column>
           <el-table-column label="图片" align="center" min-width="100">
             <template slot-scope="scope">
@@ -260,9 +272,9 @@
             </template>
           </el-table-column>
           <el-table-column label="扣分" align="center" prop="kskf" min-width="80"/>
-          <el-table-column label="扣分明细" align="center" prop="msg" min-width="300"  show-overflow-tooltip>
+          <el-table-column label="扣分明细" align="center" prop="msg" min-width="300" show-overflow-tooltip>
             <template slot-scope="scope">
-              {{scope.row.kfdm == null? '':scope.row.kfdm+'-'}}{{scope.row.msg}}
+              {{ scope.row.kfdm == null ? '' : scope.row.kfdm + '-' }}{{ scope.row.msg }}
             </template>
           </el-table-column>
 
@@ -271,12 +283,12 @@
       </div>
     </el-dialog>
     <!-- 视频回放对话框 -->
-    <el-dialog :title="title" :visible.sync="videoOpen" width="780px"  append-to-body class="video-dialog">
-<!--      <iframe :src="videoUrl" frameborder="0" width="100%" height="620px"></iframe>-->
+    <el-dialog :title="title" :visible.sync="videoOpen" width="780px" append-to-body class="video-dialog">
+      <!--      <iframe :src="videoUrl" frameborder="0" width="100%" height="620px"></iframe>-->
       <back-video :video-obj="backVideoObj" :open="videoOpen" :time-range="backTime"></back-video>
     </el-dialog>
     <!-- 确认重考对话框 -->
-    <el-dialog :title="title" :visible.sync="openReset" width="600px"  append-to-body>
+    <el-dialog :title="title" :visible.sync="openReset" width="600px" append-to-body>
       <div class="tip-msg">
         注意请先在监管平台确认申请重考通过
       </div>
@@ -290,7 +302,7 @@
         <el-form-item label="考车编号" prop="kcbh">
           <el-input v-model="form.kcbh" placeholder="请输入考车编号" readonly/>
         </el-form-item>
-        <el-form-item label="考试车型" prop="kscx" >
+        <el-form-item label="考试车型" prop="kscx">
           <el-select v-model="form.kscx" placeholder="请选择考试车型" disabled>
             <el-option
               v-for="dict in dict.type.param_car_type"
@@ -347,7 +359,7 @@ export default {
   name: "Records",
   components: {BackVideo},
 
-  dicts: ['record_ksjg', 'record_ksyy', 'record_is_print', 'param_car_type','record_wpxz'],
+  dicts: ['record_ksjg', 'record_ksyy', 'record_is_print', 'param_car_type', 'record_wpxz'],
   data() {
     return {
       // 按钮loading
@@ -393,28 +405,26 @@ export default {
         sbbh: undefined
       },
       // 表单参数
-      form: {
-
-      },
-      processList:[],
+      form: {},
+      processList: [],
       // 表单校验
       rules: {
         id: [
-          { required: true, message: "ID不能为空", trigger: "blur" }
+          {required: true, message: "ID不能为空", trigger: "blur"}
         ],
         wpyy: [
-          { required: true, message: "误判原因不能为空", trigger: "blur" }
+          {required: true, message: "误判原因不能为空", trigger: "blur"}
         ],
         wpxz: [
-          { required: true, message: "误判选择不能为空", trigger: "change" }
+          {required: true, message: "误判选择不能为空", trigger: "change"}
         ],
       },
-      backVideoObj:{},
-      backTime:[],
-      carList:[],
-      schoolList:[],
-      cdxmbhList:[],
-      kcxxList:[],
+      backVideoObj: {},
+      backTime: [],
+      carList: [],
+      schoolList: [],
+      cdxmbhList: [],
+      kcxxList: [],
     };
   },
   created() {
@@ -426,25 +436,25 @@ export default {
   },
   methods: {
     /**获取考车信息列表 */
-    getKcxxList(){
+    getKcxxList() {
       kcxxList().then(response => {
         this.kcxxList = response.data
       });
     },
     /**获取场地设备编号 */
-    getCdxmbh(){
+    getCdxmbh() {
       selectCdxmbh().then(response => {
         this.cdxmbhList = response.data
       });
     },
     /** 获取驾校列表 **/
     getSchoolList() {
-      selectSchool({type:3}).then(response => {
+      selectSchool({type: 3}).then(response => {
         this.schoolList = response.data
       });
     },
     /** 获取车辆列表 **/
-    getCarList(){
+    getCarList() {
       getCarList().then(response => {
         this.carList = response.data;
       });
@@ -568,7 +578,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -590,29 +600,29 @@ export default {
       });
     },
     /** 明细按钮操作 **/
-    handleDetail(row){
+    handleDetail(row) {
       this.open = true;
       this.title = "考试过程明细";
       const id = row.id || this.ids
-      if(!row.id) row = this.queuingList.filter(item => item.id == id)[0]
-      getFlowList({bh:row.ksbh,ksrq:row.ksrq.split(" ")[0]}).then(response => {
+      if (!row.id) row = this.queuingList.filter(item => item.id == id)[0]
+      getFlowList({bh: row.ksbh, ksrq: row.ksrq.split(" ")[0]}).then(response => {
         console.log(response.data);
         this.processList = response.data
       });
     },
     /** 视频回放操作 **/
-    handleVideo(row){
+    handleVideo(row) {
       // row = {id:1,kscs:2,kssj1:'2024-06-17 15:10:00',jssj2:'2024-06-17 16:10:00',kcbh:'05'}
       this.videoOpen = true;
       this.title = "视频回放";
       const id = row.id || this.ids
-      if(!row.id) row = this.queuingList.filter(item => item.id == id)[0]
+      if (!row.id) row = this.queuingList.filter(item => item.id == id)[0]
       const kcxx = this.kcxxList.filter(item => item.kch == row.kcbh)[0];
       let zx = kcxx.zxip.split(',');
-      this.backVideoObj = {ip:zx[0],port:zx[1],channel:zx[2],username:kcxx.zuser,password:kcxx.zpwd}
-      if(row.kscs == 1){
+      this.backVideoObj = {ip: zx[0], port: zx[1], channel: zx[2], username: kcxx.zuser, password: kcxx.zpwd}
+      if (row.kscs == 1) {
         this.backTime = [row.kssj1, row.jssj1]
-      }else{
+      } else {
         this.backTime = [row.kssj1, row.jssj2]
         console.log(this.backTime)
       }
@@ -658,12 +668,12 @@ export default {
       const id = row.id || this.ids;
       this.openReset = true;
       this.title = "申请误判";
-      if(!row.id) row = this.recordsList.filter(item => item.id == id)[0]
+      if (!row.id) row = this.recordsList.filter(item => item.id == id)[0]
       this.form = row;
-      this.$set(this.form,'wpxz',"2");
+      this.$set(this.form, 'wpxz', "2");
 
     },
-    resetExam(){
+    resetExam() {
       this.$refs["form"].validate(valid => {
         if (valid) {
           this.$modal.confirm(`确认申请${this.form.xm}-${this.form.wpxz}的误判吗？`).then(() => {
@@ -703,7 +713,7 @@ export default {
       // if(!row.id) row = this.recordsList.filter(item => item.id == id)[0]
 
       this.download('w2/records/exportGps', {
-        id:ids
+        id: ids
       }, `records_${new Date().getTime()}.xlsx`)
     },
     /** 导出按钮操作 */
@@ -712,21 +722,21 @@ export default {
         ...this.queryParams
       }, `records_${new Date().getTime()}.xlsx`)
     },
-    getComponentImg(zp){
+    getComponentImg(zp) {
       zp = 'd:\\webservice\\files\\20191021\\211021198705215828\\211021198705215828_1_03_2001.jpg';
-        const xhr = new XMLHttpRequest();
-        let base64Image;
-        xhr.onload = () => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            base64Image = reader.result;
-          };
-          reader.readAsDataURL(xhr.response);
+      const xhr = new XMLHttpRequest();
+      let base64Image;
+      xhr.onload = () => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          base64Image = reader.result;
         };
-        xhr.open('GET', zp);
-        xhr.responseType = 'blob';
-        xhr.send();
-        return base64Image;
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.open('GET', zp);
+      xhr.responseType = 'blob';
+      xhr.send();
+      return base64Image;
       // // zp = 'd:\\webservice\\files\\20191021';
       // try{
       //   return require(`${zp}`);
@@ -742,15 +752,16 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-.app-container{
-  ::v-deep #divPlugin{
-    width:100%;
-    height:380px;
+.app-container {
+  ::v-deep #divPlugin {
+    width: 100%;
+    height: 380px;
   }
 }
-  .video-dialog{
-    ::v-deep .el-dialog__body{
-      padding-top:0px;
-    }
+
+.video-dialog {
+  ::v-deep .el-dialog__body {
+    padding-top: 0px;
   }
+}
 </style>

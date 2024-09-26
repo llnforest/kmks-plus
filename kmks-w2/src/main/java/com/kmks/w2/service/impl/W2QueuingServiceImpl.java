@@ -5,23 +5,18 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.kmks.jianguan.domain.bo.A0221000008Bo;
-import com.kmks.jianguan.domain.vo.A0221000008Vo;
-import com.kmks.jianguan.service.IJgService;
 import com.kmks.w2.domain.W2Kcxx;
+import com.kmks.w2.domain.W2Queuhis;
 import com.kmks.w2.domain.W2Records;
 import com.kmks.w2.domain.bo.W2KcxxBo;
-import com.kmks.w2.domain.dto.SplitCarDto;
+import com.kmks.w2.domain.bo.W2RecordsBo;
 import com.kmks.w2.domain.vo.W2KcxxVo;
 import com.kmks.w2.mapper.W2KcxxMapper;
+import com.kmks.w2.mapper.W2QueuhisMapper;
 import com.kmks.w2.mapper.W2RecordsMapper;
 import com.kmks.w2.netty.handler.MessageHandler;
-import com.kmks.w2.service.ICarService;
-import com.kmks.w2.service.IW2LineconfigService;
 import com.kmks.w2.service.IW2QueuingService;
-import com.kmks.w2.utils.RedisUtil;
 import com.kmks.w2.utils.TcpUtils;
-import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.api.FailException;
 import com.ruoyi.common.utils.StringUtils;
@@ -31,7 +26,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.utils.bean.BeanHelper;
-import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.kmks.w2.domain.bo.W2QueuingBo;
@@ -53,16 +47,10 @@ import java.util.stream.Collectors;
 public class W2QueuingServiceImpl implements IW2QueuingService {
 
     private final W2QueuingMapper baseMapper;
+
+    private final W2QueuhisMapper queuhisMapper;
     private final W2KcxxMapper kcxxMapper;
     private final W2RecordsMapper recordsMapper;
-
-    private final IJgService IJgService;
-
-    private final ISysConfigService configService;
-
-    private final IW2LineconfigService lineconfigService;
-
-
 
     /**
      * 查询排队信息
@@ -103,6 +91,8 @@ public class W2QueuingServiceImpl implements IW2QueuingService {
         lqw.eq(StringUtils.isNotBlank(bo.getKszt()), W2Queuing::getKszt, bo.getKszt());
         lqw.like(StringUtils.isNotBlank(bo.getKscx()), W2Queuing::getKscx, bo.getKscx());
         lqw.like(StringUtils.isNotBlank(bo.getKgname()), W2Queuing::getKgname, bo.getKgname());
+        lqw.orderByDesc(W2Queuing::getSign);
+        lqw.orderByDesc(W2Queuing::getZt);
         lqw.orderByAsc(W2Queuing::getBdxh);
         return lqw;
     }
@@ -227,13 +217,15 @@ public class W2QueuingServiceImpl implements IW2QueuingService {
     }
 
     /**
-     * 申请考试
+     * 申请考试（人工）
      */
     @Override
     public Boolean applyExam(String ids) {
+        String[] s = ids.split("_");
         W2QueuingVo queuingVo = baseMapper.selectVoOne(
                 Wrappers.lambdaQuery(W2Queuing.class)
-                        .eq(W2Queuing::getZjhm, ids)
+                        .eq(W2Queuing::getZjhm, s[0])
+                        .eq(W2Queuing::getKskm, s[1])
                         .eq(W2Queuing::getZt, "1")
         );
         if(queuingVo == null){
@@ -241,8 +233,8 @@ public class W2QueuingServiceImpl implements IW2QueuingService {
         }
         MessageHandler bean = BeanHelper.getBean(MessageHandler.class);
         // 指令标志;车辆编号;时间;身份证;姓名;
-        String[] message = new String[]{"2001", queuingVo.getKcbh(), DateUtil.now(), queuingVo.getZjhm(), queuingVo.getXm(), ""};
-        bean.cz2001(TcpUtils.getCarChannel(queuingVo.getKcbh()),message);
+        String[] message = new String[]{"2000", queuingVo.getKcbh(), DateUtil.now(), queuingVo.getZjhm(), queuingVo.getXm(), "0"};
+        bean.cz2000(TcpUtils.getCarChannel(queuingVo.getKcbh()),message);
         return true;
     }
 
@@ -250,12 +242,14 @@ public class W2QueuingServiceImpl implements IW2QueuingService {
      * 取消考试
      */
     @Override
-    public Boolean cancelExam(String[] ids) {
+    public Boolean cancelExam(String ids) {
+        String[] s = ids.split("_");
         LambdaUpdateWrapper<W2Queuing> uw = new LambdaUpdateWrapper<>();
         uw.set(W2Queuing::getKcbh,"")
                 .set(W2Queuing::getZt,"0")
                 .set(W2Queuing::getKchp,"")
-                .in(W2Queuing::getZjhm,ids);
+                .in(W2Queuing::getKskm,s[1])
+                .in(W2Queuing::getZjhm,s[0]);
         return baseMapper.update(null,uw) > 0;
     }
 
@@ -357,107 +351,64 @@ public class W2QueuingServiceImpl implements IW2QueuingService {
     }
 
     /**
-     * 分车
-     *
-     * @return {@link List}<{@link String}>
+     * 处理导入待考学员数据
+     * @Param [queuingBos, recordsBos]
+     * @return void
+     * @Author lynn 17:53 2024/9/2
+    **/
+    @Override
+    public void handleImportData(List<W2QueuingBo> queuingBos, List<W2RecordsBo> recordsBos){
+        List<String> filterList = new ArrayList<>();
+        // 插入排队列表
+        // 过滤掉已存在的考生
+        List<W2Queuing> queuingList = queuingBos.stream().filter(v->{
+            //判断是否是今天
+            boolean exists = DateUtil.isSameDay(v.getKsrq(), DateUtil.beginOfDay(new Date()));
+            if(exists){
+                //判断今天是否已存在该考生信息
+                exists = !baseMapper.exists(
+                        Wrappers.lambdaQuery(W2Queuing.class)
+                                .eq(W2Queuing::getZjhm, v.getZjhm())
+                                .eq(W2Queuing::getKskm, v.getKskm())
+                );
+            }
+            if(!exists){
+                filterList.add(v.getZjhm()+"_"+v.getKskm());
+            }
+            return exists;
+        }).map(v -> BeanUtil.toBean(v, W2Queuing.class))
+          .collect(Collectors.toList());
+
+        baseMapper.insertBatch(queuingList);
+
+        // 插入考试列表
+        List<W2Records> recordsList = recordsBos.stream()
+                .filter(v->!filterList.contains(v.getZjhm()+"_"+v.getKskm()))
+                .map(v -> BeanUtil.toBean(v, W2Records.class))
+                .collect(Collectors.toList());
+
+        recordsMapper.insertBatch(recordsList);
+        if(filterList.size() > 0) {
+            throw new FailException("导入失败考生"+filterList.size()+"个："+String.join("，",filterList));
+        }
+    }
+
+    /**
+     * 排队信息同步到历史记录
+     * 当日之前的信息
      */
     @Override
-    public Map<String,SplitCarDto> splitCar(){
-        // 获取可用考车信息
-        LambdaQueryWrapper<W2Kcxx> kcLqw = Wrappers.lambdaQuery(W2Kcxx.class);
-        kcLqw.eq(W2Kcxx::getZt,"1");
-        List<W2KcxxVo> w2KcxxVos = kcxxMapper.selectVoList(kcLqw);
-        List<String> cphList = w2KcxxVos.stream().map(W2KcxxVo::getCph).collect(Collectors.toList());
-        if(cphList.size() == 0) throw new FailException("没有可分配的车辆");
-        Map<String, W2KcxxVo> kcxxMap = w2KcxxVos.stream().collect(Collectors.toMap(W2KcxxVo::getCph, vo->vo));
+    public void syncToHistory(){
+        List<W2Queuing> w2Queuings = baseMapper.selectList(
+                Wrappers.lambdaQuery(W2Queuing.class)
+                        .lt(W2Queuing::getKsrq,DateUtil.beginOfDay(new Date()))
+        );
 
-        // 获取排队表信息
-        LambdaQueryWrapper<W2Queuing> lqw = Wrappers.lambdaQuery();
-        lqw.select(W2Queuing::getKchp,W2Queuing::getTotalNum);
-        lqw.eq(W2Queuing::getSign,1l);
-        lqw.eq(W2Queuing::getZt,"0");
-        lqw.eq(W2Queuing::getSqks,1l);
-        lqw.groupBy(W2Queuing::getKchp);
-        List<W2QueuingVo> w2QueuingVos = baseMapper.selectVoList(lqw);
-        if(w2QueuingVos.size() == 0) return null;
-        // 获取线路信息
-        Map<String, Long> lineConfigMap = lineconfigService.getLineConfigMap(configService.selectConfigByKey(CacheNames.COURSE_KEY));
-
-        Map<String, SplitCarDto> map = new HashMap<>();
-        // 获取最大分车人数
-        Long splitNum=Long.valueOf(configService.selectConfigByKey(CacheNames.SPLIT_NUM));
-        //处理已分车的车辆继续分车
-        w2QueuingVos.stream().forEach(vo->{
-            if(cphList.contains(vo.getKchp()) && splitNum - vo.getTotalNum() > 0){
-                cphList.remove(vo.getKchp());
-
-                // 发送分车指令
-                A0221000008Vo a0221000008Vo = splitCar(vo.getKchp(),String.valueOf(splitNum - vo.getTotalNum()));
-                handleSplitResult(map, vo.getKchp(),kcxxMap.get(vo.getKchp()), a0221000008Vo, lineConfigMap);
-
-
-            }
-        });
-        // 未分车的车辆首次分车
-        if(cphList.size() > 0){
-            cphList.stream().forEach(cph->{
-                // 发送分车指令
-                A0221000008Vo a0221000008Vo = splitCar(cph,String.valueOf(splitNum));
-                handleSplitResult(map, cph,kcxxMap.get(cph), a0221000008Vo, lineConfigMap);
-            });
-        }
-
-        return map;
-    }
-
-    /**
-     * 分车
-     *
-     * @param kchp     考车号牌
-     * @param splitNum 分配人数
-     * @return {@link A0221000008Vo}
-     */
-    public A0221000008Vo splitCar(String kchp,String splitNum){
-        A0221000008Bo a0221000008Bo = new A0221000008Bo();
-        a0221000008Bo.setKchp(kchp);
-        a0221000008Bo.setSjrs(splitNum);
-        return IJgService.a0221000008(a0221000008Bo);
-    }
-
-    /**
-     * 处理分车结果
-     *
-     * @param splitResultMap 分割结果图
-     * @param kchp           kchp
-     * @param kcxxVo           kcxxVo
-     * @param a0221000008Vo        分车结果
-     */
-    private void handleSplitResult(Map<String, SplitCarDto> splitResultMap,String kchp,W2KcxxVo kcxxVo,A0221000008Vo a0221000008Vo,Map<String, Long> lineConfigMap){
-        String course = configService.selectConfigByKey(CacheNames.COURSE_KEY);
-        Map<String, Long> lineConfig = lineConfigMap;
-        Arrays.stream(a0221000008Vo.getMessage().split(",")).forEach(zjhm->{
-            SplitCarDto splitCarDto = new SplitCarDto();
-            splitCarDto.setKcbh(kcxxVo.getKch());
-            splitCarDto.setKchp(kchp);
-            if(course.equals("3")){
-                splitCarDto.setRLine(lineConfig.get(a0221000008Vo.getRetval()));
-            }
-            splitCarDto.setZt("1");
-            splitCarDto.setBdxh(RedisUtil.incrBdxh());
-            // 修改排队分车状态
-            W2Queuing w2Queuing = BeanUtil.toBean(splitCarDto, W2Queuing.class);
-            w2Queuing.setKsxm(configService.selectConfigByKey(CacheNames.PROJECT_IDS_EXPECT_KEY) + ","+kcxxVo.getXmxh());
-            w2Queuing.setKcxh(kcxxVo.getClxh());
-            baseMapper.update(w2Queuing, Wrappers.lambdaUpdate(W2Queuing.class).eq(W2Queuing::getZjhm,zjhm));
-            // 修改成绩表
-            W2Records w2Records = new W2Records();
-            w2Records.setKcbh(kcxxVo.getKch());
-            w2Records.setKchp(kchp);
-            w2Records.setKsxm(w2Queuing.getKsxm());
-            w2Records.setLine(splitCarDto.getRLine());
-            recordsMapper.update(w2Records, Wrappers.lambdaUpdate(W2Records.class).eq(W2Records::getZjhm,zjhm).eq(W2Records::getYkrq, DateUtil.today()));
-
-            splitResultMap.put(zjhm,splitCarDto);
-        });
+        List<W2Queuhis> W2QueuhisList = w2Queuings.stream().map(v -> BeanUtil.toBean(v, W2Queuhis.class)).collect(Collectors.toList());
+        queuhisMapper.insertBatch(W2QueuhisList);
+        baseMapper.delete(
+                Wrappers.lambdaQuery(W2Queuing.class)
+                        .lt(W2Queuing::getKsrq,DateUtil.beginOfDay(new Date()))
+        );
     }
 }

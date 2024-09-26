@@ -7,8 +7,10 @@ import com.kmks.w2.domain.dto.DispatchCenterDto;
 import com.kmks.w2.domain.vo.W2FlowVo;
 import com.kmks.w2.domain.vo.W2QueuingVo;
 import com.kmks.w2.service.IDispatchService;
+import com.kmks.w2.service.IW2FlowlogService;
 import com.kmks.w2.service.IW2KcxxService;
 import com.kmks.w2.service.IW2QueuingService;
+import com.kmks.w2.service.impl.supervise.SuperviseHandler;
 import com.kmks.w2.utils.RedisUtil;
 import com.kmks.w2.websocket.map.DispatchDataMap;
 import com.kmks.w2.websocket.map.QueueDataMap;
@@ -17,7 +19,6 @@ import com.ruoyi.common.core.domain.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.utils.JsonUtils;
-import com.ruoyi.common.utils.redis.RedisUtils;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.List;
 
 /**
@@ -46,7 +46,13 @@ public class SchedulerTasks {
     private IW2KcxxService kcxxService;
 
     @Resource
+    private IW2FlowlogService flowlogService;
+
+    @Resource
     private ISysConfigService configService;
+
+    @Resource
+    private SuperviseHandler superviseHandler;
 
     /**
      * 调度中心列表定时更新
@@ -114,7 +120,7 @@ public class SchedulerTasks {
     public void handleSplitCarData() {
         // 是否启动分车
         if(configService.selectConfigByKey(CacheNames.SPLIT_STATUS).equals("1")){
-            queuingService.splitCar();
+            superviseHandler.service().splitCar();
         }
     }
 
@@ -123,11 +129,21 @@ public class SchedulerTasks {
      *
      * @return {@link Boolean}
      */
-    @Scheduled(cron = "0 0 0 * * *")//每天零时执行
+    @Scheduled(cron = "0 1 0 * * *")//每天零时00:01执行
     public void resetData() {
-        //重置每日报到序号
+        // 排队信息同步到备份表中
+        queuingService.syncToHistory();
+
+        // 重置每日报到序号
         RedisUtil.setMaxBdxh(0l);
+
+        // 重置考车自检信息
         kcxxService.resetKcxxCheck();
+
+        // 过程明细同步到备份表中
+        flowlogService.syncToHistory();
+
+
     }
 
 }

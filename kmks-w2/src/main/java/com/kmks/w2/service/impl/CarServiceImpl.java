@@ -4,19 +4,19 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.kmks.jianguan.domain.bo.*;
-import com.kmks.jianguan.domain.vo.*;
-import com.kmks.jianguan.service.IJgService;
+import com.kmks.jianguan.enums.HttpEnum;
 import com.kmks.w2.domain.W2Flowrec;
 import com.kmks.w2.domain.W2Queuing;
 import com.kmks.w2.domain.W2Records;
 import com.kmks.w2.domain.bo.W2KcxxBo;
 import com.kmks.w2.domain.gateDto.FaceRecognizeBo;
+import com.kmks.w2.domain.gateDto.ScoreResultDto;
 import com.kmks.w2.domain.vo.*;
 import com.kmks.w2.mapper.W2FlowrecMapper;
 import com.kmks.w2.mapper.W2QueuingMapper;
 import com.kmks.w2.mapper.W2RecordsMapper;
 import com.kmks.w2.service.*;
+import com.kmks.w2.service.impl.supervise.SuperviseHandler;
 import com.kmks.w2.utils.FileUtil;
 import com.kmks.w2.utils.TcpUtils;
 import com.ruoyi.common.constant.CacheNames;
@@ -28,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -42,10 +40,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CarServiceImpl implements ICarService {
     private final IFaceService faceService;
-    private final IJgService jgService;
     private final IImageService imageService;
     private final ISysConfigService configService;
-    private final IW2LineconfigService lineconfigService;
     private final IW2CdxmbhService cdxmbhService;
 
     private final IW2KcxxService kcxxService;
@@ -57,7 +53,23 @@ public class CarServiceImpl implements ICarService {
     private final W2FlowrecMapper flowrecMapper;
     private final IW2KfconfigService kfconfigService;
 
+    private final SuperviseHandler superviseHandler;
+
     private final static String sczt = "上传成功";
+
+    /**
+     * 同步时间
+     *
+     * @return {@link String}
+     */
+    @Override
+    public String syncTime() {
+        String time = superviseHandler.service().syncTime();
+        if (StringUtils.isBlank(time)) {
+            throw new FailException("同步监管时间失败");
+        }
+        return time;
+    }
 
     /**
      * 考车上线
@@ -66,16 +78,17 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2KcxxVo}
      */
     @Override
-    public W2KcxxVo carOnLine(String kcbh){
+    public W2KcxxVo carOnLine(String kcbh) {
         W2KcxxBo w2KcxxBo = new W2KcxxBo();
         w2KcxxBo.setKch(kcbh);
         w2KcxxBo.setZt("1");
         W2KcxxVo w2KcxxVo = kcxxService.queryOne(w2KcxxBo);
-        if(w2KcxxVo == null){
+        if (w2KcxxVo == null) {
             throw new FailException("考车不存在或非可用状态");
         }
         return w2KcxxVo;
     }
+
     /**
      * 获取下一个考生
      *
@@ -83,16 +96,16 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2QueuingVo}
      */
     @Override
-    public W2QueuingVo getNextStudent(String kcbh){
+    public W2QueuingVo getNextStudent(String kcbh) {
         List<W2QueuingVo> w2QueuingVos = queuingMapper.selectVoList(
                 Wrappers.lambdaQuery(W2Queuing.class)
                         .eq(W2Queuing::getKcbh, kcbh)
                         .eq(W2Queuing::getZt, "1")
-                        .eq(W2Queuing::getKszt, "0")
-                        .eq(W2Queuing::getKsrq,DateUtil.beginOfDay(new Date()))
+                        .in(W2Queuing::getKszt, "0", "1")
+                        .eq(W2Queuing::getKsrq, DateUtil.beginOfDay(new Date()))
                         .orderByAsc(W2Queuing::getBdxh)
         );
-        if(w2QueuingVos == null || w2QueuingVos.isEmpty()){
+        if (w2QueuingVos == null || w2QueuingVos.isEmpty()) {
             throw new FailException("没有下一个考生");
         }
         return w2QueuingVos.get(0);
@@ -106,15 +119,15 @@ public class CarServiceImpl implements ICarService {
      * @return {@link String}
      */
     @Override
-    public R<Void> getFaceRecognizeResult(String zjhm, String pzzp){
-        W2RecordsVo w2RecordsVo = getTodayStudent(zjhm);
+    public R<Void> getFaceRecognizeResult(String zjhm, String pzzp) {
+        W2RecordsVo w2RecordsVo = getTodayStudent(zjhm, "");
         String jbzp = FileUtil.convertImageToBase64(w2RecordsVo.getJbzp());
         FaceRecognizeBo faceRecognizeBo = new FaceRecognizeBo();
         faceRecognizeBo.setZjhm(zjhm);
         faceRecognizeBo.setJbzp(jbzp);
         faceRecognizeBo.setZjzp(pzzp);
         Boolean similar = faceService.faceRecognize(faceRecognizeBo);
-        return similar ?R.ok("比对成功"):R.fail("比对失败");
+        return similar ? R.ok("比对成功") : R.fail("比对失败");
 
     }
 
@@ -125,13 +138,14 @@ public class CarServiceImpl implements ICarService {
      * @return {@link W2RecordsVo}
      */
     @Override
-    public W2RecordsVo getTodayStudent(String zjhm){
+    public W2RecordsVo getTodayStudent(String zjhm, String kcbh) {
         W2RecordsVo w2RecordsVo = recordsMapper.selectVoOne(
                 Wrappers.lambdaQuery(W2Records.class)
                         .eq(W2Records::getZjhm, zjhm)
+                        .eq(StringUtils.isNotBlank(kcbh), W2Records::getKcbh, kcbh)
                         .eq(W2Records::getYkrq, DateUtil.today())
         );
-        if(w2RecordsVo == null){
+        if (w2RecordsVo == null) {
             throw new FailException("今日无此考生");
         }
         return w2RecordsVo;
@@ -149,71 +163,73 @@ public class CarServiceImpl implements ICarService {
      */
     @Override
     @DSTransactional
-    public W2QueuingVo applyExam(String kcbh, String kssj,String zjhm,String kskm,String zp){
+    public W2QueuingVo applyExam(String kcbh, String kssj, String zjhm, String kskm, String zp) {
         // 验证车辆排队等基础信息
         W2QueuingVo queuingVo = judgeCarAndQueuing(kcbh, zjhm);
-        // 发送开始考试至监管
-        A0221000009Bo a0221000009Bo = new A0221000009Bo();
-        a0221000009Bo.setSfzmhm(zjhm);
-        a0221000009Bo.setKchp(kcbh);
-        a0221000009Bo.setKskm(kskm);
-        a0221000009Bo.setKssj(LocalDateTime.parse(kssj, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        if(kskm.equals("3")){
-            a0221000009Bo.setKsxl(lineconfigService.getLineDm(queuingVo.getRLine()));
-        }
-        A0221000009Vo a0221000009Vo = jgService.a0221000009(a0221000009Bo, zp);
-        handleJgResult(kcbh,a0221000009Vo.getCode().equals("1"),String.format("监管开始考试失败：%s；%s；%s",a0221000009Vo.getCode(),a0221000009Vo.getMessage(),a0221000009Vo.getRetval()));
 
-        // 更新排队数据
-        if(!queuingVo.getKszt().equals("1")){
-            queuingVo.setDjc(queuingVo.getDjc() +1);
-        }
-        if(queuingVo.getDjc() > 2l){
-            throw new FailException("已超过2次考试");
-        }
-        queuingVo.setKszt("1");
-        queuingVo.setWcxm("");
-        queuingVo.setScore(100l);
-        if(queuingMapper.updateById(BeanUtil.toBean(queuingVo,W2Queuing.class)) <= 0){
-            throw new FailException("更新排队数据失败");
-        }
-        //更新成绩数据
+        //查找成绩数据
         W2RecordsVo w2RecordsVo = recordsMapper.selectVoOne(
                 Wrappers.lambdaQuery(W2Records.class)
                         .eq(W2Records::getZjhm, zjhm)
                         .eq(W2Records::getKcbh, kcbh)
                         .eq(W2Records::getKsrq, DateUtil.beginOfDay(new Date()))
                         .orderByDesc(W2Records::getId)
-
         );
+        String name = "申请考试";
+        if (StringUtils.isBlank(zp)) {
+            name = "人工开始";
+            zp = FileUtil.convertImageToBase64(w2RecordsVo.getJbzp());
+        }
+
+        // 发送开始考试至监管
+        R<Void> superviseResult = superviseHandler.service().applyExam(queuingVo, kcbh, kssj, zjhm, kskm, zp);
+        handleJgResult(kcbh, superviseResult);
+
+        // 更新排队数据
+        if (!queuingVo.getKszt().equals("1")) {//非考试中状态
+            queuingVo.setDjc(queuingVo.getDjc() + 1);
+            queuingVo.setWcxm("");
+            queuingVo.setScore(100l);
+        }
+        if (queuingVo.getDjc() > 2l) {
+            throw new FailException("已超过2次考试");
+        }
+        queuingVo.setKszt("1");
+        if (queuingMapper.updateById(BeanUtil.toBean(queuingVo, W2Queuing.class)) <= 0) {
+            throw new FailException("更新排队数据失败");
+        }
+
+        //更新成绩数据
         W2Records w2Records = BeanUtil.toBean(w2RecordsVo, W2Records.class);
         w2Records.setKscs(queuingVo.getDjc());
-        if(w2Records.getKscs() == 1l){
+        if (w2Records.getKscs() == 1l) {
             w2Records.setKsrq1(DateUtil.beginOfDay(new Date()));
             w2Records.setKssj1(DateUtil.date());
             w2Records.setJgfs1(100l);
             w2Records.setKscj1("3");
-        }else{
+        } else {
             w2Records.setKsrq2(DateUtil.beginOfDay(new Date()));
             w2Records.setKssj2(DateUtil.date());
             w2Records.setJgfs2(100l);
             w2Records.setKscj2("3");
         }
         w2Records.setKszt("1");
+        w2Records.setKsjg("5");
 
-        if(recordsMapper.updateById(w2Records) <= 0){
+        if (recordsMapper.updateById(w2Records) <= 0) {
             throw new FailException("考试成绩信息更新失败");
         }
 
         //新增考试明细数据
-        W2Flowrec w2Flowrec = convertToW2Flowrec(queuingVo, zp, kssj, "申请考试");
+        W2Flowrec w2Flowrec = convertToW2Flowrec(queuingVo, zp, kssj, name);
 
         // 插入开始考试记录
         insertFlowrec(w2Flowrec);
 
-        //更新监管剩余项目
-        String ksxm = cdxmbhService.getMdmByGadm(new ArrayList<>(Arrays.asList(a0221000009Vo.getRetval().split(","))));
-        queuingVo.setKsxm(ksxm);
+        //特别处理，去掉额外项目
+        ArrayList<String> zkxms = new ArrayList<>(Arrays.asList(queuingVo.getZkxms().split(",")));
+        zkxms.remove(configService.selectConfigByKey(CacheNames.PROJECT_IDS_EXPECT_KEY));
+        queuingVo.setZkxms(String.join(",", zkxms));
         return queuingVo;
     }
 
@@ -229,7 +245,7 @@ public class CarServiceImpl implements ICarService {
      */
     @Override
     @DSTransactional
-    public W2QueuingVo startExam(String kcbh, String kssj, String zjhm, String zp,String speed){
+    public W2QueuingVo startExam(String kcbh, String kssj, String zjhm, String zp, String speed) {
         // 验证车辆排队等基础信息
         W2QueuingVo queuingVo = judgeCarAndQueuing(kcbh, zjhm);
         // 清空已存在的考试明细
@@ -253,39 +269,18 @@ public class CarServiceImpl implements ICarService {
      */
     @Override
     @DSTransactional
-    public String startProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed){
+    public String startProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed) {
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
 
-        // 上传项目开始至监管
-        A0221000010Bo a0221000010Bo = new A0221000010Bo();
-        a0221000010Bo.setSfzmhm(zjhm);
-        a0221000010Bo.setKchp(queuingInfo.getKchp());
-        a0221000010Bo.setKskm(queuingInfo.getKskm());
         W2CdxmbhVo cdxmConfig = cdxmbhService.getCdxmConfig(fieldId);
-        a0221000010Bo.setKsxm(cdxmConfig.getGadm());
-
-        if(a0221000010Bo.getKskm().equals("2")){
-            a0221000010Bo.setSbbh(cdxmConfig.getSbxh());
-        }else{
-            String lineDm = lineconfigService.getLineDm(queuingInfo.getRLine());
-            a0221000010Bo.setKsxl(lineDm);
-        }
-        a0221000010Bo.setKssj(LocalDateTime.parse(kssj,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        A0221000010Vo a0221000010Vo = jgService.a0221000010(a0221000010Bo);
-
-        handleJgResult(kcbh,a0221000010Vo.getCode().equals("1"),String.format("上传监管项目开始失败：%s；%s",a0221000010Vo.getCode(),a0221000010Vo.getMessage()));
+        // 上传项目开始至监管
+        R<Void> superviseResult = superviseHandler.service().startProgram(queuingInfo, kcbh, kssj, zjhm, cdxmConfig, zp, speed);
+        handleJgResult(kcbh, superviseResult);
 
         // 上传考试过程图片至监管
-        A0221000012Bo a0221000012Bo = new A0221000012Bo();
-        a0221000012Bo.setKskm(a0221000010Bo.getKskm());
-        a0221000012Bo.setZpsj(a0221000010Bo.getKssj());
-        a0221000012Bo.setSfzmhm(zjhm);
-        a0221000012Bo.setKskm(cdxmConfig.getGadm());
-        a0221000012Bo.setCs(Double.valueOf(speed));
-        A0221000012Vo a0221000012Vo = jgService.a0221000012(a0221000012Bo, zp);
-
-        handleJgResult(kcbh,a0221000012Vo.getCode().equals("1"),String.format(String.format("上传监管考试过程图片失败：%s；%s",a0221000012Vo.getCode(),a0221000012Vo.getMessage())));
+        R<Void> imgResult = superviseHandler.service().uploadImg(queuingInfo, queuingInfo.getKskm(), kcbh, kssj, zjhm, cdxmConfig.getGadm(), zp, speed);
+        handleJgResult(kcbh, imgResult);
 
         //新增考试明细数据
         W2Flowrec w2Flowrec = convertToW2Flowrec(queuingInfo, zp, kssj, "项目开始");
@@ -302,27 +297,15 @@ public class CarServiceImpl implements ICarService {
 
     @Override
     @DSTransactional
-    public W2QueuingVo finishProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed){
+    public W2QueuingVo finishProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed) {
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
 
-        // 上传考试结束至监管
-        A0221000013Bo a0221000013Bo = new A0221000013Bo();
-        a0221000013Bo.setSfzmhm(zjhm);
-        a0221000013Bo.setKskm(queuingInfo.getKskm());
         W2CdxmbhVo cdxmConfig = cdxmbhService.getCdxmConfig(fieldId);
-        a0221000013Bo.setKsxm(cdxmConfig.getGadm());
-        if(a0221000013Bo.getKskm().equals("2")){
-            a0221000013Bo.setSbbh(cdxmConfig.getSbxh());
-        }else{
-            String lineDm = lineconfigService.getLineDm(queuingInfo.getRLine());
-            a0221000013Bo.setKsxl(lineDm);
-        }
-        a0221000013Bo.setJssj(LocalDateTime.parse(kssj,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        a0221000013Bo.setCzlx("1");
-        A0221000013Vo a0221000013Vo = jgService.a0221000013(a0221000013Bo);
 
-        handleJgResult(kcbh,a0221000013Vo.getCode().equals("1"),String.format(String.format("上传监管项目结束失败：%s；%s",a0221000013Vo.getCode(),a0221000013Vo.getMessage())));
+        // 上传项目结束至监管
+        R<Void> superviseResult = superviseHandler.service().finishProgram(queuingInfo, kcbh, kssj, zjhm, cdxmConfig, zp, speed);
+        handleJgResult(kcbh, superviseResult);
 
         //新增考试明细数据
         W2Flowrec w2Flowrec = convertToW2Flowrec(queuingInfo, zp, kssj, "项目结束");
@@ -336,7 +319,7 @@ public class CarServiceImpl implements ICarService {
 
         //获取完成项目
         String wcxm = getWcxm(cdxmConfig.getMdm(), queuingInfo);
-        if(wcxm.equals(queuingInfo.getWcxm())){
+        if (wcxm.equals(queuingInfo.getWcxm())) {
             return queuingInfo;
         }
         queuingInfo.setWcxm(wcxm);
@@ -346,7 +329,7 @@ public class CarServiceImpl implements ICarService {
 //            // 考试结束业务处理
 //            finishExam(queuingInfo, kssj, zp, speed);
 //        }
-        if(queuingMapper.updateById(BeanUtil.toBean(queuingInfo,W2Queuing.class)) > 0){
+        if (queuingMapper.updateById(BeanUtil.toBean(queuingInfo, W2Queuing.class)) > 0) {
             return queuingInfo;
         }
         throw new FailException("更新排队信息失败");
@@ -359,82 +342,66 @@ public class CarServiceImpl implements ICarService {
      * @param kcbh  kcbh
      * @param kssj  kssj
      * @param zjhm  zjhm
-     * @param score 分数
+     * @param score 扣分
      * @param zp    zp
      * @param speed 速度
      * @return {@link W2QueuingVo}
      */
     @Override
     @DSTransactional
-    public W2QueuingVo finishExam(String kcbh, String kssj, String zjhm, String score, String zp, String speed){
+    public W2QueuingVo finishExam(String kcbh, String kssj, String zjhm, String score, String zp, String speed) {
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
-        // 上传考试结束至监管
-        A0221000014Bo a0221000014Bo = new A0221000014Bo();
-        a0221000014Bo.setSfzmhm(zjhm);
-        a0221000014Bo.setKskm(queuingInfo.getKskm());
-        a0221000014Bo.setJssj(LocalDateTime.parse(kssj,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        a0221000014Bo.setKscj(score);
-        A0221000014Vo a0221000014Vo = jgService.a0221000014(a0221000014Bo,zp);
 
-        handleJgResult(kcbh,a0221000014Vo.getCode().equals("1"),String.format(String.format("上传监管考试结束失败：%s；%s",a0221000014Vo.getCode(),a0221000014Vo.getMessage())));
+        // 判断考试结束数据是否有问题
+        //获取考试结果
+        Long getScore = Long.valueOf(score);
+        ScoreResultDto scoreResultDto = handleScoreResult(queuingInfo.getKskm(), queuingInfo.getDjc(), queuingInfo.getScore());
+        if (queuingInfo.getScore() != getScore) {
+            throw new FailException("考试结束与过程分数不一致");
+        } else if (scoreResultDto.getKsjg().equals("1") && !StringUtils.isBlank(queuingInfo.getKsxm())) {
+            throw new FailException("考试合格却存在未考项目");
+        }
+
+        // 上传考试结束至监管
+        R<Void> superviseResult = superviseHandler.service().finishExam(queuingInfo, kcbh, kssj, zjhm, String.valueOf(getScore), zp, speed);
+        handleJgResult(kcbh, superviseResult);
 
         // 插入结束考试记录
         W2Flowrec w2Flowrec = convertToW2Flowrec(queuingInfo, zp, kssj, "考试结束");
         insertFlowrec(w2Flowrec);
 
         // 更新排队信息
-        queuingInfo.setScore(Long.valueOf(score));
         queuingInfo.setKszt("2");
 
         // 处理考试成绩表
         W2RecordsVo recordsInfo = getRecordsInfo(queuingInfo.getKcbh(), queuingInfo.getZjhm());
         recordsInfo.setKszt("2");
+
         //评判考试结果
-        Long qualifiedScore = 0l;
-        if(queuingInfo.getKskm().equals("2")){
-            qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_K2_SCORE_KEY));
-        }else{
-            qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_K3_SCORE_KEY));
-        }
-
-        if(recordsInfo.getKscs() == 1l){
+        if (recordsInfo.getKscs() == 1l) {
+            recordsInfo.setKsjg(scoreResultDto.getKsjg());
             recordsInfo.setJssj1(DateUtil.parse(kssj));
-            if(recordsInfo.getJgfs1() >= qualifiedScore){
-                recordsInfo.setKsjg("1");
-                recordsInfo.setKscj1("1");
-                queuingInfo.setKscj(1l);
-            }else{
-                recordsInfo.setKsjg("2");
-                recordsInfo.setKscj1("2");
-                queuingInfo.setKscj(2l);
-            }
-
-        }else{
+            recordsInfo.setKscj1(scoreResultDto.getKscj1());
+            queuingInfo.setKscj(scoreResultDto.getKscj());
+        } else {
+            recordsInfo.setKsjg(scoreResultDto.getKsjg());
             recordsInfo.setJssj2(DateUtil.parse(kssj));
-            if(recordsInfo.getJgfs2() >= qualifiedScore){
-                recordsInfo.setKsjg("1");
-                recordsInfo.setKscj1("3");
-                queuingInfo.setKscj(3l);
-            }else{
-                recordsInfo.setKsjg("2");
-                recordsInfo.setKscj1("4");
-                queuingInfo.setKscj(4l);
-            }
+            recordsInfo.setKscj2(scoreResultDto.getKscj2());
+            queuingInfo.setKscj(scoreResultDto.getKscj());
         }
 
-        if(queuingMapper.updateById(BeanUtil.toBean(queuingInfo,W2Queuing.class)) <= 0){
+        if (queuingMapper.updateById(BeanUtil.toBean(queuingInfo, W2Queuing.class)) <= 0) {
             throw new FailException("更新排队信息失败");
         }
 
-        if(recordsMapper.updateById(BeanUtil.toBean(recordsInfo,W2Records.class))>0){
+        if (recordsMapper.updateById(BeanUtil.toBean(recordsInfo, W2Records.class)) > 0) {
             return queuingInfo;
         }
         throw new FailException("结束考试更新成绩数据失败");
     }
 
     /**
-     * 扣分
      * 上传扣分
      *
      * @param kcbh    kcbh
@@ -449,33 +416,20 @@ public class CarServiceImpl implements ICarService {
      */
     @Override
     @DSTransactional
-    public W2QueuingVo deductPoint(String kcbh, String kssj, String zjhm, String fieldId, String kfdm, String kfType, String zp, String speed){
+    public W2QueuingVo deductPoint(String kcbh, String kssj, String zjhm, String fieldId, String kfdm, String kfType, String zp, String speed) {
         // 获取考生排队信息
         W2QueuingVo queuingInfo = getQueuingInfo(kcbh, zjhm);
         W2CdxmbhVo cdxmConfig = cdxmbhService.getCdxmConfig(fieldId);
+
         // 上传考试扣分至监管
-        A0221000011Bo a0221000011Bo = new A0221000011Bo();
-        a0221000011Bo.setSfzmhm(zjhm);
-        a0221000011Bo.setKskm(queuingInfo.getKskm());
-        a0221000011Bo.setKfsj(LocalDateTime.parse(kssj,DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        a0221000011Bo.setKsxm(cdxmConfig.getGadm());
-        a0221000011Bo.setKfxm(kfdm);
-        a0221000011Bo.setKffs(kfType);
-        A0221000011Vo a0221000011Vo = jgService.a0221000011(a0221000011Bo);
-        handleJgResult(kcbh,a0221000011Vo.getCode().equals("1"),String.format(String.format("上传监管考试扣分失败：%s；%s",a0221000011Vo.getCode(),a0221000011Vo.getMessage())));
+        R<Void> superviseResult = superviseHandler.service().deductPoint(queuingInfo, kcbh, kssj, zjhm, cdxmConfig, kfdm, kfType, zp, speed);
+        handleJgResult(kcbh, superviseResult);
 
         // 上传考试过程图片至监管
-        A0221000012Bo a0221000012Bo = new A0221000012Bo();
-        a0221000012Bo.setKskm(a0221000011Bo.getKskm());
-        a0221000012Bo.setZpsj(a0221000011Bo.getKfsj());
-        a0221000012Bo.setSfzmhm(zjhm);
-        a0221000012Bo.setKskm(cdxmConfig.getGadm());
-        a0221000012Bo.setCs(Double.valueOf(speed));
-        A0221000012Vo a0221000012Vo = jgService.a0221000012(a0221000012Bo, zp);
-        handleJgResult(kcbh,a0221000012Vo.getCode().equals("1"),String.format(String.format("上传监管考试过程图片失败：%s；%s",a0221000012Vo.getCode(),a0221000012Vo.getMessage())));
+        R<Void> imgResult = superviseHandler.service().uploadImg(queuingInfo, queuingInfo.getKskm(), kcbh, kssj, zjhm, cdxmConfig.getGadm(), zp, speed);
+        handleJgResult(kcbh, imgResult);
 
         // 插入考试扣分记录
-
         W2Flowrec w2Flowrec = convertToW2Flowrec(queuingInfo, zp, kssj, "评判扣分");
         w2Flowrec.setKsxm(fieldId);
         w2Flowrec.setXmmc(cdxmConfig.getParamname());
@@ -488,24 +442,24 @@ public class CarServiceImpl implements ICarService {
         insertFlowrec(w2Flowrec);
 
         // 更新排队信息
-        Long score = (queuingInfo.getScore()-kfConfig.getKf()) > 0?(queuingInfo.getScore()-kfConfig.getKf()):0l;
+        Long score = (queuingInfo.getScore() - kfConfig.getKf()) > 0 ? (queuingInfo.getScore() - kfConfig.getKf()) : 0l;
         queuingInfo.setScore(score);
 
-        if(queuingMapper.updateById(BeanUtil.toBean(queuingInfo,W2Queuing.class)) <= 0){
+        if (queuingMapper.updateById(BeanUtil.toBean(queuingInfo, W2Queuing.class)) <= 0) {
             throw new FailException("更新排队信息失败");
         }
 
         // 处理考试成绩表
         W2RecordsVo recordsInfo = getRecordsInfo(queuingInfo.getKcbh(), queuingInfo.getZjhm());
 
-        if(recordsInfo.getKscs() == 1l){
+        if (recordsInfo.getKscs() == 1l) {
             recordsInfo.setJgfs1(score);
-            recordsInfo.setKfxx1(StringUtils.isBlank(recordsInfo.getKfxx1()) ? kfdm : recordsInfo.getKfxx1()+";"+kfdm);
-        }else{
+            recordsInfo.setKfxx1(StringUtils.isBlank(recordsInfo.getKfxx1()) ? kfdm : recordsInfo.getKfxx1() + ";" + kfdm);
+        } else {
             recordsInfo.setJgfs2(score);
-            recordsInfo.setKfxx2(StringUtils.isBlank(recordsInfo.getKfxx2()) ? kfdm : recordsInfo.getKfxx2()+";"+kfdm);
+            recordsInfo.setKfxx2(StringUtils.isBlank(recordsInfo.getKfxx2()) ? kfdm : recordsInfo.getKfxx2() + ";" + kfdm);
         }
-        if(recordsMapper.updateById(BeanUtil.toBean(recordsInfo,W2Records.class)) > 0){
+        if (recordsMapper.updateById(BeanUtil.toBean(recordsInfo, W2Records.class)) > 0) {
             return queuingInfo;
         }
         throw new FailException("扣分成绩更新成绩数据失败");
@@ -519,18 +473,18 @@ public class CarServiceImpl implements ICarService {
      * @param queuingVo 排队vo
      * @return {@link String}
      */
-    private String getWcxm(String xm,W2QueuingVo queuingVo){
+    private String getWcxm(String xm, W2QueuingVo queuingVo) {
         String wcxm = queuingVo.getWcxm();
         ArrayList<String> wcxms = new ArrayList<>();
-        if(StringUtils.isNotBlank(wcxm)){
+        if (StringUtils.isNotBlank(wcxm)) {
             wcxms = new ArrayList<>(Arrays.asList(wcxm.split(",")));
         }
-        if(wcxms.contains(xm)){
+        if (wcxms.contains(xm)) {
             return wcxm;
-        }else{
+        } else {
             wcxms.add(xm);
             String[] ksxms = queuingVo.getKsxm().split(",");
-            if(wcxms.size() == ksxms.length -1 && !wcxms.contains(configService.selectConfigByKey(CacheNames.PROJECT_IDS_EXPECT_KEY))){
+            if (wcxms.size() == ksxms.length - 1 && !wcxms.contains(configService.selectConfigByKey(CacheNames.PROJECT_IDS_EXPECT_KEY))) {
                 wcxms.add(configService.selectConfigByKey(CacheNames.PROJECT_IDS_EXPECT_KEY));
             }
             Collections.sort(wcxms);
@@ -547,12 +501,12 @@ public class CarServiceImpl implements ICarService {
      * @param zjhm zjhm
      * @return {@link W2QueuingVo}
      */
-    private W2QueuingVo judgeCarAndQueuing(String kcbh,String zjhm){
+    private W2QueuingVo judgeCarAndQueuing(String kcbh, String zjhm) {
         // 判断考车状态
         W2KcxxBo w2KcxxBo = new W2KcxxBo();
         w2KcxxBo.setKch(kcbh);
         w2KcxxBo.setZt("1");
-        if(!kcxxService.exists(w2KcxxBo)){
+        if (!kcxxService.exists(w2KcxxBo)) {
             throw new FailException("考车状态不可用");
         }
         // 判断是否允许学员考试
@@ -560,9 +514,9 @@ public class CarServiceImpl implements ICarService {
                 Wrappers.lambdaQuery(W2Queuing.class)
                         .eq(W2Queuing::getZjhm, zjhm)
                         .eq(W2Queuing::getKcbh, kcbh)
-                        .eq(W2Queuing::getKsrq,DateUtil.beginOfDay(new Date()))
+                        .eq(W2Queuing::getKsrq, DateUtil.beginOfDay(new Date()))
         );
-        if(queuingVo == null){
+        if (queuingVo == null) {
             throw new FailException("不存在该考生或考生状态不允许开始考试");
         }
         return queuingVo;
@@ -575,17 +529,17 @@ public class CarServiceImpl implements ICarService {
      * @param zjhm zjhm
      * @return {@link W2QueuingVo}
      */
-    private W2QueuingVo getQueuingInfo(String kcbh,String zjhm){
+    private W2QueuingVo getQueuingInfo(String kcbh, String zjhm) {
         // 获取正在考试中的排队信息
         W2QueuingVo queuingVo = queuingMapper.selectVoOne(
                 Wrappers.lambdaQuery(W2Queuing.class)
                         .eq(W2Queuing::getZjhm, zjhm)
                         .eq(W2Queuing::getKcbh, kcbh)
-                        .eq(W2Queuing::getKsrq,DateUtil.beginOfDay(new Date()))
+                        .eq(W2Queuing::getKsrq, DateUtil.beginOfDay(new Date()))
                         .eq(W2Queuing::getZt, "1")
-                        .eq(W2Queuing::getKszt,"1")
+                        .eq(W2Queuing::getKszt, "1")
         );
-        if(queuingVo == null){
+        if (queuingVo == null) {
             throw new FailException("未查询到考生排队信息");
         }
         return queuingVo;
@@ -598,7 +552,7 @@ public class CarServiceImpl implements ICarService {
      * @param zjhm zjhm
      * @return {@link W2RecordsVo}
      */
-    private W2RecordsVo getRecordsInfo(String kcbh,String zjhm){
+    private W2RecordsVo getRecordsInfo(String kcbh, String zjhm) {
         // 获取正在考试中的成绩信息
         W2RecordsVo w2RecordsVo = recordsMapper.selectVoOne(
                 Wrappers.lambdaQuery(W2Records.class)
@@ -608,7 +562,7 @@ public class CarServiceImpl implements ICarService {
                         .orderByDesc(W2Records::getId)
 
         );
-        if(w2RecordsVo == null){
+        if (w2RecordsVo == null) {
             throw new FailException("未查询到考生成绩信息");
         }
         return w2RecordsVo;
@@ -623,10 +577,10 @@ public class CarServiceImpl implements ICarService {
      * @param kszt      kszt
      * @return {@link W2Flowrec}
      */
-    private W2Flowrec convertToW2Flowrec(W2QueuingVo queuingVo,String zp,String kssj,String kszt){
+    private W2Flowrec convertToW2Flowrec(W2QueuingVo queuingVo, String zp, String kssj, String kszt) {
         W2Flowrec w2Flowrec = new W2Flowrec();
 
-        if(StringUtils.isNotBlank(zp)){
+        if (StringUtils.isNotBlank(zp)) {
             w2Flowrec.setZp(imageService.saveImage(zp));
         }
 
@@ -650,8 +604,8 @@ public class CarServiceImpl implements ICarService {
      *
      * @param w2Flowrec w2Flowrec
      */
-    private void insertFlowrec(W2Flowrec w2Flowrec){
-        if(flowrecMapper.insert(w2Flowrec) <= 0){
+    private void insertFlowrec(W2Flowrec w2Flowrec) {
+        if (flowrecMapper.insert(w2Flowrec) <= 0) {
             throw new FailException("插入考试明细失败");
         }
     }
@@ -659,14 +613,57 @@ public class CarServiceImpl implements ICarService {
     /**
      * 处理上传监管结果处理
      *
-     * @param kcbh         kcbh
-     * @param result       后果
-     * @param errorMessage 错误消息
+     * @param kcbh     kcbh
+     * @param response response
      */
-    private void handleJgResult(String kcbh,Boolean result,String errorMessage){
-        TcpUtils.setDispatchCenterDtoSczt(kcbh,result?sczt:errorMessage);
-        if(!result){
-            throw new FailException(errorMessage);
+    private void handleJgResult(String kcbh, R<Void> response) {
+        boolean result = response.getCode() == HttpEnum.SUCCESS.getCode();
+        TcpUtils.setDispatchCenterDtoSczt(kcbh, result ? sczt : response.getMsg());
+        if (!result) {
+            throw new FailException(response.getMsg());
         }
+    }
+
+    /**
+     * 处理得分结果
+     *
+     * @param kskm 考试科目
+     * @param kscs 考试次数
+     * @param ksfs 考试分数
+     * @return {@link ScoreResultDto}
+     */
+    @Override
+    public ScoreResultDto handleScoreResult(String kskm, Long kscs, Long ksfs) {
+        ScoreResultDto scoreResultDto = new ScoreResultDto();
+        Long qualifiedScore = 0l;
+        if (kskm.equals("2")) {
+            qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_K2_SCORE_KEY));
+        } else {
+            qualifiedScore = Long.valueOf(configService.selectConfigByKey(CacheNames.QUALIFIED_K3_SCORE_KEY));
+        }
+
+        if (kscs == 1l) {
+            if (ksfs >= qualifiedScore) {
+                scoreResultDto.setKsjg("1");
+                scoreResultDto.setKscj1("1");
+                scoreResultDto.setKscj(1l);
+            } else {
+                scoreResultDto.setKsjg("2");
+                scoreResultDto.setKscj1("2");
+                scoreResultDto.setKscj(2l);
+            }
+
+        } else {
+            if (ksfs >= qualifiedScore) {
+                scoreResultDto.setKsjg("1");
+                scoreResultDto.setKscj2("3");
+                scoreResultDto.setKscj(3l);
+            } else {
+                scoreResultDto.setKsjg("2");
+                scoreResultDto.setKscj2("4");
+                scoreResultDto.setKscj(4l);
+            }
+        }
+        return scoreResultDto;
     }
 }

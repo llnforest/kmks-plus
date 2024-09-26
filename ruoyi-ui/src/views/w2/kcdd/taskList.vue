@@ -18,7 +18,7 @@
           plain
           icon="el-icon-circle-close"
           size="mini"
-          :disabled="multiple"
+          :disabled="single"
           @click="handleCancel"
           v-hasPermi="['w2:dispatch:cancel']"
         >取消考试</el-button>
@@ -30,15 +30,20 @@
     <el-table ref="dragTable" v-loading="loading" :data="queuingList" :row-class-name="tableRowClassName"
               row-key="zjhm" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="考车编号" align="center" prop="kcbh" min-width="70"/>
+      <el-table-column label="考车编号" align="center" prop="kcbh" min-width="80"/>
       <el-table-column label="考车信息" align="center" prop="kcxx" min-width="90"/>
-      <el-table-column label="考试状态" align="center" prop="kszt" min-width="80"/>
-      <el-table-column label="考生姓名" align="center" prop="ksxm" min-width="60"/>
-      <el-table-column label="证件号码" align="center" prop="zjhm" min-width="120"/>
+      <el-table-column label="考试状态" align="center" prop="kszt" min-width="120"/>
+      <el-table-column label="考试科目" align="center" prop="kskm" min-width="80">
+        <template slot-scope="scope">
+          <dict-tag :options="dict.type.sys_kskm" :value="scope.row.kskm"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="考生姓名" align="center" prop="ksxm" min-width="80"/>
+      <el-table-column label="证件号码" align="center" prop="zjhm" min-width="160"/>
       <el-table-column label="当前项目" align="center" prop="dqxm" min-width="80"/>
       <el-table-column label="上传状态" align="center" prop="sczt" min-width="100"/>
-      <el-table-column label="考试分数" align="center" prop="ksfs" min-width="60"/>
-      <el-table-column label="考试结果" align="center" prop="kscj" min-width="70">
+      <el-table-column label="考试分数" align="center" prop="ksfs" min-width="80"/>
+      <el-table-column label="考试结果" align="center" prop="kscj" min-width="80">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.record_ksjg" :value="scope.row.kscj"/>
         </template>
@@ -73,7 +78,7 @@ import {applyExam, cancelExam, centerList, flowList} from "@/api/w2/dispatch";
 
 export default {
   name: "TaskList",
-  dicts: ['record_ksjg'],
+  dicts: ['record_ksjg','sys_kskm'],
   data() {
     return {
       // 按钮loading
@@ -128,7 +133,11 @@ export default {
     },
     /** 申请考试 */
     handleApply(row) {
-      const ids = row.zjhm || this.ids;
+      const ids = row.zjhm+"_"+row.kskm || this.ids;
+      if(ids == "null_null"){
+        this.$modal.msgError("该考车尚未查找下一个待考考生");
+        return ;
+      }
       this.$modal.confirm('是否确认证件号码为"' + ids + '"的考生申请考试？').then(() => {
         this.loading = true;
         return applyExam(ids);
@@ -143,7 +152,11 @@ export default {
     },
     /** 取消考试 */
     handleCancel(row) {
-      const ids = row.zjhm || this.ids;
+      const ids = row.zjhm+"_"+row.kskm || this.ids;
+      if(ids == "null_null"){
+        this.$modal.msgError("该考车尚未查找下一个待考考生");
+        return ;
+      }
       this.$modal.confirm('是否确认取消证件号码为"' + ids + '"的考试？').then(() => {
         this.loading = true;
         return cancelExam(ids);
@@ -170,7 +183,8 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.zjhm)
+      console.log(selection);
+      this.ids = selection.map(item => item.zjhm+"_"+item.kskm)
       console.log(this.ids)
       this.single = selection.length!==1
       this.multiple = !selection.length

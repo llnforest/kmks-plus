@@ -1,11 +1,11 @@
 # 项目相关配置
 ruoyi:
   # 名称
-  name: RuoYi-Vue-Plus
+  name: kmksPlus
   # 版本
-  version: ${ruoyi-vue-plus.version}X
+  version: 3.15
   # 版权年份
-  copyrightYear: 2022
+  copyrightYear: 2024
   # 实例演示开关
   demoEnabled: true
   # 获取ip地址开关

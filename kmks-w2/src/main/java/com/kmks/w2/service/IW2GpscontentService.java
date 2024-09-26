@@ -33,6 +33,10 @@ public interface IW2GpscontentService {
 
     <T> List<T> queryListByTable(W2GpscontentBo bo, Class<T> clazz);
 
+    Boolean insertRawSql(String sql);
+
+    void checkAndCreateTable();
+
     /**
      * 新增轨迹数据
      */

@@ -83,7 +83,7 @@ public class DispatchCenterController extends BaseController {
     @SaCheckPermission("w2:dispatch:cancel")
     @Log(title = "调度中心", businessType = BusinessType.UPDATE,remark = "取消考试")
     @PutMapping("/cancel/{ids}")
-    public R<Void> cancel(@NotEmpty(message = "主键不能为空") @PathVariable("ids") String[] ids){
+    public R<Void> cancel(@NotEmpty(message = "主键不能为空") @PathVariable("ids") String ids){
         return toAjax(iw2QueuingService.cancelExam(ids));
     }
 

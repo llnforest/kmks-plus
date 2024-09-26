@@ -66,7 +66,7 @@ public class W2Queuing {
      */
     private Long iLock;
     /**
-     * 监管分车
+     * 签到状态
      */
     private Long sign;
     /**
@@ -174,7 +174,7 @@ public class W2Queuing {
      */
     private Date ksrq;
     /**
-     * $column.columnComment
+     * 分车状态
      */
     private String zt;
     /**

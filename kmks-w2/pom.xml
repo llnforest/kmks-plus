@@ -30,6 +30,12 @@
             <groupId>com.ruoyi</groupId>
             <artifactId>kmks-jianguan</artifactId>
         </dependency>
+
+        <!-- 老监管服务-->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>kmks-jianguanold</artifactId>
+        </dependency>
         <!-- websocket -->
         <dependency>
             <groupId>org.springframework</groupId>

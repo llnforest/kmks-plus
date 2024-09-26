@@ -93,7 +93,8 @@
           :disabled="single"
           @click="handleUpdateKscx"
           v-hasPermi="['w2:queuing:kscx']"
-        >修改车型</el-button>
+        >修改车型
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -104,7 +105,8 @@
           :disabled="single"
           @click="handleUpdateInfo"
           v-hasPermi="['w2:queuing:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5" v-if="false">
         <el-button
@@ -115,7 +117,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['w2:queuing:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -125,7 +128,19 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['w2:queuing:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleImport"
+          v-hasPermi="['w2:queuing:import']"
+        >导入预约学员
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-tooltip content="长按行可以上下拖动排序哦" placement="right" effect="light">
@@ -135,15 +150,18 @@
             icon="el-icon-d-caret"
             size="mini"
             v-hasPermi="['w2:queuing:upDown']"
-          >排序</el-button>
+          >排序
+          </el-button>
         </el-tooltip>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table ref="dragTable" row-key="id"  v-loading="loading" :data="queuingList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
-      <el-table-column type="selection" width="55" align="center" />
+    <el-table ref="dragTable" row-key="id" v-loading="loading" :data="queuingList"
+              @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="ID" align="center" prop="id" v-if="false"/>
+      <el-table-column label="流水号" align="center" prop="lsh" min-width="90" v-if="isJgType(2)"/>
       <el-table-column label="证件号码" align="center" prop="zjhm" min-width="160"/>
       <el-table-column label="考生姓名" align="center" prop="xm" min-width="100"/>
       <el-table-column label="排队序号" align="center" prop="bdxh" min-width="80"/>
@@ -165,8 +183,9 @@
       <el-table-column label="考车编号" align="center" prop="kcbh" min-width="80"/>
       <el-table-column label="车牌号码" align="center" prop="kchp" min-width="100"/>
       <el-table-column label="考试车型" align="center" prop="kscx" min-width="80"/>
-      <el-table-column label="线路" align="center" prop="rline" min-width="60"  v-if="isCourse(3)"/>
-      <el-table-column label="夜考" align="center" prop="sfyk" min-width="60"  v-if="isCourse(3)">
+      <el-table-column label="考官" align="center" prop="kg" min-width="60" v-if="isJgType(2)"/>
+      <el-table-column label="线路" align="center" prop="rline" min-width="60" v-if="isCourse(3)"/>
+      <el-table-column label="夜考" align="center" prop="sfyk" min-width="60" v-if="isCourse(3)">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_status" :value="scope.row.sfyk"/>
         </template>
@@ -184,12 +203,12 @@
       <el-table-column label="成绩" align="center" prop="score" min-width="60"/>
       <el-table-column label="分配项目" align="left" prop="ksxm" min-width="600" show-overflow-tooltip>
         <template slot-scope="scope">
-          {{getWcxmNames(scope.row.ksxm)}}
+          {{ getWcxmNames(scope.row.ksxm) }}
         </template>
       </el-table-column>
       <el-table-column label="完成项目" align="left" prop="wcxm" min-width="600" show-overflow-tooltip>
         <template slot-scope="scope">
-          {{getWcxmNames(scope.row.wcxm)}}
+          {{ getWcxmNames(scope.row.wcxm) }}
         </template>
       </el-table-column>
     </el-table>
@@ -241,8 +260,8 @@
       <el-form ref="formInfo" :model="updateForm" :rules="rules" label-width="80px">
         <el-form-item label="考试项目" prop="ksxm">
           <el-checkbox-group v-model="updateForm.ksxm">
-            <template  v-for="(item,index) in xmdmList">
-              <el-checkbox :key="item.id" :label="item.custxh" v-if="item.show">{{item.name}}</el-checkbox>
+            <template v-for="(item,index) in xmdmList">
+              <el-checkbox :key="item.id" :label="item.custxh" v-if="item.show">{{ item.name }}</el-checkbox>
               <el-divider content-position="left" v-if="item.id == 10000">科目二</el-divider>
               <el-divider content-position="left" v-if="item.id == 30000">科目三</el-divider>
             </template>
@@ -279,31 +298,31 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="考试编号" prop="ksbh">
-          <el-input v-model="form.ksbh" placeholder="请输入考试编号" />
+          <el-input v-model="form.ksbh" placeholder="请输入考试编号"/>
         </el-form-item>
         <el-form-item label="考生姓名" prop="xm">
-          <el-input v-model="form.xm" placeholder="请输入考生姓名" />
+          <el-input v-model="form.xm" placeholder="请输入考生姓名"/>
         </el-form-item>
         <el-form-item label="证件号码" prop="zjhm">
-          <el-input v-model="form.zjhm" placeholder="请输入证件号码" />
+          <el-input v-model="form.zjhm" placeholder="请输入证件号码"/>
         </el-form-item>
         <el-form-item label="驾校名称" prop="jxmc">
-          <el-input v-model="form.jxmc" placeholder="请输入驾校名称" />
+          <el-input v-model="form.jxmc" placeholder="请输入驾校名称"/>
         </el-form-item>
         <el-form-item label="考车编号" prop="kcbh">
-          <el-input v-model="form.kcbh" placeholder="请输入考车编号" />
+          <el-input v-model="form.kcbh" placeholder="请输入考车编号"/>
         </el-form-item>
         <el-form-item label="车牌号码" prop="kchp">
-          <el-input v-model="form.kchp" placeholder="请输入车牌号码" />
+          <el-input v-model="form.kchp" placeholder="请输入车牌号码"/>
         </el-form-item>
         <el-form-item label="线路" prop="rLine">
-          <el-input v-model="form.rLine" placeholder="请输入线路" />
+          <el-input v-model="form.rLine" placeholder="请输入线路"/>
         </el-form-item>
         <el-form-item label="锁定状态" prop="iLock">
-          <el-input v-model="form.iLock" placeholder="请输入锁定状态" />
+          <el-input v-model="form.iLock" placeholder="请输入锁定状态"/>
         </el-form-item>
         <el-form-item label="监管分车" prop="sign">
-          <el-input v-model="form.sign" placeholder="请输入监管分车" />
+          <el-input v-model="form.sign" placeholder="请输入监管分车"/>
         </el-form-item>
         <el-form-item label="考试状态" prop="kszt">
           <el-select v-model="form.kszt" placeholder="请选择考试状态">
@@ -316,37 +335,37 @@
           </el-select>
         </el-form-item>
         <el-form-item label="第几次" prop="djc">
-          <el-input v-model="form.djc" placeholder="请输入第几次" />
+          <el-input v-model="form.djc" placeholder="请输入第几次"/>
         </el-form-item>
         <el-form-item label="缴费" prop="sqks">
-          <el-input v-model="form.sqks" placeholder="请输入缴费" />
+          <el-input v-model="form.sqks" placeholder="请输入缴费"/>
         </el-form-item>
         <el-form-item label="成绩" prop="score">
-          <el-input v-model="form.score" placeholder="请输入成绩" />
+          <el-input v-model="form.score" placeholder="请输入成绩"/>
         </el-form-item>
         <el-form-item label="夜考" prop="sfyk">
-          <el-input v-model="form.sfyk" placeholder="请输入夜考" />
+          <el-input v-model="form.sfyk" placeholder="请输入夜考"/>
         </el-form-item>
         <el-form-item label="分配项目" prop="ksxm">
-          <el-input v-model="form.ksxm" placeholder="请输入分配项目" />
+          <el-input v-model="form.ksxm" placeholder="请输入分配项目"/>
         </el-form-item>
         <el-form-item label="完成项目" prop="wcxm">
-          <el-input v-model="form.wcxm" placeholder="请输入完成项目" />
+          <el-input v-model="form.wcxm" placeholder="请输入完成项目"/>
         </el-form-item>
         <el-form-item label="考试车型" prop="kscx">
-          <el-input v-model="form.kscx" placeholder="请输入考试车型" />
+          <el-input v-model="form.kscx" placeholder="请输入考试车型"/>
         </el-form-item>
         <el-form-item label="考官姓名" prop="kgname">
-          <el-input v-model="form.kgname" placeholder="请输入考官姓名" />
+          <el-input v-model="form.kgname" placeholder="请输入考官姓名"/>
         </el-form-item>
         <el-form-item label="考官证件" prop="kg">
-          <el-input v-model="form.kg" placeholder="请输入考官证件" />
+          <el-input v-model="form.kg" placeholder="请输入考官证件"/>
         </el-form-item>
         <el-form-item label="安全员" prop="sSafe">
-          <el-input v-model="form.sSafe" placeholder="请输入安全员" />
+          <el-input v-model="form.sSafe" placeholder="请输入安全员"/>
         </el-form-item>
         <el-form-item label="安全员证件" prop="sSafeZjhm">
-          <el-input v-model="form.sSafeZjhm" placeholder="请输入安全员证件" />
+          <el-input v-model="form.sSafeZjhm" placeholder="请输入安全员证件"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -354,19 +373,61 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 导入对话框 -->
+    <el-dialog
+      :title="upload.title"
+      :visible.sync="upload.open"
+      width="500px"
+      append-to-body
+    >
+      <el-form ref="formImport" :model="form" :rules="rules" label-width="90px">
+        <el-form-item label="EXCEL文件">
+          <el-upload
+            ref="upload"
+            :limit="1"
+            accept=".xlsx, .xls"
+            :headers="upload.headers"
+            :action="upload.url + '?updateSupport=' + upload.updateSupport"
+            :disabled="upload.isUploading"
+            :on-progress="handleFileUploadProgress"
+            :on-success="handleFileSuccess"
+            :auto-upload="false"
+            drag
+          >
+            <i class="el-icon-upload"></i>
+            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          </el-upload>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitFileForm">确 定</el-button>
+        <el-button @click="upload.open = false">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import {listQueuing, getQueuing, delQueuing, addQueuing, updateQueuing, updateKscx, updateInfo,upDown} from "@/api/w2/queuing";
+import {
+  listQueuing,
+  getQueuing,
+  delQueuing,
+  addQueuing,
+  updateQueuing,
+  updateKscx,
+  updateInfo,
+  upDown
+} from "@/api/w2/queuing";
 import {selectKsxmdmJg, selectMapKsxmdmJg} from "@/api/w2/ksxmdmJg";
 import {selectLineconfig} from "@/api/w2/lineconfig";
 import {kcxxList} from "@/api/w2/kcxx";
 import Sortable from "sortablejs";
+import {getToken} from "@/utils/auth";
 
 export default {
   name: "Queuing",
-  dicts: ['queue_status','queue_djc','queue_is_lock','param_car_type','queue_zt','queue_sign','queue_kszt','queue_sqks','sys_status'],
+  dicts: ['queue_status', 'queue_djc', 'queue_is_lock', 'param_car_type', 'queue_zt', 'queue_sign', 'queue_kszt', 'queue_sqks', 'sys_status'],
   data() {
     return {
       // 按钮loading
@@ -402,26 +463,39 @@ export default {
         kszt: undefined,
         kscx: undefined,
         kgname: undefined,
-        zt:undefined,
-        sign:undefined,
+        zt: undefined,
+        sign: undefined,
+      },
+      // 导入参数
+      upload: {
+        // 是否显示弹出层（用户导入）
+        open: false,
+        // 弹出层标题（用户导入）
+        title: "",
+        // 是否禁用上传
+        isUploading: false,
+        // 设置上传的请求头部
+        headers: {Authorization: "Bearer " + getToken()},
+        // 上传的地址
+        url: window.globalConfig.VUE_APP_BASE_API + "/w2/queuing/import",
       },
       // 表单参数
       form: {},
       // 表单校验
       rulesKscx: {
         id: [
-          { required: true, message: "id不能为空", trigger: "blur" }
+          {required: true, message: "id不能为空", trigger: "blur"}
         ],
         kscx: [
-          { required: true, message: "考试车型不能为空", trigger: "blur" }
+          {required: true, message: "考试车型不能为空", trigger: "blur"}
         ],
       },
       rules: {
         id: [
-          { required: true, message: "id不能为空", trigger: "blur" }
+          {required: true, message: "id不能为空", trigger: "blur"}
         ],
         kscx: [
-          { required: true, message: "考试车型不能为空", trigger: "blur" }
+          {required: true, message: "考试车型不能为空", trigger: "blur"}
         ],
       },
       // 路线数据
@@ -430,25 +504,25 @@ export default {
       carList: [],
       // 项目代码
       xmdmList: [],
-      xmdmMap:{},
+      xmdmMap: {},
       // 考试车型
-      updateKscxForm:{
-        id:undefined,
+      updateKscxForm: {
+        id: undefined,
         kscx: undefined
       },
       // 更新
-      updateForm:{
-        id:undefined,
-        djc:undefined,
-        kszt:undefined,
-        ksxm:[]
+      updateForm: {
+        id: undefined,
+        djc: undefined,
+        kszt: undefined,
+        ksxm: []
       },
-      updateKscx:false,
-      updateInfo:false,
-      ws:null
+      updateKscx: false,
+      updateInfo: false,
+      ws: null
     };
   },
-  mounted(){
+  mounted() {
     this.rowDrop();
   },
   created() {
@@ -465,9 +539,9 @@ export default {
       const tbody = this.$refs.dragTable.$el.querySelectorAll(".el-table__body-wrapper > table > tbody")[0];
       const _this = this
       Sortable.create(tbody, {
-        onEnd({ newIndex, oldIndex }) {
-          if(newIndex == oldIndex) return;
-          console.log(newIndex,oldIndex);
+        onEnd({newIndex, oldIndex}) {
+          if (newIndex == oldIndex) return;
+          console.log(newIndex, oldIndex);
           const beforeRow = _this.queuingList[newIndex]
           const currRow = _this.queuingList.splice(oldIndex, 1)[0]
           _this.queuingList.splice(newIndex, 0, currRow)
@@ -475,7 +549,7 @@ export default {
           console.log(_this.queuingList);
           // let {id,kcbh} = {...currRow}
           // let obj = currRow.map(({id,kcbh}) => ({id,kcbh}));
-          upDown({id:currRow.id,newIndex:beforeRow.bdxh,oldIndex:currRow.bdxh}).then(response => {
+          upDown({id: currRow.id, newIndex: beforeRow.bdxh, oldIndex: currRow.bdxh}).then(response => {
             console.log("成功");
             _this.getList();
           });
@@ -491,7 +565,7 @@ export default {
       })
     },
     // 获取车辆列表
-    getCarList(){
+    getCarList() {
       kcxxList().then(response => {
         this.carList = response.data
       })
@@ -503,12 +577,12 @@ export default {
       });
     },
     getXmdmList() {
-      selectKsxmdmJg({kskm:this.$store.getters.configCourses}).then(response => {
+      selectKsxmdmJg({kskm: this.$store.getters.configCourses}).then(response => {
         this.xmdmList = response.data
-        this.xmdmList.forEach((item,index) =>{
-          if(this.xmdmMap.hasOwnProperty(item.custxh)){
+        this.xmdmList.forEach((item, index) => {
+          if (this.xmdmMap.hasOwnProperty(item.custxh)) {
             item.show = false
-          }else{
+          } else {
             item.show = true
           }
           this.xmdmMap[item.custxh] = item.name;
@@ -618,19 +692,19 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 修改操作 */
     handleUpdateInfo(row) {
       const id = row.id || this.ids[0]
 
-      if(!row.id) row = this.queuingList.filter(item => item.id == id)[0]
-      this.updateForm ={
+      if (!row.id) row = this.queuingList.filter(item => item.id == id)[0]
+      this.updateForm = {
         id,
-        kszt:row.kszt,
-        djc:row.djc,
-        ksxm:row.ksxm.split(",")
+        kszt: row.kszt,
+        djc: row.djc,
+        ksxm: row.ksxm.split(",")
       };
       this.title = `修改信息—${row.xm}—${row.zjhm}`;
       this.updateInfo = true;
@@ -656,10 +730,10 @@ export default {
     handleUpdateKscx(row) {
       const id = row.id || this.ids[0]
 
-      if(!row.id) row = this.queuingList.filter(item => item.id == id)[0]
-      this.updateKscxForm ={
+      if (!row.id) row = this.queuingList.filter(item => item.id == id)[0]
+      this.updateKscxForm = {
         id,
-        kscx:row.kscx
+        kscx: row.kscx
       };
       this.title = `修改车型—${row.xm}—${row.zjhm}`;
       this.updateKscx = true;
@@ -752,20 +826,46 @@ export default {
         ...this.queryParams
       }, `queuing_${new Date().getTime()}.xlsx`)
     },
+    /** 导入按钮操作 */
+    handleImport() {
+      this.upload.title = "预约学员导入";
+      this.upload.open = true;
+    },
+    // 文件上传中处理
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    // 文件上传成功处理
+    handleFileSuccess(response, file, fileList) {
+      this.upload.open = false;
+      this.upload.isUploading = false;
+      this.$refs.upload.clearFiles();
+      this.$alert(response.msg, "导入结果", {dangerouslyUseHTMLString: true});
+      this.getList();
+    },
+    // 提交上传文件
+    submitFileForm() {
+      this.$refs["formImport"].validate((valid) => {
+        if (valid) {
+          this.buttonLoading = true;
+          this.$refs.upload.submit();
+        }
+      });
+    },
     //完成项目拼接字符喜欢
-    getWcxmNames(wcxm){
-      if(wcxm == null) return '';
+    getWcxmNames(wcxm) {
+      if (wcxm == null) return '';
       const wcxmArr = [];
       wcxm.split(",").forEach(id => {
-        if(id != ""){
-          if(this.xmdmMap[id] != null) wcxmArr.push(id+":"+this.xmdmMap[id])
+        if (id != "") {
+          if (this.xmdmMap[id] != null) wcxmArr.push(id + ":" + this.xmdmMap[id])
         }
       });
       return wcxmArr.join(",");
     },
     // 1、WebSocket连接状态检测：
     WebSocket_StatusCheck() {
-       this.WebSocketINI()
+      this.WebSocketINI()
     },
 
     // 2、WebSocket初始化：
@@ -777,7 +877,7 @@ export default {
       }
 
       // 2、从后台提取WebScoket服务器连接地址：根据自己业务接口获取 或者直接跳过 下面直接写死
-      const wsSrverAddress = window.globalConfig.VUE_APP_BASE_API +"/websocket/queue/"+10 //可以直接赋值如：ws://127.0.0.1:1234
+      const wsSrverAddress = window.globalConfig.VUE_APP_BASE_API + "/websocket/queue/" + 10 //可以直接赋值如：ws://127.0.0.1:1234
 
       // 3、创建Websocket连接
       this.ws = new WebSocket(wsSrverAddress)
@@ -786,16 +886,16 @@ export default {
       this.$WebSocket.WebsocketINI(this.ws)
 
       // 5、WebSocket连接成功提示
-      this.ws.onopen = function(e) {
+      this.ws.onopen = function (e) {
         console.log('webcoket连接成功')
       }
 
       //6、连接失败提示
-      this.ws.onclose = function(e) {
+      this.ws.onclose = function (e) {
         console.log('webcoket连接关闭：', e)
       }
 
-      this.ws.onmessage = function(e) {
+      this.ws.onmessage = function (e) {
         console.log("接收到排队消息")
         const response = JSON.parse(e.data);
         console.log(response)
@@ -804,7 +904,7 @@ export default {
       }
     }
   },
-  beforeDestroy(){
+  beforeDestroy() {
     if (this.ws) {
       this.ws.close();
     }

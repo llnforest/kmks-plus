@@ -21,6 +21,7 @@ import com.kmks.w2.domain.vo.W2KfconfigVo;
 import com.kmks.w2.domain.W2Kfconfig;
 import com.kmks.w2.mapper.W2KfconfigMapper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -43,7 +44,7 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
      * 查询评判参数
      */
     @Override
-    public W2KfconfigVo queryById(String gakey){
+    public W2KfconfigVo queryById(String gakey) {
         return baseMapper.selectVoById(gakey);
     }
 
@@ -56,7 +57,6 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
         Page<W2KfconfigVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
-
 
 
     /**
@@ -79,9 +79,10 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
         lqw.eq(StringUtils.isNotBlank(bo.getAutoflag()), W2Kfconfig::getAutoflag, bo.getAutoflag());
         lqw.eq(StringUtils.isNotBlank(bo.getKsxm()), W2Kfconfig::getKsxm, bo.getKsxm());
         lqw.eq(StringUtils.isNotBlank(bo.getParamtype()), W2Kfconfig::getParamtype, bo.getParamtype());
-        lqw.in(W2Kfconfig::getKskm,configService.selectConfigByKey(CacheNames.COURSE_KEY).split(","));
-        lqw.in(String.valueOf(params.get("judgeType")).equals("1"), W2Kfconfig::getParamtype, 0,4);
-        lqw.in(String.valueOf(params.get("judgeType")).equals("2"), W2Kfconfig::getParamtype, 1,2,3);
+        lqw.in(W2Kfconfig::getKskm, configService.selectConfigByKey(CacheNames.COURSE_KEY).split(","));
+        lqw.in(String.valueOf(params.get("judgeType")).equals("1"), W2Kfconfig::getParamtype, 0, 4);
+        lqw.in(String.valueOf(params.get("judgeType")).equals("2"), W2Kfconfig::getParamtype, 1, 2, 3);
+        lqw.orderByAsc(W2Kfconfig::getGakfdm);
         lqw.orderByAsc(W2Kfconfig::getKsxm);
         return lqw;
     }
@@ -112,19 +113,19 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
 
     /**
      * 在ids中查询
-     *
      */
     @Override
-    public List<W2Kfconfig>  queryInIds(String ids){
+    public List<W2Kfconfig> queryInIds(String ids) {
         LambdaQueryWrapper<W2Kfconfig> lqw = Wrappers.lambdaQuery();
-        lqw.in(StringUtils.isNotBlank(ids),W2Kfconfig::getId,ids.split(";"));
+        lqw.in(StringUtils.isNotBlank(ids), W2Kfconfig::getId, ids.split(";"));
         List<W2Kfconfig> w2Kfconfigs = baseMapper.selectList(lqw);
         return w2Kfconfigs;
     }
+
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(W2Kfconfig entity){
+    private void validEntityBeforeSave(W2Kfconfig entity) {
         //TODO 做一些数据校验,如唯一约束
     }
 
@@ -133,7 +134,7 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<String> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
@@ -145,14 +146,14 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
      * @return {@link Map}<{@link String}, {@link Long}>
      */
     @Override
-    public Map<String, W2KfconfigVo>  resetKfConfigMapCache(){
+    public Map<String, W2KfconfigVo> resetKfConfigMapCache() {
         // 删除缓存
         RedisKfConfigData.deleteKfConfigData();
         // 重置缓存
         List<W2KfconfigVo> w2KfVos = queryList(new W2KfconfigBo());
         Map<String, W2KfconfigVo> dataMap = w2KfVos.stream()
-                .filter(v->StringUtils.isNotBlank(v.getGakfdm()))
-                .collect(Collectors.toMap(v->v.getGakfdm(), v -> v));
+                .filter(v -> StringUtils.isNotBlank(v.getGakfdm()))
+                .collect(Collectors.toMap(v -> v.getGakfdm(), v -> v));
         RedisKfConfigData.setKfConfigData(dataMap);
         return dataMap;
 
@@ -167,7 +168,7 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
     @Override
     public W2KfconfigVo getKfConfig(String kfdm) {
         Map<String, W2KfconfigVo> cdxmMap = RedisKfConfigData.getKfConfigReturn();
-        if(cdxmMap.containsKey(kfdm)){
+        if (cdxmMap.containsKey(kfdm)) {
             return cdxmMap.get(kfdm);
         }
         throw new FailException("未匹配到扣分代码");
@@ -179,10 +180,13 @@ public class W2KfconfigServiceImpl implements IW2KfconfigService {
      * @return {@link Map}<{@link String}, {@link List}<{@link W2KfconfigVo}>>
      */
     @Override
-    public Map<String, List<W2KfconfigVo>> getKfConfigByGroup(){
+    public Map<String, List<W2KfconfigVo>> getKfConfigByGroup() {
         W2KfconfigBo kfconfigBo = new W2KfconfigBo();
-       List<W2KfconfigVo> w2KfconfigVos = queryList(kfconfigBo);
-        Map<String, List<W2KfconfigVo>> collect = w2KfconfigVos.stream().collect(Collectors.groupingBy(W2KfconfigVo::getGakfmc));
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("judgeType", "2");
+        kfconfigBo.setParams(map);
+        List<W2KfconfigVo> w2KfconfigVos = queryList(kfconfigBo);
+        Map<String, List<W2KfconfigVo>> collect = w2KfconfigVos.stream().collect(Collectors.groupingBy(W2KfconfigVo::getKsxm));
         return collect;
     }
 }

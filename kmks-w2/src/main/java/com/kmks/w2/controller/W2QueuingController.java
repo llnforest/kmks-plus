@@ -1,11 +1,20 @@
 package com.kmks.w2.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Map;
 
+import com.alibaba.excel.EasyExcel;
+import com.kmks.w2.domain.ExtraData;
 import com.kmks.w2.domain.bo.W2QueuingBo;
 import com.kmks.w2.domain.vo.W2QueuingVo;
 import com.kmks.w2.service.IW2QueuingService;
+import com.kmks.w2.utils.CarExtraDataListener;
+import com.kmks.w2.utils.QueuingExtraDataListener;
+import com.ruoyi.common.constant.CacheNames;
+import com.ruoyi.common.enums.OperatorType;
+import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
@@ -22,6 +31,7 @@ import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 排队管理
@@ -36,6 +46,8 @@ import com.ruoyi.common.core.page.TableDataInfo;
 public class W2QueuingController extends BaseController {
 
     private final IW2QueuingService iW2QueuingService;
+
+    private final ISysConfigService configService;
 
     /**
      * 查询排队管理列表
@@ -117,5 +129,16 @@ public class W2QueuingController extends BaseController {
                           @RequestParam("id") Long id
     ){
         return toAjax(iW2QueuingService.upDownBdxh(newIndex,oldIndex,id));
+    }
+
+    @SaCheckPermission("w2:queuing:import")
+    @Log(title = "导入预约学员", businessType = BusinessType.IMPORT, operatorType = OperatorType.MODEL)
+    @PostMapping("/import")
+    public R<Void> importExcel(MultipartFile file, @RequestParam Map<String, String> params) throws IOException {
+            EasyExcel.read(file.getInputStream(), ExtraData.class, new QueuingExtraDataListener(iW2QueuingService, params, file, configService.selectConfigByKey(CacheNames.FILE_PATH_KEY)))
+                    .headRowNumber(0)
+                    .sheet().doRead();
+
+        return R.ok("导入成功");
     }
 }

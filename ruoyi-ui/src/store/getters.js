@@ -14,9 +14,10 @@ const getters = {
   resetPass: state => state.user.resetPass,
   userData: state => state.user.userData,
   permission_routes: state => state.permission.routes,
-  topbarRouters:state => state.permission.topbarRouters,
-  defaultRoutes:state => state.permission.defaultRoutes,
-  sidebarRouters:state => state.permission.sidebarRouters,
-  configCourses:state => state.config.course,
+  topbarRouters: state => state.permission.topbarRouters,
+  defaultRoutes: state => state.permission.defaultRoutes,
+  sidebarRouters: state => state.permission.sidebarRouters,
+  configCourses: state => state.config.course,
+  configJgType: state => state.config.jgType,
 }
 export default getters

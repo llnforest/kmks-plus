@@ -1,5 +1,6 @@
 package com.kmks.w2.service;
 
+import com.kmks.w2.domain.gateDto.ScoreResultDto;
 import com.kmks.w2.domain.vo.W2KcxxVo;
 import com.kmks.w2.domain.vo.W2QueuingVo;
 import com.kmks.w2.domain.vo.W2RecordsVo;
@@ -12,17 +13,19 @@ import org.springframework.transaction.annotation.Transactional;
  * @date 2024/5/31 15:17
  */
 public interface ICarService {
+    String syncTime();
+
     W2KcxxVo carOnLine(String kcbh);
 
     W2QueuingVo getNextStudent(String kcbh);
 
     R<Void> getFaceRecognizeResult(String zjhm, String pzzp);
 
-    W2RecordsVo getTodayStudent(String zjhm);
+    W2RecordsVo getTodayStudent(String zjhm, String kcbh);
 
-    W2QueuingVo applyExam(String kcbh, String kssj,String zjhm,String kskm,String zp);
+    W2QueuingVo applyExam(String kcbh, String kssj, String zjhm, String kskm, String zp);
 
-    W2QueuingVo startExam(String kcbh, String kssj, String zjhm, String zp,String speed);
+    W2QueuingVo startExam(String kcbh, String kssj, String zjhm, String zp, String speed);
 
     String startProgram(String kcbh, String kssj, String zjhm, String fieldId, String zp, String speed);
 
@@ -32,4 +35,6 @@ public interface ICarService {
     W2QueuingVo finishExam(String kcbh, String kssj, String zjhm, String score, String zp, String speed);
 
     W2QueuingVo deductPoint(String kcbh, String kssj, String zjhm, String fieldId, String kfdm, String kfType, String zp, String speed);
+
+    ScoreResultDto handleScoreResult(String kskm, Long kscs, Long ksfs);
 }

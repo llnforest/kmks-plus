@@ -8,6 +8,7 @@ import com.kmks.jianguan.params.FilesItemParam;
 import com.kmks.jianguan.response.CommonResult;
 import com.kmks.jianguan.response.Result;
 import com.kmks.jianguan.service.IJgService;
+import com.ruoyi.common.exception.api.FailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -145,9 +146,18 @@ public class JgServiceImpl implements IJgService {
         CommonBo<A0221000007Bo> commonBo = httpHandler.getCommonBo(bo, files);
         CommonResult<Result<JSONObject>> result = httpHandler.sendData(commonBo);
         // 根据监管接口处理业务逻辑
-
+        A0221000007Vo vo = (A0221000007Vo) httpHandler.getVo(result,A0221000007Vo.class);
+        if(!vo.getCode().equals("1")){
+            // 未缴款 不允许签到
+            if(!vo.getRetval().equals("1")){
+                throw new FailException("本地签到失败："+(vo.getRetval().equals("0")?"未缴款":vo.getRetval()));
+            }else {
+                // 其他签到失败状态
+                throw new FailException("签到失败：" + vo.getCode() + ":" + vo.getMessage() + "；" + vo.getRetval());
+            }
+        }
         // 返回监管底层数据
-        return (A0221000007Vo) httpHandler.getVo(result,A0221000007Vo.class);
+        return vo;
     }
 
     /**

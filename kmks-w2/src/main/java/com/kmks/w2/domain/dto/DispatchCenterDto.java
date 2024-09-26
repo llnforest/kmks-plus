@@ -26,6 +26,11 @@ public class DispatchCenterDto {
     private String kszt;
 
     /**
+     * 考试科目
+     **/
+    private String kskm;
+
+    /**
      * 考生姓名
      **/
     private String ksxm;

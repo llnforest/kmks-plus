@@ -19,7 +19,7 @@ public class HCNetTool {
 
     public static int lUserID = -1;
 
-    public static void load(String dllFile){
+    public static void load(){
         hCNetSDK = (HCNetSDK) Native.loadLibrary("D:\\kmksService\\commonEnv\\hcNet\\dll\\HCNetSDK.dll", HCNetSDK.class);
     }
 
