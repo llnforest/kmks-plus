@@ -193,7 +193,7 @@
         </template>
       </el-table-column>
       <el-table-column label="分数1" align="center" prop="jgfs1" min-width="60"/>
-      <el-table-column label="考官1" align="center" prop="ksy1" min-width="60" v-if="isJgType(2)"/>
+      <el-table-column label="考试员1" align="center" prop="ksy1" min-width="60" v-if="isJgType(2)"/>
       <el-table-column label="考试日期2" align="center" prop="ksrq2" min-width="90">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.ksrq2, '{y}-{m}-{d}') }}</span>
@@ -205,7 +205,7 @@
         </template>
       </el-table-column>
       <el-table-column label="分数2" align="center" prop="jgfs2" min-width="60"/>
-      <el-table-column label="考官2" align="center" prop="ksy2" min-width="60" v-if="isJgType(2)"/>
+      <el-table-column label="考试员2" align="center" prop="ksy2" min-width="60" v-if="isJgType(2)"/>
       <el-table-column label="考试次数" align="center" prop="kscs" min-width="80"/>
       <!--      <el-table-column label="效验码" align="center" prop="sjjyw" />-->
 

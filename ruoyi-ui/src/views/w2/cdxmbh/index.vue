@@ -48,7 +48,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['w2:cdxmbh:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -59,7 +60,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['w2:cdxmbh:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -70,7 +72,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['w2:cdxmbh:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -80,18 +83,32 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['w2:cdxmbh:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleDownload"
+          v-hasPermi="['w2:cdxmbh:download']"
+          v-if="isJgType(2)"
+        >设备备案信息下载
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="cdxmbhList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="设备序号" align="center" prop="sbxh" />
-      <el-table-column label="项目代码" align="center" prop="paramdm" />
-      <el-table-column label="项目名称" align="center" prop="paramname" />
-      <el-table-column label="公安代码" align="center" prop="gadm" />
-      <el-table-column label="内部代码" align="center" prop="mdm" />
+    <el-table v-loading="loading" :data="cdxmbhList" @selection-change="handleSelectionChange" @row-click="rowClick"
+              @row-contextmenu="rightClick">
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column label="设备序号" align="center" prop="sbxh"/>
+      <el-table-column label="项目代码" align="center" prop="paramdm"/>
+      <el-table-column label="项目名称" align="center" prop="paramname"/>
+      <el-table-column label="公安代码" align="center" prop="gadm"/>
+      <el-table-column label="内部代码" align="center" prop="mdm"/>
       <el-table-column label="考试科目" align="center" prop="kskm">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_kskm" :value="scope.row.kskm"/>
@@ -125,19 +142,19 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="设备编号" prop="sbxh">
-          <el-input v-model="form.sbxh" placeholder="请输入设备序号" />
+          <el-input v-model="form.sbxh" placeholder="请输入设备序号"/>
         </el-form-item>
         <el-form-item label="项目代码" prop="paramdm">
-          <el-input v-model="form.paramdm" placeholder="请输入项目代码" />
+          <el-input v-model="form.paramdm" placeholder="请输入项目代码"/>
         </el-form-item>
         <el-form-item label="项目名称" prop="paramname">
-          <el-input v-model="form.paramname" placeholder="请输入项目名称" />
+          <el-input v-model="form.paramname" placeholder="请输入项目名称"/>
         </el-form-item>
         <el-form-item label="公安代码" prop="gadm">
-          <el-input v-model="form.gadm" placeholder="请输入公安代码" />
+          <el-input v-model="form.gadm" placeholder="请输入公安代码"/>
         </el-form-item>
         <el-form-item label="内部代码" prop="mdm">
-          <el-input v-model="form.mdm" placeholder="请输入内部代码" />
+          <el-input v-model="form.mdm" placeholder="请输入内部代码"/>
         </el-form-item>
         <el-form-item label="考试科目" prop="kskm">
           <el-select v-model="form.kskm" placeholder="请选择考试科目" clearable>
@@ -159,7 +176,7 @@
 </template>
 
 <script>
-import { listCdxmbh, getCdxmbh, delCdxmbh, addCdxmbh, updateCdxmbh } from "@/api/w2/cdxmbh";
+import {listCdxmbh, getCdxmbh, delCdxmbh, addCdxmbh, updateCdxmbh} from "@/api/w2/cdxmbh";
 
 export default {
   name: "Cdxmbh",
@@ -191,34 +208,34 @@ export default {
         pageNum: 1,
         pageSize: 10,
         paramdm: undefined,
-        sbxh:undefined,
-        gadm:undefined,
-        mdm:undefined,
+        sbxh: undefined,
+        gadm: undefined,
+        mdm: undefined,
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         nid: [
-          { required: true, message: "ID不能为空", trigger: "blur" }
+          {required: true, message: "ID不能为空", trigger: "blur"}
         ],
         paramdm: [
-          { required: true, message: "考试项目不能为空", trigger: "blur" }
+          {required: true, message: "考试项目不能为空", trigger: "blur"}
         ],
         paramname: [
-          { required: true, message: "项目名称不能为空", trigger: "blur" }
+          {required: true, message: "项目名称不能为空", trigger: "blur"}
         ],
         mdm: [
-          { required: true, message: "内部代码不能为空", trigger: "blur" }
+          {required: true, message: "内部代码不能为空", trigger: "blur"}
         ],
         sbxh: [
-          { required: true, message: "设备序号不能为空", trigger: "blur" }
+          {required: true, message: "设备序号不能为空", trigger: "blur"}
         ],
         gadm: [
-          { required: true, message: "公安代码不能为空", trigger: "blur" }
+          {required: true, message: "公安代码不能为空", trigger: "blur"}
         ],
         kskm: [
-          { required: true, message: "考试科目不能为空", trigger: "blur" }
+          {required: true, message: "考试科目不能为空", trigger: "blur"}
         ],
       }
     };
@@ -267,7 +284,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.nid)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -333,7 +350,18 @@ export default {
       this.download('w2/cdxmbh/export', {
         ...this.queryParams
       }, `场地项目_${new Date().getTime()}.xlsx`)
-    }
+    },
+    /** 下载按钮操作 */
+    handleDownload() {
+      this.$modal.confirm('是否确认下载设备备案数据？').then(() => {
+        this.download('w2/cdxmbh/download', {
+          ...this.queryParams
+        }, `设备备案信息_${new Date().getTime()}.xlsx`)
+      }).catch(() => {
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
   }
 };
 </script>

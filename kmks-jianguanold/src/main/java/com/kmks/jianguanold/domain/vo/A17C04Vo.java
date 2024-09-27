@@ -6,7 +6,8 @@ import javax.xml.bind.annotation.*;
 import java.util.List;
 
 /**
- * 考试员备案信息下载
+ * 考试员备案信息同步
+ *
  * @description: TODO
  * @date 2023/5/9 11:09
  */
@@ -17,7 +18,7 @@ public class A17C04Vo {
     private List<Body> body;
 
     @Data
-    public static class Head{
+    public static class Head {
         // 标记 1成功
         private String code;
 

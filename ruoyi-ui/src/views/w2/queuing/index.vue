@@ -183,7 +183,7 @@
       <el-table-column label="考车编号" align="center" prop="kcbh" min-width="80"/>
       <el-table-column label="车牌号码" align="center" prop="kchp" min-width="100"/>
       <el-table-column label="考试车型" align="center" prop="kscx" min-width="80"/>
-      <el-table-column label="考官" align="center" prop="kg" min-width="60" v-if="isJgType(2)"/>
+      <el-table-column label="考试员" align="center" prop="kg" min-width="60" v-if="isJgType(2)"/>
       <el-table-column label="线路" align="center" prop="rline" min-width="60" v-if="isCourse(3)"/>
       <el-table-column label="夜考" align="center" prop="sfyk" min-width="60" v-if="isCourse(3)">
         <template slot-scope="scope">
@@ -355,11 +355,11 @@
         <el-form-item label="考试车型" prop="kscx">
           <el-input v-model="form.kscx" placeholder="请输入考试车型"/>
         </el-form-item>
-        <el-form-item label="考官姓名" prop="kgname">
-          <el-input v-model="form.kgname" placeholder="请输入考官姓名"/>
+        <el-form-item label="考试员姓名" prop="kgname">
+          <el-input v-model="form.kgname" placeholder="请输入考试员姓名"/>
         </el-form-item>
-        <el-form-item label="考官证件" prop="kg">
-          <el-input v-model="form.kg" placeholder="请输入考官证件"/>
+        <el-form-item label="考试员证件" prop="kg">
+          <el-input v-model="form.kg" placeholder="请输入考试员证件"/>
         </el-form-item>
         <el-form-item label="安全员" prop="sSafe">
           <el-input v-model="form.sSafe" placeholder="请输入安全员"/>
@@ -870,6 +870,7 @@ export default {
 
     // 2、WebSocket初始化：
     WebSocketINI() {
+      const _this = this;
       // 1、浏览器是否支持WebSocket检测
       if (!('WebSocket' in window)) {
         console.log('您的浏览器不支持WebSocket!')
@@ -896,11 +897,11 @@ export default {
       }
 
       this.ws.onmessage = function (e) {
-        console.log("接收到排队消息")
         const response = JSON.parse(e.data);
         console.log(response)
-        this.queuingList = response.rows;
-        this.total = response.total;
+        _this.queuingList = response.rows;
+        _this.total = response.total;
+
       }
     }
   },

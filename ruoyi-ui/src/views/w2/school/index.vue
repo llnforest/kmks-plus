@@ -32,7 +32,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['w2:school:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -43,7 +44,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['w2:school:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -54,7 +56,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['w2:school:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -64,22 +67,36 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['w2:school:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleDownload"
+          v-hasPermi="['w2:school:download']"
+          v-if="isJgType(2)"
+        >驾校备案信息下载
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="schoolList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
-      <el-table-column type="selection" width="55" align="center" />
+    <el-table v-loading="loading" :data="schoolList" @selection-change="handleSelectionChange" @row-click="rowClick"
+              @row-contextmenu="rightClick">
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="编号" align="center" prop="nid" min-width="70"/>
-      <el-table-column label="驾校代码" align="center" prop="paramdm" />
-      <el-table-column label="驾校名称" align="center" prop="paramname" />
-      <el-table-column label="场次" align="center" prop="paramtype" >
-          <template slot-scope="scope">
+      <el-table-column label="驾校代码" align="center" prop="paramdm"/>
+      <el-table-column label="驾校名称" align="center" prop="paramname"/>
+      <el-table-column label="场次" align="center" prop="paramtype">
+        <template slot-scope="scope">
           <dict-tag :options="dict.type.school_param_type" :value="scope.row.paramtype"/>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="bz" />
+      <el-table-column label="备注" align="center" prop="bz"/>
     </el-table>
     <!--    鼠标右键菜单-->
     <div id="menu" class="menuDiv" v-show="rightMenuVisible" :style="{top:rightMenuTop,left:rightMenuLeft}">
@@ -108,10 +125,10 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="驾校代码" prop="paramdm">
-          <el-input v-model="form.paramdm" placeholder="请输入驾校代码" />
+          <el-input v-model="form.paramdm" placeholder="请输入驾校代码"/>
         </el-form-item>
         <el-form-item label="驾校名称" prop="paramname">
-          <el-input v-model="form.paramname" placeholder="请输入驾校名称" />
+          <el-input v-model="form.paramname" placeholder="请输入驾校名称"/>
         </el-form-item>
         <el-form-item label="场次选择" prop="paramtype">
           <el-select v-model="form.paramtype" placeholder="请选择场次 ">
@@ -124,7 +141,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="bz">
-          <el-input v-model="form.bz" placeholder="请输入备注" />
+          <el-input v-model="form.bz" placeholder="请输入备注"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -136,11 +153,11 @@
 </template>
 
 <script>
-import { listSchool, getSchool, delSchool, addSchool, updateSchool } from "@/api/w2/school";
+import {listSchool, getSchool, delSchool, addSchool, updateSchool, downloadSchool} from "@/api/w2/school";
 
 export default {
   name: "School",
-  dicts:['school_param_type'],
+  dicts: ['school_param_type'],
   data() {
     return {
       // 按钮loading
@@ -178,16 +195,16 @@ export default {
       // 表单校验
       rules: {
         nid: [
-          { required: true, message: "编号不能为空", trigger: "blur" }
+          {required: true, message: "编号不能为空", trigger: "blur"}
         ],
         paramdm: [
-          { required: true, message: "驾校代码不能为空", trigger: "blur" }
+          {required: true, message: "驾校代码不能为空", trigger: "blur"}
         ],
         paramname: [
-          { required: true, message: "驾校名称不能为空", trigger: "blur" }
+          {required: true, message: "驾校名称不能为空", trigger: "blur"}
         ],
         paramtype: [
-          { required: true, message: "场次不能为空", trigger: "change" }
+          {required: true, message: "场次不能为空", trigger: "change"}
         ],
       }
     };
@@ -237,7 +254,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.nid)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -302,8 +319,19 @@ export default {
     handleExport() {
       this.download('w2/school/export', {
         ...this.queryParams
-      }, `school_${new Date().getTime()}.xlsx`)
-    }
+      }, `驾校信息管理_${new Date().getTime()}.xlsx`)
+    },
+    /** 下载按钮操作 */
+    handleDownload() {
+      this.$modal.confirm('是否确认下载驾校备案数据？').then(() => {
+        this.download('w2/school/download', {
+          ...this.queryParams
+        }, `驾校备案信息_${new Date().getTime()}.xlsx`)
+      }).catch(() => {
+      }).finally(() => {
+        this.loading = false;
+      });
+    },
   }
 };
 </script>

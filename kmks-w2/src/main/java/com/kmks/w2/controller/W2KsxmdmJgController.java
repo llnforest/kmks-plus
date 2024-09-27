@@ -6,10 +6,16 @@ import java.util.stream.Collectors;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kmks.jianguanold.domain.bo.A17C01Bo;
+import com.kmks.jianguanold.domain.bo.A17C02Bo;
+import com.kmks.jianguanold.domain.vo.A17C01Vo;
+import com.kmks.jianguanold.domain.vo.A17C02Vo;
+import com.kmks.jianguanold.service.IJgOldService;
 import com.kmks.w2.domain.KfCodeReport;
 import com.kmks.w2.service.IW2RecordsService;
 import com.kmks.w2.domain.vo.W2KsxmdmJgVo;
 import com.kmks.w2.service.IW2KsxmdmJgService;
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
 
@@ -48,6 +54,8 @@ public class W2KsxmdmJgController extends BaseController {
     private final IW2RecordsService iW2RecordsService;
 
     private final ISysConfigService configService;
+
+    private final IJgOldService jgOldService;
 
     /**
      * 查询项目代码列表
@@ -156,7 +164,7 @@ public class W2KsxmdmJgController extends BaseController {
     @PostMapping("/getTotalKfCodeReport")
     public TableDataInfo<KfCodeReport> getTotalKfCodeReport(@RequestBody PageQuery pageQuery) {
         Page<KfCodeReport> page = pageQuery.build();
-        Page<KfCodeReport> kfCodeReports = iW2KsxmdmJgService.getTotalKfCodeReport(page,"3");
+        Page<KfCodeReport> kfCodeReports = iW2KsxmdmJgService.getTotalKfCodeReport(page, "3");
         List<KfCodeReport> kfCodeReports1 = kfCodeReports.getRecords().stream().map(item -> {
             item.setXMMC(iW2KsxmdmJgService.getXMMCName("3", item.getKSXM()));
             item.setNUM1(iW2RecordsService.selectCountByGakfdm1(item.getKSXM()));
@@ -165,15 +173,15 @@ public class W2KsxmdmJgController extends BaseController {
             item.setNUMS1(iW2RecordsService.selectCountByKfxx1());
             item.setNUMS2(iW2RecordsService.selectCountByKfxx2());
             item.setNUMS(item.getNUMS1() + item.getNUM2());
-            if(item.getNUMS1() > 0){
-                item.setBL1(NumberUtil.div(item.getNUM1(),item.getNUMS1()).doubleValue());
+            if (item.getNUMS1() > 0) {
+                item.setBL1(NumberUtil.div(item.getNUM1(), item.getNUMS1()).doubleValue());
             }
-            if(item.getNUMS2() > 0){
-                item.setBL2(NumberUtil.div(item.getNUM2(),item.getNUMS2()).doubleValue());
+            if (item.getNUMS2() > 0) {
+                item.setBL2(NumberUtil.div(item.getNUM2(), item.getNUMS2()).doubleValue());
             }
-            if (item.getNUMS() > 0){
-                item.setBL(NumberUtil.div(item.getNUM(),item.getNUMS()).doubleValue());
-                item.setTotalRatio(NumberUtil.div((double)item.getNUM(),NumberUtil.mul(item.getNUMS().toString(),String.valueOf(kfCodeReports.getSize())).doubleValue()));
+            if (item.getNUMS() > 0) {
+                item.setBL(NumberUtil.div(item.getNUM(), item.getNUMS()).doubleValue());
+                item.setTotalRatio(NumberUtil.div((double) item.getNUM(), NumberUtil.mul(item.getNUMS().toString(), String.valueOf(kfCodeReports.getSize())).doubleValue()));
             }
             return item;
         }).collect(Collectors.toList());
@@ -189,6 +197,19 @@ public class W2KsxmdmJgController extends BaseController {
         Page<W2KsxmdmJgVo> page = pageQuery.build();
         Page<W2KsxmdmJgVo> kfCodeReports = iW2KsxmdmJgService.listKsxmdmJgByLogNew(page);
         return TableDataInfo.build(kfCodeReports);
+    }
+
+    /**
+     * 下载场地备案信息
+     */
+    @SaCheckPermission("w2:ksxmdmJg:download")
+    @Log(title = "场地备案信息下载", businessType = BusinessType.UPDATE)
+    @PostMapping("/download")
+    public void download(HttpServletResponse response) {
+        A17C01Bo a17C01Bo = new A17C01Bo();
+        a17C01Bo.setFzjg(configService.selectConfigByKey(CacheNames.JG_OLD_FZJG));
+        A17C01Vo a17C01Vo = jgOldService.a17c01(a17C01Bo);
+        ExcelUtil.exportExcel(a17C01Vo.getBody(), "场地备案信息", A17C01Vo.Body.class, response);
     }
 
 }

@@ -52,7 +52,7 @@ public class SplitCarDto {
     private Map<String, W2KcxxVo> kcxxMap;
 
     /**
-     * 考官证件号
+     * 考试员证件号
      **/
     private String kgzjh;
 

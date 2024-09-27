@@ -24,119 +24,127 @@ public class WebServiceImpl implements WebService {
      * @return {@link String}
      */
     @Override
-    public String downUpInfo(String cmd){
+    public String downUpInfo(String cmd) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("StrInfo",cmd);
+        map.put("StrInfo", cmd);
         String downUpInfo = WebServiceUtil.send("DownUpInfo", map);
-        try{
+        try {
             String[] split = downUpInfo.split(";");
-            if(split[2].equals("1")){
+            if (split[2].equals("1")) {
                 return split[3];
             }
-            log.info("返回数据:{}",downUpInfo);
-        }catch (Exception exception){
-            log.info("数据处理失败：{}",exception.getMessage());
+            log.info("返回数据:{}", downUpInfo);
+        } catch (Exception exception) {
+            log.info("数据处理失败：{}", exception.getMessage());
         }
 
         return null;
     }
 
 
-
     /**
      * 下载考点信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C01Xml(){
+    public String Down17C01Xml() {
         String info = WebServiceUtil.send("Down17C01Xml");
         return info;
     }
 
     /**
      * 下载项目、备案信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C02Xml(){
+    public String Down17C02Xml() {
         String info = WebServiceUtil.send("Down17C02Xml");
         return info;
     }
 
     /**
      * 下载车辆信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C03Xml(){
+    public String Down17C03Xml() {
         String info = WebServiceUtil.send("Down17C03Xml");
         return info;
     }
 
     /**
-     * 下载考官信息
+     * 下载考试员信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C04Xml(){
+    public String Down17C04Xml() {
         String info = WebServiceUtil.send("Down17C04Xml");
         return info;
     }
 
     /**
      * 下载驾校信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C05Xml(){
+    public String Down17C05Xml() {
         String info = WebServiceUtil.send("Down17C05Xml");
         return info;
     }
 
     /**
      * 下载明细、分组信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C06Xml(String ksrq){
+    public String Down17C06Xml(String ksrq) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("ksrq",ksrq);
-        String info = WebServiceUtil.send("Down17C06Xml",map);
+        map.put("ksrq", ksrq);
+        String info = WebServiceUtil.send("Down17C06Xml", map);
         return info;
     }
 
     /**
      * 查询、下载信息
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C08Xml(String ksrq, String zpdownflag){
+    public String Down17C08Xml(String ksrq, String zpdownflag) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("ksrq",ksrq);
-        map.put("zpdownflag",zpdownflag);
-        String info = WebServiceUtil.send("Down17C08Xml",map);
+        map.put("ksrq", ksrq);
+        map.put("zpdownflag", zpdownflag);
+        String info = WebServiceUtil.send("Down17C08Xml", map);
         return info;
     }
 
     /**
      * 同步时间
+     *
      * @return {@link String}
      */
     @Override
-    public String Down17C09Xml(){
+    public String Down17C09Xml() {
         String info = WebServiceUtil.send("Down17C09Xml");
         return info;
     }
 
     /**
      * 同步时间
+     *
      * @return {@link String}
      */
     @Override
-    public String ReExamine(String cmd){
+    public String ReExamine(String cmd) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("StrInfo",cmd);
-        String info = WebServiceUtil.send("ReExamine",map);
+        map.put("StrInfo", cmd);
+        String info = WebServiceUtil.send("ReExamine", map);
         return info;
     }
 }

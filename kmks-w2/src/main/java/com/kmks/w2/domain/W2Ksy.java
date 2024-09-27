@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ import java.util.Map;
 import com.ruoyi.common.core.domain.BaseEntity;
 
 /**
- * 考官信息对象 w2_ksy
+ * 考试员信息对象 w2_ksy
  *
  * @author lynn
  * @date 2023-04-28
@@ -22,9 +23,9 @@ import com.ruoyi.common.core.domain.BaseEntity;
 @KeySequence(value = "SEQ_ORA_INTEGER_KEY")
 @EqualsAndHashCode(callSuper = false)
 @TableName("w2_ksy")
-public class W2Ksy{
+public class W2Ksy {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 序号

@@ -33,9 +33,15 @@ public class JgOldServiceImpl implements IJgOldService {
         CommonOldBo<A17C01Bo> commonOldBo = httpOldHandler.getCommonBo(bo, cdxxEnum);
         JSONObject result = httpOldHandler.sendData(commonOldBo);
         // 根据监管接口处理业务逻辑
-
+        A17C01Vo vo = (A17C01Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
+        if (!vo.getHead().getCode().equals("1")) {
+            throw new FailException(vo.getHead().getMessage());
+        }
+        if (vo.getHead().getRownum() <= 0) {
+            throw new FailException("同步下载场地备案信息记录数为0");
+        }
         // 返回监管底层数据
-        return (A17C01Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
+        return vo;
     }
 
     /**
@@ -51,12 +57,18 @@ public class JgOldServiceImpl implements IJgOldService {
         JSONObject result = httpOldHandler.sendData(commonOldBo);
         // 根据监管接口处理业务逻辑
         A17C02Vo vo = (A17C02Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
+        if (!vo.getHead().getCode().equals("1")) {
+            throw new FailException(vo.getHead().getMessage());
+        }
+        if (vo.getHead().getRownum() <= 0) {
+            throw new FailException("同步下载设备备案信息记录数为0");
+        }
         // 返回监管底层数据
         return vo;
     }
 
     /**
-     * 考试员备案信息下载
+     * 考试员备案信息同步
      *
      * @param bo bo
      * @return {@link A17C04Vo}
@@ -66,10 +78,16 @@ public class JgOldServiceImpl implements IJgOldService {
         CdxxEnum cdxxEnum = CdxxEnum.findByClazz(bo.getClass());
         CommonOldBo<A17C04Bo> commonOldBo = httpOldHandler.getCommonBo(bo, cdxxEnum);
         JSONObject result = httpOldHandler.sendData(commonOldBo);
+        A17C04Vo vo = (A17C04Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
         // 根据监管接口处理业务逻辑
-
+        if (!vo.getHead().getCode().equals("1")) {
+            throw new FailException(vo.getHead().getMessage());
+        }
+        if (vo.getHead().getRownum() <= 0) {
+            throw new FailException("同步下载考试员备案信息记录数为0");
+        }
         // 返回监管底层数据
-        return (A17C04Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
+        return vo;
     }
 
     /**
@@ -83,10 +101,16 @@ public class JgOldServiceImpl implements IJgOldService {
         CdxxEnum cdxxEnum = CdxxEnum.findByClazz(bo.getClass());
         CommonOldBo<A17C05Bo> commonOldBo = httpOldHandler.getCommonBo(bo, cdxxEnum);
         JSONObject result = httpOldHandler.sendData(commonOldBo);
+        A17C05Vo vo = (A17C05Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
         // 根据监管接口处理业务逻辑
-
+        if (!vo.getHead().getCode().equals("1")) {
+            throw new FailException(vo.getHead().getMessage());
+        }
+        if (vo.getHead().getRownum() <= 0) {
+            throw new FailException("同步下载驾校备案信息记录数为0");
+        }
         // 返回监管底层数据
-        return (A17C05Vo) httpOldHandler.getVo(result, cdxxEnum.getClazzVo());
+        return vo;
     }
 
     /**

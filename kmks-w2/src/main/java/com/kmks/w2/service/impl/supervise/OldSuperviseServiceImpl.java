@@ -118,12 +118,13 @@ public class OldSuperviseServiceImpl implements ISuperviseService {
         W2Records w2Records = BeanUtil.toBean(a17C08Vo.getBody().get(0), W2Records.class);
         w2Records.setZjhm(a17C08Vo.getBody().get(0).getSfzmhm());
         w2Records.setSZjmc(a17C08Vo.getBody().get(0).getSfzmmc());
+        w2Records.setZkzh(a17C08Vo.getBody().get(0).getZkzmbh());
         //生成考生记录
         commonHandlerService.checkInCreateW2Records(w2Records, checkInBo);
 
         //录入排队信息
         W2Queuing w2Queuing = new W2Queuing();
-        // 分配考官，去查找证件号码（优化成保存成考官证件号码）
+        // 分配考试员，去查找证件号码（优化成保存成考试员证件号码）
         W2KsyVo w2KsyVo = ksyMapper.selectVoOne(Wrappers.lambdaQuery(W2Ksy.class).eq(W2Ksy::getXm, w2Records.getKsy1()));
         if (w2KsyVo == null) {
             throw new FailException("考试员【" + w2Records.getKsy1() + "】信息未下载或不存在");
@@ -133,6 +134,7 @@ public class OldSuperviseServiceImpl implements ISuperviseService {
             w2Queuing.setKgname(w2KsyVo.getSfzmhm());
         }
         w2Queuing.setSqks(a17C08Vo.getBody().get(0).getJkbj());
+        w2Queuing.setLsh(w2Records.getLsh());
         //生成排队记录
         commonHandlerService.checkInCreateW2Queuing(w2Queuing, w2Records);
         return true;
@@ -321,7 +323,7 @@ public class OldSuperviseServiceImpl implements ISuperviseService {
      * @param kchp     考车号牌
      * @param splitNum 分配人数
      * @param kscc     考试场次
-     * @param kgzjh    考官证件号码
+     * @param kgzjh    考试员证件号码
      * @return {@link SplitCarServerResponseDto}
      */
     private SplitCarServerResponseDto sendSplitCar(String kchp, String splitNum, Long kscc, String kgzjh) {

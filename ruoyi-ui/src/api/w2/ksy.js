@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询考官信息列表
+// 查询考试员信息列表
 export function listKsy(query) {
   return request({
     url: '/w2/ksy/list',
@@ -9,7 +9,7 @@ export function listKsy(query) {
   })
 }
 
-// 查询考官信息详细
+// 查询考试员信息详细
 export function getKsy(xh) {
   return request({
     url: '/w2/ksy/' + xh,
@@ -17,7 +17,7 @@ export function getKsy(xh) {
   })
 }
 
-// 新增考官信息
+// 新增考试员信息
 export function addKsy(data) {
   return request({
     url: '/w2/ksy',
@@ -26,7 +26,7 @@ export function addKsy(data) {
   })
 }
 
-// 修改考官信息
+// 修改考试员信息
 export function updateKsy(data) {
   return request({
     url: '/w2/ksy',
@@ -35,7 +35,7 @@ export function updateKsy(data) {
   })
 }
 
-// 删除考官信息
+// 删除考试员信息
 export function delKsy(xh) {
   return request({
     url: '/w2/ksy/' + xh,

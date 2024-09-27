@@ -33,7 +33,7 @@ public class TcpUtils {
      *
      * @return {@link Map}<{@link String}, {@link DispatchCenterDto}>
      */
-    public static Map<String, DispatchCenterDto> getDispatchCenterMap(){
+    public static Map<String, DispatchCenterDto> getDispatchCenterMap() {
         return dispatchCenterMap;
     }
 
@@ -42,8 +42,8 @@ public class TcpUtils {
      *
      * @return {@link Map}<{@link String}, {@link DispatchCenterDto}>
      */
-    public static DispatchCenterDto getDispatchCenterDto(String kcbh){
-        if(dispatchCenterMap.containsKey(kcbh)){
+    public static DispatchCenterDto getDispatchCenterDto(String kcbh) {
+        if (dispatchCenterMap.containsKey(kcbh)) {
             return dispatchCenterMap.get(kcbh);
         }
         throw new FailException("考车不在线");
@@ -54,10 +54,10 @@ public class TcpUtils {
      *
      * @return {@link Map}<{@link String}, {@link DispatchCenterDto}>
      */
-    public static void setDispatchCenterDtoZt(String kcbh, Boolean zt){
-        if(dispatchCenterMap.containsKey(kcbh)){
-            dispatchCenterMap.get(kcbh).setZt(zt?1:0);
-            return ;
+    public static void setDispatchCenterDtoZt(String kcbh, Boolean zt) {
+        if (dispatchCenterMap.containsKey(kcbh)) {
+            dispatchCenterMap.get(kcbh).setZt(zt ? 1 : 0);
+            return;
         }
         throw new FailException("考车不在线");
     }
@@ -67,10 +67,10 @@ public class TcpUtils {
      *
      * @return {@link Map}<{@link String}, {@link DispatchCenterDto}>
      */
-    public static void setDispatchCenterDtoSczt(String kcbh, String sczt){
-        if(dispatchCenterMap.containsKey(kcbh)){
+    public static void setDispatchCenterDtoSczt(String kcbh, String sczt) {
+        if (dispatchCenterMap.containsKey(kcbh)) {
             dispatchCenterMap.get(kcbh).setSczt(sczt);
-            return ;
+            return;
         }
         throw new FailException("考车不在线");
     }
@@ -83,13 +83,13 @@ public class TcpUtils {
      * @param result  结果
      * @param data    数据
      */
-    public static void response(Channel channel,String mark,Boolean result,List<String> data){
+    public static void response(Channel channel, String mark, Boolean result, List<String> data) {
         // 插入头
-        data.add(0,mark);
+        data.add(0, mark);
         // 插入结果
-        data.add(1,result?"1":"0");
-        String message = responseStartMark+";"+String.join(";",data)+"\r\n";
-        LogUtils.tcp(">>>{}",message);
+        data.add(1, result ? "1" : "0");
+        String message = responseStartMark + ";" + String.join(";", data) + "\r\n";
+        LogUtils.tcp(">>>{}", message);
         channel.writeAndFlush(message.getBytes(Charset.forName("GBK")));
     }
 
@@ -100,9 +100,9 @@ public class TcpUtils {
      * @param message  消息
      */
     public static void sendToCar(String plateNum, byte[] message) {
-        if(carChannelMap.containsKey(plateNum)){
+        if (carChannelMap.containsKey(plateNum)) {
             try {
-                LogUtils.tcp(">>>{}",new String(message,"GBK"));
+                LogUtils.tcp(">>>{}", new String(message, "GBK"));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -148,6 +148,12 @@ public class TcpUtils {
      */
     public static void removeCarChannel(Channel channel) {
 //        carChannelMap.keySet().removeIf(key->channel.remoteAddress().toString().equals(carChannelMap.get(key).remoteAddress().toString()));
-        carChannelMap.keySet().removeIf(key->channel.remoteAddress() == carChannelMap.get(key).remoteAddress());
+        carChannelMap.keySet().removeIf(key -> {
+            if (channel.remoteAddress() == carChannelMap.get(key).remoteAddress()) {
+                dispatchCenterMap.get(key).setKszt("考车下线");
+                return true;
+            }
+            return false;
+        });
     }
 }

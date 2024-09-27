@@ -88,7 +88,7 @@ public class MessageHandler {
                 //不存在上线车辆
                 DispatchCenterDto dispatchCenterDto = new DispatchCenterDto();
                 dispatchCenterDto.setKszt("考车上线");
-                dispatchCenterDto.setSczt("");
+                dispatchCenterDto.setSczt("未上传");
                 dispatchCenterDto.setZt(1);
                 dispatchCenterDto.setKcbh(message[1]);
                 dispatchCenterDto.setKcxx(w2KcxxVo.getCph());
@@ -649,7 +649,7 @@ public class MessageHandler {
 
     private DispatchCenterDto handleInitTcp(String kcbh, String kszt) {
         DispatchCenterDto dispatchCenterDto = TcpUtils.getDispatchCenterDto(kcbh);
-        dispatchCenterDto.setSczt("");
+        dispatchCenterDto.setSczt("未上传");
         dispatchCenterDto.setZt(1);
         dispatchCenterDto.setKszt(kszt);
         return dispatchCenterDto;

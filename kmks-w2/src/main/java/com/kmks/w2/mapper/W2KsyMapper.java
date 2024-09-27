@@ -5,7 +5,7 @@ import com.kmks.w2.domain.W2Ksy;
 import com.ruoyi.common.core.mapper.BaseMapperPlus;
 
 /**
- * 考官信息Mapper接口
+ * 考试员信息Mapper接口
  *
  * @author lynn
  * @date 2023-04-28

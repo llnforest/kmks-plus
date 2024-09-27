@@ -6,11 +6,13 @@ import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.core.validate.QueryGroup;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import javax.validation.constraints.*;
 
 import java.util.Date;
 
 import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.core.domain.BaseEntity;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -29,7 +31,7 @@ public class W2QueuingBo extends BaseEntity {
     /**
      * ID
      */
-    @NotBlank(message = "ID不能为空",groups = QueryGroup.class)
+    @NotBlank(message = "ID不能为空", groups = QueryGroup.class)
     @Column(value = "编号")
     private Long id;
 
@@ -137,12 +139,12 @@ public class W2QueuingBo extends BaseEntity {
     private String kscx;
 
     /**
-     * 考官姓名
+     * 考试员姓名
      */
     private String kgname;
 
     /**
-     * 考官证件
+     * 考试员证件
      */
     private String kg;
 

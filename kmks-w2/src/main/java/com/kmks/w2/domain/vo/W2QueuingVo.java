@@ -1,14 +1,15 @@
 package com.kmks.w2.domain.vo;
 
 import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
-import java.util.Date;
 
+import java.util.Date;
 
 
 /**
@@ -147,14 +148,13 @@ public class W2QueuingVo {
     private String wcxm;
 
 
-
     /**
-     * 考官姓名
+     * 考试员姓名
      */
     private String kgname;
 
     /**
-     * 考官证件
+     * 考试员证件
      */
     private String kg;
 
@@ -182,7 +182,6 @@ public class W2QueuingVo {
      * $column.columnComment
      */
     private String zkxms;
-
 
 
     /**

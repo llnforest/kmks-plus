@@ -2,6 +2,7 @@ package com.kmks.w2.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
+import com.kmks.jianguanold.domain.vo.A17C04Vo;
 import com.kmks.w2.domain.bo.W2KsyBo;
 import com.kmks.w2.domain.vo.W2KsyVo;
 import com.kmks.w2.mapper.W2KsyMapper;
@@ -19,9 +20,10 @@ import com.kmks.w2.domain.W2Ksy;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
- * 考官信息Service业务层处理
+ * 考试员信息Service业务层处理
  *
  * @author lynn
  * @date 2023-04-28
@@ -33,15 +35,15 @@ public class W2KsyServiceImpl implements IW2KsyService {
     private final W2KsyMapper baseMapper;
 
     /**
-     * 查询考官信息
+     * 查询考试员信息
      */
     @Override
-    public W2KsyVo queryById(String xh){
+    public W2KsyVo queryById(String xh) {
         return baseMapper.selectVoById(xh);
     }
 
     /**
-     * 查询考官信息列表
+     * 查询考试员信息列表
      */
     @Override
     public TableDataInfo<W2KsyVo> queryPageList(W2KsyBo bo, PageQuery pageQuery) {
@@ -51,7 +53,7 @@ public class W2KsyServiceImpl implements IW2KsyService {
     }
 
     /**
-     * 查询考官信息列表
+     * 查询考试员信息列表
      */
     @Override
     public List<W2KsyVo> queryList(W2KsyBo bo) {
@@ -84,7 +86,7 @@ public class W2KsyServiceImpl implements IW2KsyService {
     }
 
     /**
-     * 新增考官信息
+     * 新增考试员信息
      */
     @Override
     public Boolean insertByBo(W2KsyBo bo) {
@@ -100,7 +102,7 @@ public class W2KsyServiceImpl implements IW2KsyService {
     }
 
     /**
-     * 修改考官信息
+     * 修改考试员信息
      */
     @Override
     public Boolean updateByBo(W2KsyBo bo) {
@@ -114,18 +116,31 @@ public class W2KsyServiceImpl implements IW2KsyService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(W2Ksy entity){
+    private void validEntityBeforeSave(W2Ksy entity) {
         //TODO 做一些数据校验,如唯一约束
     }
 
     /**
-     * 批量删除考官信息
+     * 批量删除考试员信息
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<String> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
+    }
+
+    /**
+     * 下载ksy信息
+     *
+     * @param list 列表
+     * @return {@link Boolean}
+     */
+    @Override
+    public Boolean downLoadKsy(List<A17C04Vo.Body> list) {
+        baseMapper.delete(null);
+        List<W2Ksy> collect = list.stream().map(v -> BeanUtil.toBean(v, W2Ksy.class)).collect(Collectors.toList());
+        return baseMapper.insertBatch(collect);
     }
 }

@@ -101,7 +101,7 @@ public class CarServiceImpl implements ICarService {
                 Wrappers.lambdaQuery(W2Queuing.class)
                         .eq(W2Queuing::getKcbh, kcbh)
                         .eq(W2Queuing::getZt, "1")
-                        .in(W2Queuing::getKszt, "0", "1")
+                        .in(W2Queuing::getKszt, "0", "1", "3")
                         .eq(W2Queuing::getKsrq, DateUtil.beginOfDay(new Date()))
                         .orderByAsc(W2Queuing::getBdxh)
         );
@@ -372,14 +372,21 @@ public class CarServiceImpl implements ICarService {
         insertFlowrec(w2Flowrec);
 
         // 更新排队信息
-        queuingInfo.setKszt("2");
+        if (scoreResultDto.getKsjg().equals("1")) {
+            queuingInfo.setKszt("5"); // 考试通过
+        } else if (queuingInfo.getDjc() == 1l) {
+            queuingInfo.setKszt("3"); // 第1次不过
+        } else {
+            queuingInfo.setKszt("4"); // 两次不过
+        }
+
 
         // 处理考试成绩表
         W2RecordsVo recordsInfo = getRecordsInfo(queuingInfo.getKcbh(), queuingInfo.getZjhm());
         recordsInfo.setKszt("2");
 
         //评判考试结果
-        if (recordsInfo.getKscs() == 1l) {
+        if (queuingInfo.getDjc() == 1l) {
             recordsInfo.setKsjg(scoreResultDto.getKsjg());
             recordsInfo.setJssj1(DateUtil.parse(kssj));
             recordsInfo.setKscj1(scoreResultDto.getKscj1());

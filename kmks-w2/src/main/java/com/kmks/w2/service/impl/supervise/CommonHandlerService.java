@@ -140,7 +140,11 @@ public class CommonHandlerService {
      * @param w2Records w2考生记录
      */
     public void checkInCreateW2Queuing(W2Queuing w2Queuing, W2Records w2Records) {
+        w2Queuing.setXm(w2Records.getXm());
         w2Queuing.setZjhm(w2Records.getZjhm());
+        w2Queuing.setKscx(w2Records.getKscx());
+        w2Queuing.setZkzh(w2Records.getZkzh());
+        w2Queuing.setKskm(w2Records.getKskm());
         w2Queuing.setSign(0l);
         w2Queuing.setZt("0");
         w2Queuing.setKszt("0");

@@ -4,15 +4,25 @@ import java.util.List;
 import java.util.Arrays;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.kmks.jianguanold.domain.bo.A17C02Bo;
+import com.kmks.jianguanold.domain.bo.A17C05Bo;
+import com.kmks.jianguanold.domain.vo.A17C02Vo;
+import com.kmks.jianguanold.domain.vo.A17C05Vo;
+import com.kmks.jianguanold.service.IJgOldService;
+import com.kmks.jianguanold.service.impl.JgOldServiceImpl;
 import com.kmks.w2.domain.EquipmentBean;
 import com.kmks.w2.domain.bo.W2CdxmbhBo;
 import com.kmks.w2.domain.vo.W2CdxmbhVo;
 import com.kmks.w2.service.IW2CdxmbhService;
 import com.kmks.w2.service.WebService;
+import com.ruoyi.common.constant.CacheNames;
 import com.ruoyi.common.core.validate.CustomGroup;
+import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
+
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -40,7 +50,9 @@ import com.ruoyi.common.core.page.TableDataInfo;
 public class W2CdxmbhController extends BaseController {
 
     private final IW2CdxmbhService iW2CdxmbhService;
-    private final WebService webService;
+    private final ISysConfigService configService;
+
+    private final IJgOldService jgOldService;
 
     /**
      * 查询场地项目编号列表
@@ -70,7 +82,7 @@ public class W2CdxmbhController extends BaseController {
     @SaCheckPermission("w2:cdxmbh:query")
     @GetMapping("/{nid}")
     public R<W2CdxmbhVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long nid) {
+                                 @PathVariable Long nid) {
         return R.ok(iW2CdxmbhService.queryById(nid));
     }
 
@@ -111,9 +123,9 @@ public class W2CdxmbhController extends BaseController {
 
     /**
      * 查询考场设备编号
-    **/
+     **/
     @PostMapping("/select")
-    public R<List<W2CdxmbhVo>> select(@RequestBody W2CdxmbhBo bo){
+    public R<List<W2CdxmbhVo>> select(@RequestBody W2CdxmbhBo bo) {
         return R.ok(iW2CdxmbhService.queryList(bo));
     }
 
@@ -121,11 +133,27 @@ public class W2CdxmbhController extends BaseController {
      * 设备项统计
      */
     @PostMapping("/listCdxmbhByLogNew")
-    public TableDataInfo<EquipmentBean> listCdxmbhByLogNew(@RequestBody PageQuery pageQuery){
+    public TableDataInfo<EquipmentBean> listCdxmbhByLogNew(@RequestBody PageQuery pageQuery) {
         Page<EquipmentBean> page = pageQuery.build();
-        return  TableDataInfo.build(iW2CdxmbhService.listCdxmbhByLogNew(page));
+        return TableDataInfo.build(iW2CdxmbhService.listCdxmbhByLogNew(page));
     }
+
+    /**
+     * 下载设备备案信息
+     */
+    @SaCheckPermission("w2:cdxmbh:download")
+    @Log(title = "设备备案信息下载", businessType = BusinessType.UPDATE)
+    @PostMapping("/download")
+    public void download(HttpServletResponse response) {
+        A17C02Bo a17C02Bo = new A17C02Bo();
+        a17C02Bo.setFzjg(configService.selectConfigByKey(CacheNames.JG_OLD_FZJG));
+        a17C02Bo.setKcxh(configService.selectConfigByKey(CacheNames.JG_COMMON_KSXTXH));
+        A17C02Vo a17C02Vo = jgOldService.a17c02(a17C02Bo);
+        ExcelUtil.exportExcel(a17C02Vo.getBody(), "设备备案信息", A17C02Vo.Body.class, response);
+    }
+    
     // ----------------------------------数据下载------------------------------------
+
     /**
      * 查询场地项目编号列表
      */
@@ -136,21 +164,6 @@ public class W2CdxmbhController extends BaseController {
     }
 
     /**
-     * 下载场地项目编号信息
-     */
-    @SaCheckPermission("w2:cdxmbh:download")
-    @Log(title = "场地项目编号下载", businessType = BusinessType.UPDATE)
-    @PostMapping("/download")
-    public R<Void> download() {
-        String result = webService.Down17C02Xml();
-        if(result.equals("")){
-            return toAjax(true);
-        }else{
-            return toAjax(false);
-        }
-    }
-
-    /**
      * 导出场地项目编号
      */
     @SaCheckPermission("w2:cdxmbh:exportData")
@@ -158,7 +171,7 @@ public class W2CdxmbhController extends BaseController {
     @PostMapping("/exportData")
     public void exportData(W2CdxmbhBo bo, HttpServletResponse response) {
         List<W2CdxmbhVo> list = iW2CdxmbhService.queryList(bo);
-        ExcelUtil.exportExcel(list, "场地项目编号", W2CdxmbhVo.class, response,"data");
+        ExcelUtil.exportExcel(list, "场地项目编号", W2CdxmbhVo.class, response, "data");
     }
 
     /**
@@ -171,7 +184,6 @@ public class W2CdxmbhController extends BaseController {
     public R<Void> updateData(@Validated(CustomGroup.class) @RequestBody W2CdxmbhBo bo) {
         return toAjax(iW2CdxmbhService.updateByBo(bo));
     }
-
 
 
 }

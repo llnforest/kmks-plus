@@ -13,7 +13,7 @@ public enum A17C51VoEnum {
     INVALID_CANDIDATE("-4", "考生身份不合法"),
     INVALID_SUBJECT_SYSTEM("-5", "科目考试系统不合法"),
     NO_GROUP_INFO("-6", "无考生分组信息"),
-    MISMATCHED_GROUP("-7", "分组考官和考生不匹配"),
+    MISMATCHED_GROUP("-7", "分组考试员和考生不匹配"),
     INVALID_EXAM_CENTER("-8", "考场信息不合法"),
     INVALID_EXAMINER("-9", "考试员信息不合法"),
     INVALID_SYSTEM_TIME("-10", "科目考试系统时间不合法"),

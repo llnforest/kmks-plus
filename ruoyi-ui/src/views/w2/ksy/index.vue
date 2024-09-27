@@ -9,7 +9,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['w2:ksy:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -20,7 +21,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['w2:ksy:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -31,7 +33,8 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['w2:ksy:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -41,13 +44,27 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['w2:ksy:export']"
-        >导出</el-button>
+        >导出
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleDownload"
+          v-hasPermi="['w2:ksy:download']"
+          v-if="isJgType(2)"
+        >考试员备案信息同步
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="ksyList" @selection-change="handleSelectionChange"  @row-click="rowClick" @row-contextmenu="rightClick">
-      <el-table-column type="selection" width="55" align="center" />
+    <el-table v-loading="loading" :data="ksyList" @selection-change="handleSelectionChange" @row-click="rowClick"
+              @row-contextmenu="rightClick">
+      <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="序号" align="center" prop="xh" v-if="true"/>
       <el-table-column label="所属发证机关" align="center" prop="sszd" min-width="120"/>
       <el-table-column label="管理部门" align="center" prop="glbm" min-width="100"/>
@@ -75,7 +92,7 @@
       @pagination="getList"
     />
 
-<!--    鼠标右键菜单-->
+    <!--    鼠标右键菜单-->
     <div id="menu" class="menuDiv" v-show="rightMenuVisible" :style="{top:rightMenuTop,left:rightMenuLeft}">
       <ul class="menuUl">
         <li v-hasPermi="['w2:ksy:edit']"
@@ -90,50 +107,50 @@
         </li>
       </ul>
     </div>
-    <!-- 添加或修改考官信息对话框 -->
+    <!-- 添加或修改考试员信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="700px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="140px">
         <el-form-item label="所属发证机关" prop="sszd">
-          <el-input v-model="form.sszd" placeholder="请输入所属发证机关" />
+          <el-input v-model="form.sszd" placeholder="请输入所属发证机关"/>
         </el-form-item>
         <el-form-item label="管理部门" prop="glbm">
-          <el-input v-model="form.glbm" placeholder="请输入管理部门" />
+          <el-input v-model="form.glbm" placeholder="请输入管理部门"/>
         </el-form-item>
         <el-form-item label="证件名称" prop="sfzmmc">
-          <el-input v-model="form.sfzmmc" placeholder="请输入证件名称" />
+          <el-input v-model="form.sfzmmc" placeholder="请输入证件名称"/>
         </el-form-item>
         <el-form-item label="身份证明号码" prop="sfzmhm">
-          <el-input v-model="form.sfzmhm" placeholder="请输入身份证明号码" />
+          <el-input v-model="form.sfzmhm" placeholder="请输入身份证明号码"/>
         </el-form-item>
         <el-form-item label="驾驶证档案编号" prop="dabh">
-          <el-input v-model="form.dabh" placeholder="请输入驾驶证档案编号" />
+          <el-input v-model="form.dabh" placeholder="请输入驾驶证档案编号"/>
         </el-form-item>
         <el-form-item label="姓名" prop="xm">
-          <el-input v-model="form.xm" placeholder="请输入姓名" />
+          <el-input v-model="form.xm" placeholder="请输入姓名"/>
         </el-form-item>
         <el-form-item label="性别" prop="xb">
-          <el-input v-model="form.xb" placeholder="请输入性别" />
+          <el-input v-model="form.xb" placeholder="请输入性别"/>
         </el-form-item>
         <el-form-item label="出生日期" prop="csrq">
-          <el-input v-model="form.csrq" placeholder="请输入出生日期" />
+          <el-input v-model="form.csrq" placeholder="请输入出生日期"/>
         </el-form-item>
         <el-form-item label="考试准驾车型范围" prop="zkcx">
-          <el-input v-model="form.zkcx" placeholder="请输入考试准驾车型范围" />
+          <el-input v-model="form.zkcx" placeholder="请输入考试准驾车型范围"/>
         </el-form-item>
         <el-form-item label="考试员证发证日期" prop="fzrq">
-          <el-input v-model="form.fzrq" placeholder="请输入考试员证发证日期" />
+          <el-input v-model="form.fzrq" placeholder="请输入考试员证发证日期"/>
         </el-form-item>
         <el-form-item label="考试员证有效期止" prop="kszyxqz">
-          <el-input v-model="form.kszyxqz" placeholder="请输入考试员证有效期止" />
+          <el-input v-model="form.kszyxqz" placeholder="请输入考试员证有效期止"/>
         </el-form-item>
         <el-form-item label="工作单位" prop="gzdw">
-          <el-input v-model="form.gzdw" placeholder="请输入工作单位" />
+          <el-input v-model="form.gzdw" placeholder="请输入工作单位"/>
         </el-form-item>
         <el-form-item label="经办人" prop="jbr">
-          <el-input v-model="form.jbr" placeholder="请输入经办人" />
+          <el-input v-model="form.jbr" placeholder="请输入经办人"/>
         </el-form-item>
         <el-form-item label="考试员证发证单位" prop="fzjg">
-          <el-input v-model="form.fzjg" placeholder="请输入考试员证发证单位" />
+          <el-input v-model="form.fzjg" placeholder="请输入考试员证发证单位"/>
         </el-form-item>
 
       </el-form>
@@ -146,7 +163,7 @@
 </template>
 
 <script>
-import { listKsy, getKsy, delKsy, addKsy, updateKsy,downloadKsy} from "@/api/w2/ksy";
+import {listKsy, getKsy, delKsy, addKsy, updateKsy, downloadKsy} from "@/api/w2/ksy";
 import {delDeviceSign} from "@/api/w2/deviceSign";
 
 export default {
@@ -167,7 +184,7 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 考官信息表格数据
+      // 考试员信息表格数据
       ksyList: [],
       // 弹出层标题
       title: "",
@@ -200,22 +217,22 @@ export default {
       // 表单校验
       rules: {
         sszd: [
-          { required: true, message: "发证机关不能为空", trigger: "blur" }
+          {required: true, message: "发证机关不能为空", trigger: "blur"}
         ],
         glbm: [
-          { required: true, message: "管理部门不能为空", trigger: "blur" }
+          {required: true, message: "管理部门不能为空", trigger: "blur"}
         ],
         sfzmmc: [
-          { required: true, message: "证件名称不能为空", trigger: "blur" }
+          {required: true, message: "证件名称不能为空", trigger: "blur"}
         ],
         sfzmhm: [
-          { required: true, message: "身份证明号码不能为空", trigger: "blur" }
+          {required: true, message: "身份证明号码不能为空", trigger: "blur"}
         ]
-        ,dabh: [
-          { required: true, message: "驾驶证档案编号不能为空", trigger: "blur" }
+        , dabh: [
+          {required: true, message: "驾驶证档案编号不能为空", trigger: "blur"}
         ],
         xm: [
-          { required: true, message: "考官姓名不能为空", trigger: "blur" }
+          {required: true, message: "考试员姓名不能为空", trigger: "blur"}
         ],
 
       }
@@ -225,7 +242,7 @@ export default {
     this.getList();
   },
   methods: {
-    /** 查询考官信息列表 */
+    /** 查询考试员信息列表 */
     getList() {
       this.loading = true;
       listKsy(this.queryParams).then(response => {
@@ -276,14 +293,14 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.xh)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加考官信息";
+      this.title = "添加考试员信息";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -324,13 +341,13 @@ export default {
     },
     /** 下载按钮操作 */
     handleDownload() {
-      this.$modal.confirm('是否确认下载数据？').then(() => {
+      this.$modal.confirm('是否确认同步数据？').then(() => {
         this.loading = true;
         return downloadKsy();
       }).then(() => {
         this.loading = false;
         this.getList();
-        this.$modal.msgSuccess("下载成功");
+        this.$modal.msgSuccess("考试员备案信息同步成功");
       }).catch(() => {
       }).finally(() => {
         this.loading = false;
@@ -340,12 +357,12 @@ export default {
     handleExport() {
       this.download('w2/ksy/export', {
         ...this.queryParams
-      }, `考官_${new Date().getTime()}.xlsx`)
+      }, `考试员_${new Date().getTime()}.xlsx`)
     },
     /** 删除按钮操作 */
     handleDelete(row) {
       const xhs = row.xh || this.ids;
-      this.$modal.confirm('是否确认删除考官序号为"' + xhs + '"的数据项？').then(() => {
+      this.$modal.confirm('是否确认删除考试员序号为"' + xhs + '"的数据项？').then(() => {
         this.loading = true;
         return delKsy(xhs);
       }).then(() => {

@@ -231,5 +231,10 @@ public interface CacheNames {
      **/
     String JG_OLD_GLBM = "jg.old.glbm";
 
+    /**
+     * 发证机关
+     **/
+    String JG_OLD_FZJG = "jg.old.fzjg";
+
 
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
@@ -23,9 +24,9 @@ import com.ruoyi.common.core.domain.BaseEntity;
  */
 @Data
 @TableName("w2_records")
-public class W2Records{
+public class W2Records {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * ID
@@ -81,7 +82,7 @@ public class W2Records{
      */
     private Long jgfs1;
     /**
-     * 考官1
+     * 考试员1
      */
     private String ksy1;
     /**
@@ -105,7 +106,7 @@ public class W2Records{
      */
     private Long jgfs2;
     /**
-     * 考官2
+     * 考试员2
      */
     private String ksy2;
     /**
@@ -342,11 +343,11 @@ public class W2Records{
     private String kszt;
 
 
-    @TableField(value = "count(*)",select = false,insertStrategy = FieldStrategy.NEVER, updateStrategy = FieldStrategy.NEVER,whereStrategy=FieldStrategy.NEVER)
+    @TableField(value = "count(*)", select = false, insertStrategy = FieldStrategy.NEVER, updateStrategy = FieldStrategy.NEVER, whereStrategy = FieldStrategy.NEVER)
     private int totalNum;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @TableField(exist = false)
-    private Map<String,Object> params = new HashMap<>();
+    private Map<String, Object> params = new HashMap<>();
 
 }

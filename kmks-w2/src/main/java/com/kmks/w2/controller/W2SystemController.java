@@ -3,10 +3,19 @@ package com.kmks.w2.controller;
 import java.util.List;
 import java.util.Arrays;
 
+import com.kmks.jianguanold.domain.bo.A17C04Bo;
+import com.kmks.jianguanold.domain.bo.A17C05Bo;
+import com.kmks.jianguanold.domain.vo.A17C04Vo;
+import com.kmks.jianguanold.domain.vo.A17C05Vo;
+import com.kmks.jianguanold.service.IJgOldService;
 import com.kmks.w2.service.WebService;
+import com.ruoyi.common.constant.CacheNames;
+import com.ruoyi.system.service.ISysConfigService;
 import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.*;
+
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +46,9 @@ import com.ruoyi.common.core.page.TableDataInfo;
 public class W2SystemController extends BaseController {
 
     private final IW2SystemService iW2SystemService;
-    private final WebService webService;
+    private final IJgOldService jgOldService;
+
+    private final ISysConfigService configService;
 
     /**
      * 查询基础编码列表
@@ -67,7 +78,7 @@ public class W2SystemController extends BaseController {
     @SaCheckPermission("w2:school:query")
     @GetMapping("/{nid}")
     public R<W2SystemVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable Long nid) {
+                                 @PathVariable Long nid) {
         return R.ok(iW2SystemService.queryById(nid));
     }
 
@@ -108,6 +119,7 @@ public class W2SystemController extends BaseController {
 
     /**
      * 选择查找
+     *
      * @param bo
      */
     @PostMapping("/select")
@@ -116,6 +128,7 @@ public class W2SystemController extends BaseController {
     }
 
     // ----------------------------------数据下载------------------------------------
+
     /**
      * 查询驾校信息列表
      */
@@ -129,15 +142,13 @@ public class W2SystemController extends BaseController {
      * 下载驾校信息
      */
     @SaCheckPermission("w2:school:download")
-    @Log(title = "驾校信息下载", businessType = BusinessType.UPDATE)
+    @Log(title = "驾校备案信息下载", businessType = BusinessType.UPDATE)
     @PostMapping("/download")
-    public R<Void> download() {
-        String result = webService.Down17C05Xml();
-        if(result.equals("")){
-            return toAjax(true);
-        }else{
-            return toAjax(false);
-        }
+    public void download(HttpServletResponse response) {
+        A17C05Bo a17C05Bo = new A17C05Bo();
+        a17C05Bo.setFzjg(configService.selectConfigByKey(CacheNames.JG_OLD_FZJG));
+        A17C05Vo a17C05Vo = jgOldService.a17c05(a17C05Bo);
+        ExcelUtil.exportExcel(a17C05Vo.getBody(), "驾校备案信息", A17C05Vo.Body.class, response);
     }
 
     /**
@@ -148,7 +159,7 @@ public class W2SystemController extends BaseController {
     @PostMapping("/exportData")
     public void exportData(W2SystemBo bo, HttpServletResponse response) {
         List<W2SystemVo> list = iW2SystemService.queryList(bo);
-        ExcelUtil.exportExcel(list, "基础编码", W2SystemVo.class, response,"data");
+        ExcelUtil.exportExcel(list, "基础编码", W2SystemVo.class, response, "data");
     }
 
 }

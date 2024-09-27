@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
 @TableName("w2_queuing")
 public class W2Queuing {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * ID
@@ -102,11 +103,11 @@ public class W2Queuing {
      */
     private String kscx;
     /**
-     * 考官姓名
+     * 考试员姓名
      */
     private String kgname;
     /**
-     * 考官证件
+     * 考试员证件
      */
     private String kg;
     /**
@@ -297,9 +298,9 @@ public class W2Queuing {
     /**
      * 计算总数
      */
-    @TableField(value = "count(*)",select = false,insertStrategy = FieldStrategy.NEVER, updateStrategy = FieldStrategy.NEVER,whereStrategy=FieldStrategy.NEVER)
+    @TableField(value = "count(*)", select = false, insertStrategy = FieldStrategy.NEVER, updateStrategy = FieldStrategy.NEVER, whereStrategy = FieldStrategy.NEVER)
     private Long totalNum;
-    
+
     /**
      * 请求参数
      */

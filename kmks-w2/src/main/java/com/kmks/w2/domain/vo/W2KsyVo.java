@@ -5,12 +5,12 @@ import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
+
 import java.util.Date;
 
 
-
 /**
- * 考官信息视图对象 w2_ksy
+ * 考试员信息视图对象 w2_ksy
  *
  * @author lynn
  * @date 2023-04-28

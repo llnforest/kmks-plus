@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
-import java.util.Date;
 
+import java.util.Date;
 
 
 /**
@@ -49,22 +49,16 @@ public class W2KsxmdmJgVo {
     /**
      * $column.columnComment
      */
-    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "$column.readConverterExp()")
     private Long kmtime1;
 
     /**
      * $column.columnComment
      */
-    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "$column.readConverterExp()")
     private Long kmtime2;
 
     /**
      * $column.columnComment
      */
-    @ExcelProperty(value = "${comment}", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "$column.readConverterExp()")
     private Long kmtime3;
 
     @TableField(exist = false)

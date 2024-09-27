@@ -35,7 +35,8 @@
           size="mini"
           @click="handleAdd"
           v-hasPermi="['w2:ksxmdmJg:add']"
-        >新增</el-button>
+        >新增
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -46,7 +47,8 @@
           :disabled="single"
           @click="handleUpdate"
           v-hasPermi="['w2:ksxmdmJg:edit']"
-        >修改</el-button>
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -57,21 +59,46 @@
           :disabled="multiple"
           @click="handleDelete"
           v-hasPermi="['w2:ksxmdmJg:remove']"
-        >删除</el-button>
+        >删除
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          plain
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['w2:ksxmdmJg:export']"
+        >导出
+        </el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="el-icon-upload"
+          size="mini"
+          @click="handleDownload"
+          v-hasPermi="['w2:ksxmdmJg:download']"
+          v-if="isJgType(2)"
+        >场地备案信息下载
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="ksxmdmJgList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="项目代码" align="center" prop="id" />
-      <el-table-column label="项目名称" align="center" prop="name" />
+    <el-table v-loading="loading" :data="ksxmdmJgList" @selection-change="handleSelectionChange" @row-click="rowClick"
+              @row-contextmenu="rightClick">
+      <el-table-column type="selection" width="55" align="center"/>
+      <el-table-column label="项目代码" align="center" prop="id"/>
+      <el-table-column label="项目名称" align="center" prop="name"/>
       <el-table-column label="考试科目" align="center" prop="kskm">
         <template slot-scope="scope">
           <dict-tag :options="dict.type.sys_kskm" :value="scope.row.kskm"/>
         </template>
       </el-table-column>
-      <el-table-column label="项目序号" align="center" prop="custxh" />
+      <el-table-column label="项目序号" align="center" prop="custxh"/>
 
     </el-table>
     <div id="menu" class="menuDiv" v-show="rightMenuVisible" :style="{top:rightMenuTop,left:rightMenuLeft}">
@@ -100,10 +127,10 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="项目代码" prop="id">
-          <el-input v-model="form.id" placeholder="请输入项目代码" />
+          <el-input v-model="form.id" placeholder="请输入项目代码"/>
         </el-form-item>
         <el-form-item label="项目名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入项目名称" />
+          <el-input v-model="form.name" placeholder="请输入项目名称"/>
         </el-form-item>
         <el-form-item label="考试科目" prop="kskm">
           <el-select v-model="form.kskm" placeholder="请选择考试科目">
@@ -116,7 +143,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="项目序号" prop="custxh">
-          <el-input v-model="form.custxh" placeholder="请输入项目序号" />
+          <el-input v-model="form.custxh" placeholder="请输入项目序号"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -128,7 +155,7 @@
 </template>
 
 <script>
-import { listKsxmdmJg, getKsxmdmJg, delKsxmdmJg, addKsxmdmJg, updateKsxmdmJg } from "@/api/w2/ksxmdmJg";
+import {listKsxmdmJg, getKsxmdmJg, delKsxmdmJg, addKsxmdmJg, updateKsxmdmJg} from "@/api/w2/ksxmdmJg";
 
 export default {
   name: "KsxmdmJg",
@@ -170,16 +197,16 @@ export default {
       // 表单校验
       rules: {
         id: [
-          { required: true, message: "项目代码不能为空", trigger: "blur" }
+          {required: true, message: "项目代码不能为空", trigger: "blur"}
         ],
         name: [
-          { required: true, message: "项目名称不能为空", trigger: "blur" }
+          {required: true, message: "项目名称不能为空", trigger: "blur"}
         ],
         kskm: [
-          { required: true, message: "考试科目不能为空", trigger: "change" }
+          {required: true, message: "考试科目不能为空", trigger: "change"}
         ],
         custxh: [
-          { required: true, message: "项目序号不能为空", trigger: "blur" }
+          {required: true, message: "项目序号不能为空", trigger: "blur"}
         ],
       }
     };
@@ -207,7 +234,7 @@ export default {
       this.form = {
         id: undefined,
         name: undefined,
-        kskm: this.$store.getters.configCourses == "2,3"?"2":this.$store.getters.configCourses,
+        kskm: this.$store.getters.configCourses == "2,3" ? "2" : this.$store.getters.configCourses,
         custxh: undefined,
         kmtime1: undefined,
         kmtime2: undefined,
@@ -228,7 +255,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
@@ -284,6 +311,17 @@ export default {
       this.download('w2/ksxmdmJg/export', {
         ...this.queryParams
       }, `场地项目代码_${new Date().getTime()}.xlsx`)
+    },
+    /** 下载按钮操作 */
+    handleDownload() {
+      this.$modal.confirm('是否确认下载场地备案数据？').then(() => {
+        this.download('w2/ksxmdmJg/download', {
+          ...this.queryParams
+        }, `场地备案信息_${new Date().getTime()}.xlsx`)
+      }).catch(() => {
+      }).finally(() => {
+        this.loading = false;
+      });
     }
   }
 };

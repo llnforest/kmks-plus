@@ -1,14 +1,15 @@
 package com.kmks.w2.domain.vo;
 
 import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.annotation.ExcelDictFormat;
 import com.ruoyi.common.convert.ExcelDictConvert;
 import lombok.Data;
-import java.util.Date;
 
+import java.util.Date;
 
 
 /**
@@ -111,9 +112,9 @@ public class W2RecordsVo {
     private Long jgfs1;
 
     /**
-     * 考官1
+     * 考试员1
      */
-//    @ExcelProperty(value = "考官1")
+//    @ExcelProperty(value = "考试员1")
     private String ksy1;
 
     /**
@@ -147,9 +148,9 @@ public class W2RecordsVo {
     private Long jgfs2;
 
     /**
-     * 考官2
+     * 考试员2
      */
-//    @ExcelProperty(value = "考官2")
+//    @ExcelProperty(value = "考试员2")
     private String ksy2;
 
     /**
@@ -170,7 +171,6 @@ public class W2RecordsVo {
 //    @ExcelProperty(value = "打印", converter = ExcelDictConvert.class)
 //    @ExcelDictFormat(dictType = "record_is_print")
     private String sfprint;
-
 
 
     /**

@@ -43,10 +43,10 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="考官" prop="ksy1">
+      <el-form-item label="考试员" prop="ksy1">
         <el-input
           v-model="queryParams.ksy1"
-          placeholder="请输入考官1"
+          placeholder="请输入考试员1"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -94,13 +94,15 @@
           size="mini"
           @click="handleExport"
           v-hasPermi="['w2:passRate:exportTotal']"
-        >导出</el-button>
+        >导出
+        </el-button>
       </el-col>
 
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="recordsList" @selection-change="handleSelectionChange" @row-click="rowClick" @row-contextmenu="rightClick">
+    <el-table v-loading="loading" :data="recordsList" @selection-change="handleSelectionChange" @row-click="rowClick"
+              @row-contextmenu="rightClick">
       <el-table-column type="selection" width="55" align="center" v-if="false"/>
       <el-table-column label="统计对象" align="center" prop="name" min-width="120"/>
       <el-table-column label="合计" align="center" prop="total" min-width="80"/>
@@ -176,19 +178,19 @@ export default {
       // 表单校验
       rules: {
         id: [
-          { required: true, message: "ID不能为空", trigger: "blur" }
+          {required: true, message: "ID不能为空", trigger: "blur"}
         ],
         wpyy: [
-          { required: true, message: "误判原因不能为空", trigger: "blur" }
+          {required: true, message: "误判原因不能为空", trigger: "blur"}
         ],
         wpxz: [
-          { required: true, message: "误判选择不能为空", trigger: "change" }
+          {required: true, message: "误判选择不能为空", trigger: "change"}
         ],
       },
-      carList:[],
-      schoolList:[],
-      cdxmbhList:[],
-      wpOptions:["第2次","第1次","2次全"]
+      carList: [],
+      schoolList: [],
+      cdxmbhList: [],
+      wpOptions: ["第2次", "第1次", "2次全"]
     };
   },
   created() {
@@ -198,19 +200,19 @@ export default {
     this.getSchoolList();
   },
   methods: {
-    getCdxmbh(){
+    getCdxmbh() {
       selectCdxmbh().then(response => {
         this.cdxmbhList = response.data
       });
     },
     /** 获取驾校列表 **/
     getSchoolList() {
-      selectSchool({type:3}).then(response => {
+      selectSchool({type: 3}).then(response => {
         this.schoolList = response.data
       });
     },
     /** 获取车辆列表 **/
-    getCarList(){
+    getCarList() {
       getCarList().then(response => {
         this.carList = response.data;
       });
@@ -348,7 +350,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
-      this.single = selection.length!==1
+      this.single = selection.length !== 1
       this.multiple = !selection.length
     },
 
