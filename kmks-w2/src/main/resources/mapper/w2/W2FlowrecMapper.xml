@@ -54,8 +54,27 @@
         <result property="flag" column="flag"/>
     </resultMap>
     <select id="getFlowListByDay" resultType="com.kmks.w2.domain.vo.W2FlowVo">
-        SELECT ID,XM,KSBH,KSXM,KSSJ,KSKF, KFDM,KSCS,XYH,KSZT,ZP,KCBH,XMMC,MSG,SCBJ,ICODE,IMESSAGE FROM W2_FLOWREC
-        WHERE KSBH=#{ksbh} AND  <![CDATA[ KSSJ >= TO_DATE('${ksrq} 00:00:00','yyyy-mm-dd HH24:MI:SS') AND KSSJ <= TO_DATE('${ksrq} 23:59:59','yyyy-mm-dd HH24:MI:SS') ]]> ORDER BY ID ASC
+        SELECT ID,
+               XM,
+               KSBH,
+               KSXM,
+               KSSJ,
+               KSKF,
+               KFDM,
+               KSCS,
+               XYH,
+               KSZT,
+               ZP,
+               KCBH,
+               XMMC,
+               MSG,
+               SCBJ,
+               ICODE,
+               IMESSAGE
+        FROM W2_FLOWREC
+        WHERE ZJHM = #{zjhm}
+          AND  <![CDATA[ KSSJ >= TO_DATE('${ksrq} 00:00:00', 'yyyy-mm-dd HH24:MI:SS')
+          AND KSSJ <= TO_DATE('${ksrq} 23:59:59', 'yyyy-mm-dd HH24:MI:SS') ]]> ORDER BY ID ASC
     </select>
 
 </mapper>

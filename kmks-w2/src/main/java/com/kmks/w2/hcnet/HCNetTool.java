@@ -19,15 +19,15 @@ public class HCNetTool {
 
     public static int lUserID = -1;
 
-    public static void load(){
+    public static void load() {
         hCNetSDK = (HCNetSDK) Native.loadLibrary("D:\\kmksService\\commonEnv\\hcNet\\dll\\HCNetSDK.dll", HCNetSDK.class);
     }
 
-    public static boolean initAndLogin(){
-        if(lUserID == -1){
+    public static boolean init() {
+        if (lUserID == -1) {
             boolean init = hCNetSDK.NET_DVR_Init();
-            LogUtils.hc("初始化：{}",init);
-            if(!init){
+            LogUtils.hc("初始化：{}", init);
+            if (!init) {
                 return init;
             }
 
@@ -36,13 +36,12 @@ public class HCNetTool {
     }
 
     /**
-     *
      * @param m_sDeviceIP 设备ip地址
      * @param wPort       端口号，设备网络SDK登录默认端口8000
      * @param m_sUsername 用户名
      * @param m_sPassword 密码
      */
-    public static void login(String m_sDeviceIP,short wPort,String m_sUsername,String m_sPassword) {
+    public static void login(String m_sDeviceIP, short wPort, String m_sUsername, String m_sPassword) {
         /* 注册 */
         // 设备登录信息
         HCNetSDK.NET_DVR_USER_LOGIN_INFO m_strLoginInfo = new HCNetSDK.NET_DVR_USER_LOGIN_INFO();
@@ -51,7 +50,7 @@ public class HCNetTool {
         HCNetSDK.NET_DVR_DEVICEINFO_V40 m_strDeviceInfo = new HCNetSDK.NET_DVR_DEVICEINFO_V40();
         m_strLoginInfo.sDeviceAddress = new byte[HCNetSDK.NET_DVR_DEV_ADDRESS_MAX_LEN];
         System.arraycopy(m_sDeviceIP.getBytes(), 0, m_strLoginInfo.sDeviceAddress, 0, m_sDeviceIP.length());
-        m_strLoginInfo.wPort =wPort ;
+        m_strLoginInfo.wPort = wPort;
         m_strLoginInfo.sUserName = new byte[HCNetSDK.NET_DVR_LOGIN_USERNAME_MAX_LEN];
         System.arraycopy(m_sUsername.getBytes(), 0, m_strLoginInfo.sUserName, 0, m_sUsername.length());
         m_strLoginInfo.sPassword = new byte[HCNetSDK.NET_DVR_LOGIN_PASSWD_MAX_LEN];
@@ -75,19 +74,16 @@ public class HCNetTool {
     }
 
 
-
     //设备注销 SDK释放
     public static void logout() {
-        if (lUserID>=0)
-        {
+        if (lUserID >= 0) {
             if (hCNetSDK.NET_DVR_Logout(lUserID) == false) {
                 System.out.println("注销失败，错误码为" + hCNetSDK.NET_DVR_GetLastError());
             }
             System.out.println("注销成功");
             hCNetSDK.NET_DVR_Cleanup();
             return;
-        }
-        else{
+        } else {
             System.out.println("设备未登录");
             hCNetSDK.NET_DVR_Cleanup();
             return;
@@ -96,21 +92,19 @@ public class HCNetTool {
 
     /**
      * 测试文字覆盖
-    **/
-    public static Boolean setOsdText(){
+     **/
+    public static Boolean setOsdText() {
         HCNetSDK.NET_DVR_OUTPUT_OSD_CFG osdCfg = new HCNetSDK.NET_DVR_OUTPUT_OSD_CFG();
-        int dwOsdWinNo =(1 << 24) | (1 << 16) | 6;
+        int dwOsdWinNo = (1 << 24) | (1 << 16) | 6;
         int nSize = osdCfg.size();
         IntByReference dwReturn = new IntByReference(0);
         osdCfg.write();
-        if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserID,HCNetSDK.NET_DVR_GET_OUTPUT_OSD_CFG, dwOsdWinNo, osdCfg.getPointer(), nSize, dwReturn))
-        {
+        if (!hCNetSDK.NET_DVR_GetDVRConfig(lUserID, HCNetSDK.NET_DVR_GET_OUTPUT_OSD_CFG, dwOsdWinNo, osdCfg.getPointer(), nSize, dwReturn)) {
             log.info("OSD获取失败: NET_DVR_OUTPUT_OSD_CFG failed, error code=" + hCNetSDK.NET_DVR_GetLastError());
             return false;
-        }else{
-              osdCfg.read();
+        } else {
+            osdCfg.read();
         }
-
 
 
         osdCfg.byOSDColor = 2;
@@ -131,12 +125,12 @@ public class HCNetTool {
         osdCfg.write();
         boolean b = hCNetSDK.NET_DVR_SetDVRConfig(lUserID, HCNetSDK.NET_DVR_SET_OUTPUT_OSD_CFG, dwOsdWinNo, osdCfg.getPointer(), osdCfg.size());
         osdCfg.read();
-        log.info("text:{}",hCNetSDK.NET_DVR_GetLastError());
-        log.info("result:{}",b);
+        log.info("text:{}", hCNetSDK.NET_DVR_GetLastError());
+        log.info("result:{}", b);
         return b;
     }
 
-    public static Boolean setVideo(){
+    public static Boolean setVideo() {
         HCNetSDK.NET_DVR_IPC_PROTO_LIST m_struProtoList = new HCNetSDK.NET_DVR_IPC_PROTO_LIST();
         m_struProtoList.dwSize = m_struProtoList.size(); // 设置结构体大小
 
@@ -148,12 +142,11 @@ public class HCNetTool {
             log.info("获取IPC协议列表失败");
         } else {
             String text = new String(m_struProtoList.struProto[0].byDescribe);
-            log.info("获取IPC协议列表成功:{}",text);
+            log.info("获取IPC协议列表成功:{}", text);
         }
 
         HCNetSDK.NET_DVR_PU_STREAM_CFG_V41 cfg_v41 = new HCNetSDK.NET_DVR_PU_STREAM_CFG_V41();
-        int dwDecChanNum =(1 << 24) | (1 << 16) | 1;
-
+        int dwDecChanNum = (1 << 24) | (1 << 16) | 1;
 
 
         cfg_v41.dwSize = cfg_v41.size();
@@ -177,14 +170,14 @@ public class HCNetTool {
 
         cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byChanType = 0;//通道类型：0-普通通道，1-零通道，2-流ID，3-本地输入源
         cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.dwChannel = 1;//通道号，通道类型为普通通道，零通道，本地输入源，虚拟屏服务器通道，拼接通道，屏幕服务器，分布式网络源时填此字段
-        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.wDVRPort=8000;//端口号
-        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byTransProtocol=0;//传输协议类型0-TCP，1-UDP
-        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byTransMode=0;//传输码流模式 0－主码流 1－子码流
-        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byFactoryType= (byte) m_struProtoList.struProto[0].dwType;//前端设备厂家类型,通过接口获取
+        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.wDVRPort = 8000;//端口号
+        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byTransProtocol = 0;//传输协议类型0-TCP，1-UDP
+        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byTransMode = 0;//传输码流模式 0－主码流 1－子码流
+        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byFactoryType = (byte) m_struProtoList.struProto[0].dwType;//前端设备厂家类型,通过接口获取
 
         cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.byAddress = devIpByte;//设备域名
-        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.sUserName=devNameByte;//布防主机登陆帐号
-        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.sPassword=devPassByte;//布防主机密码
+        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.sUserName = devNameByte;//布防主机登陆帐号
+        cfg_v41.uDecStreamMode.struDecStreamDev.struDevChanInfo.sPassword = devPassByte;//布防主机密码
 
         cfg_v41.write();
         boolean b = hCNetSDK.NET_DVR_MatrixStartDynamic_V41(lUserID, dwDecChanNum, cfg_v41.getPointer());
@@ -195,14 +188,14 @@ public class HCNetTool {
         String devPass = new String(devPassByte);
 
         log.info("IP:{},name:{},pass:{}", devIp, devName, devPass);
-        log.info("error:{}",hCNetSDK.NET_DVR_GetLastError());
-        log.info("result:{}",b);
+        log.info("error:{}", hCNetSDK.NET_DVR_GetLastError());
+        log.info("result:{}", b);
         return b;
     }
 
-    public static Boolean showImg(){
+    public static Boolean showImg() {
         HCNetSDK.NET_DVR_OUTPUT_PIC_CFG pic_cfg = new HCNetSDK.NET_DVR_OUTPUT_PIC_CFG();
-        int dwOsdWinNo =(1 << 24) | (1 << 16) | 1;
+        int dwOsdWinNo = (1 << 24) | (1 << 16) | 1;
 
         pic_cfg.dwSize = pic_cfg.size();
         pic_cfg.dwOutputPicNo = 2; // 图片序号
@@ -218,13 +211,13 @@ public class HCNetTool {
         pic_cfg.write();
         boolean b = hCNetSDK.NET_DVR_SetDVRConfig(lUserID, HCNetSDK.NET_DVR_SET_OUTPUT_PIC_WIN_CFG, dwOsdWinNo, pic_cfg.getPointer(), pic_cfg.size());
         pic_cfg.read();
-        log.info("text:{}",hCNetSDK.NET_DVR_GetLastError());
-        log.info("result:{}",b);
+        log.info("text:{}", hCNetSDK.NET_DVR_GetLastError());
+        log.info("result:{}", b);
         return b;
     }
 
 
-    public static Boolean setImgInfo(){
+    public static Boolean setImgInfo() {
         HCNetSDK.NET_DVR_OUTPUT_PIC_INFO pic_info = new HCNetSDK.NET_DVR_OUTPUT_PIC_INFO();
         byte[] picNameContent = "01".getBytes(Charset.forName("GBK"));
         byte[] picNameByte = new byte[32];
@@ -236,15 +229,15 @@ public class HCNetTool {
         pic_info.sPicName = picNameByte;
 
         pic_info.write();
-        boolean b = hCNetSDK.NET_DVR_SetDVRConfig(lUserID, HCNetSDK.NET_DVR_SET_OUTPUT_PIC_INFO,1,  pic_info.getPointer(), pic_info.size());
+        boolean b = hCNetSDK.NET_DVR_SetDVRConfig(lUserID, HCNetSDK.NET_DVR_SET_OUTPUT_PIC_INFO, 1, pic_info.getPointer(), pic_info.size());
         pic_info.read();
-        log.info("设置图片参数:{}",b);
-        log.info("设置图片参数error:{}",hCNetSDK.NET_DVR_GetLastError());
+        log.info("设置图片参数:{}", b);
+        log.info("设置图片参数error:{}", hCNetSDK.NET_DVR_GetLastError());
         return b;
     }
 
-    public static long uploadImg(){
-        String fileName = "C:\\Users\\Star\\Desktop\\image\\phone\\01.bmp";
+    public static long uploadImg() {
+        String fileName = "D:\\驾考BS升级\\合码器\\1.bmp";
         HCNetSDK.NET_DVR_PICCFG net_dvr_piccfg = new HCNetSDK.NET_DVR_PICCFG();
         net_dvr_piccfg.dwSize = net_dvr_piccfg.size();
         net_dvr_piccfg.byUseType = 4; //1- 底图，2- GIF图片，3- CAD图片，4- 输出口图片
@@ -261,25 +254,25 @@ public class HCNetTool {
         net_dvr_piccfg.struBasemapCfg.wSourWidth = 0;
         net_dvr_piccfg.struBasemapCfg.wSourHeight = 0;
         net_dvr_piccfg.write();
-        long result = hCNetSDK.NET_DVR_PicUpload(lUserID,fileName,net_dvr_piccfg.getPointer());
+        long result = hCNetSDK.NET_DVR_PicUpload(lUserID, fileName, net_dvr_piccfg.getPointer());
         net_dvr_piccfg.read();
-        log.info("上传结果：{}",result);
-        if(result == -1l) log.info("上传error:{}",hCNetSDK.NET_DVR_GetLastError());
+        log.info("上传结果：{}", result);
+        if (result == -1l) log.info("上传error:{}", hCNetSDK.NET_DVR_GetLastError());
         return result;
     }
 
-    public static void getUploadStatus(long lUploadHandle) throws Exception{
+    public static void getUploadStatus(long lUploadHandle) throws Exception {
         // 4294967295
         long l = hCNetSDK.NET_DVR_GetPicUploadState(lUploadHandle);
-        log.info("上传状态：{}",l);
+        log.info("上传状态：{}", l);
 
 
-        while(true){
+        while (true) {
             long process = hCNetSDK.NET_DVR_GetPicUploadProgress(lUploadHandle);
-            log.info("上传进度：{}",process);
-            if(process >= 100l){
+            log.info("上传进度：{}", process);
+            if (process >= 100l) {
                 boolean result = hCNetSDK.NET_DVR_CloseUploadHandle(lUploadHandle);
-                log.info("关闭上传状态：{}",result);
+                log.info("关闭上传状态：{}", result);
                 break;
             }
             Thread.sleep(1000);
@@ -287,15 +280,15 @@ public class HCNetTool {
 
     }
 
-    public static Boolean removeImg(){
+    public static Boolean removeImg() {
         HCNetSDK.NET_DVR_DELETE_OUPUT_PIC ouput_pic = new HCNetSDK.NET_DVR_DELETE_OUPUT_PIC();
         ouput_pic.bySequence = 1;// 图片序号
         ouput_pic.write();
         boolean b = hCNetSDK.NET_DVR_RemoteControl(lUserID, HCNetSDK.NET_DVR_DELETE_OUPUT_PIC, ouput_pic.getPointer(), ouput_pic.size());
         ouput_pic.read();
-        log.info("删除状态：{}",b);
-        if(!b){
-            log.info("删除error:{}",hCNetSDK.NET_DVR_GetLastError());
+        log.info("删除状态：{}", b);
+        if (!b) {
+            log.info("删除error:{}", hCNetSDK.NET_DVR_GetLastError());
         }
         return b;
     }

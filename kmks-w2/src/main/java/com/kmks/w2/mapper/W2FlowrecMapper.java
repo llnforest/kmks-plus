@@ -15,5 +15,5 @@ import java.util.List;
  * @date 2023-05-24
  */
 public interface W2FlowrecMapper extends BaseMapperPlus<W2FlowrecMapper, W2Flowrec, W2FlowVo> {
-    List<W2FlowVo> getFlowListByDay(@Param("ksbh") String ksbh, @Param("ksrq") String ksrq);
+    List<W2FlowVo> getFlowListByDay(@Param("zjhm") String zjhm, @Param("ksrq") String ksrq);
 }

@@ -159,7 +159,7 @@ public interface CacheNames {
     /**
      * 合码器轨迹照片存储位置
      **/
-    String HC_trajectory_path = "hc.trajectory.path";
+    String HC_trajectory_path = "sys.hc.trajectory.path";
 
     /**
      * 文件位置键名

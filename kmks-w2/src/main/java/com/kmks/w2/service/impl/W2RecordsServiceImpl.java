@@ -46,11 +46,12 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
 
     private final W2QueuhisMapper queuhisMapper;
     private final W2QueuingMapper queuingMapper;
+
     /**
      * 查询成绩管理
      */
     @Override
-    public W2RecordsVo queryById(Long id){
+    public W2RecordsVo queryById(Long id) {
         return baseMapper.selectVoById(id);
     }
 
@@ -59,7 +60,7 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      */
     @Override
     public TableDataInfo<W2RecordsVo> queryPageList(W2RecordsBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo,true);
+        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo, true);
         Page<W2RecordsVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
@@ -69,7 +70,7 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      */
     @Override
     public List<W2RecordsVo> queryList(W2RecordsBo bo) {
-        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo,true);
+        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo, true);
         return baseMapper.selectVoList(lqw);
     }
 
@@ -82,15 +83,15 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
     @Override
     public List<PassRateVo> queryRateList(W2RecordsBo bo) {
         // 查询数据
-        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo,false);
-        lqw.gt(W2Records::getKsjg,"0");
+        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo, false);
+        lqw.gt(W2Records::getKsjg, "0");
 
-        lqw.select(W2Records::getJxdm,W2Records::getKsjg,W2Records::getTotalNum);
-        lqw.groupBy(W2Records::getJxdm,W2Records::getKsjg);
+        lqw.select(W2Records::getJxdm, W2Records::getKsjg, W2Records::getTotalNum);
+        lqw.groupBy(W2Records::getJxdm, W2Records::getKsjg);
         List<W2RecordsVo> w2RecordsVos = baseMapper.selectVoList(lqw);
         // group转成map格式
-        Map<String, List<W2RecordsVo>> list = w2RecordsVos.stream().map(vo->{
-            if(StringUtils.isEmpty(vo.getJxdm())){
+        Map<String, List<W2RecordsVo>> list = w2RecordsVos.stream().map(vo -> {
+            if (StringUtils.isEmpty(vo.getJxdm())) {
                 vo.setJxdm("0");
             }
             return vo;
@@ -115,9 +116,9 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      */
     @Override
     public List<PassRateTotalVo> queryRateTotalList(W2RecordsBo bo) {
-        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo,false);
-        lqw.select(W2Records::getKscx,W2Records::getKsjg,W2Records::getTotalNum);
-        lqw.groupBy(W2Records::getKsjg,W2Records::getKscx);
+        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo, false);
+        lqw.select(W2Records::getKscx, W2Records::getKsjg, W2Records::getTotalNum);
+        lqw.groupBy(W2Records::getKsjg, W2Records::getKscx);
         PassRateTotalDto totalDto = new PassRateTotalDto("考试总人数");
         PassRateTotalDto passDto = new PassRateTotalDto("合格总人数");
         PassRateTotalDto unPassDto = new PassRateTotalDto("不合格总人数");
@@ -126,10 +127,10 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
         PassRateTotalDto totalTimesDto = new PassRateTotalDto("考试总次数");
 
         for (W2RecordsVo vo : baseMapper.selectVoList(lqw)) {
-            handleByResult(vo,totalDto,passDto,unPassDto,firPassDto,secPassDto,totalTimesDto);
+            handleByResult(vo, totalDto, passDto, unPassDto, firPassDto, secPassDto, totalTimesDto);
         }
 
-        return Arrays.asList(new PassRateTotalVo(totalDto), new PassRateTotalVo(passDto), new PassRateTotalVo(unPassDto),new PassRateTotalVo("总合格率",passDto,totalDto), new PassRateTotalVo(firPassDto),new PassRateTotalVo("一次合格率",firPassDto,totalDto), new PassRateTotalVo(secPassDto),new PassRateTotalVo("二次合格率",secPassDto,totalDto), new PassRateTotalVo(totalTimesDto));
+        return Arrays.asList(new PassRateTotalVo(totalDto), new PassRateTotalVo(passDto), new PassRateTotalVo(unPassDto), new PassRateTotalVo("总合格率", passDto, totalDto), new PassRateTotalVo(firPassDto), new PassRateTotalVo("一次合格率", firPassDto, totalDto), new PassRateTotalVo(secPassDto), new PassRateTotalVo("二次合格率", secPassDto, totalDto), new PassRateTotalVo(totalTimesDto));
     }
 
     /**
@@ -137,28 +138,28 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      */
     @Override
     public List<PassRateDetailVo> queryRateDetailList(W2RecordsBo bo) {
-        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo,false);
-        lqw.select(W2Records::getJxdm,W2Records::getJxmc,W2Records::getKsjg,W2Records::getTotalNum);
-        lqw.groupBy(W2Records::getKsjg,W2Records::getJxdm,W2Records::getJxmc);
+        LambdaQueryWrapper<W2Records> lqw = buildQueryWrapper(bo, false);
+        lqw.select(W2Records::getJxdm, W2Records::getJxmc, W2Records::getKsjg, W2Records::getTotalNum);
+        lqw.groupBy(W2Records::getKsjg, W2Records::getJxdm, W2Records::getJxmc);
         lqw.orderByAsc(W2Records::getJxdm);
 
 
         // 拼装map数据
         Map<String, PassRateDetailVo> map = new TreeMap<>();
         for (W2RecordsVo vo : baseMapper.selectVoList(lqw)) {
-            if(ObjectUtil.isNull(vo.getJxdm())) continue;
-            if(!map.containsKey(vo.getJxdm())){
+            if (ObjectUtil.isNull(vo.getJxdm())) continue;
+            if (!map.containsKey(vo.getJxdm())) {
                 PassRateDetailVo itemVo = new PassRateDetailVo();
                 itemVo.setSchoolCode(vo.getJxdm());
                 itemVo.setSchoolName(vo.getJxmc());
-                map.put(vo.getJxdm(),itemVo);
+                map.put(vo.getJxdm(), itemVo);
             }
-            handleByResultDetail(vo,map.get(vo.getJxdm()));
+            handleByResultDetail(vo, map.get(vo.getJxdm()));
         }
         //转list
         PassRateDetailVo totalDto = new PassRateDetailVo();
         List<PassRateDetailVo> collect = map.values().stream().map(s -> {
-            totalDto.AddNum(s.getPeopleCount(),s.getPeopleTimes(),s.getPassTotal(),s.getPassFir(),s.getPassSec());
+            totalDto.AddNum(s.getPeopleCount(), s.getPeopleTimes(), s.getPassTotal(), s.getPassFir(), s.getPassSec());
             DecimalFormat df = new DecimalFormat("0.00");
             s.setPassRate(df.format((double) s.getPassTotal() / s.getPeopleCount() * 100) + "%");
             s.handlePassRate();
@@ -181,30 +182,30 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      * @param vo       vo
      * @param detailVo 明细合格率对象
      */
-    private void handleByResultDetail(W2RecordsVo vo,PassRateDetailVo detailVo){
+    private void handleByResultDetail(W2RecordsVo vo, PassRateDetailVo detailVo) {
         //总人数
-        detailVo.setPeopleCount(detailVo.getPeopleCount()+vo.getTotalNum());
+        detailVo.setPeopleCount(detailVo.getPeopleCount() + vo.getTotalNum());
         //根据考试结果判断
-        switch (vo.getKsjg()){
+        switch (vo.getKsjg()) {
             case "1":
                 //第一次合格
-                detailVo.setPassFir(detailVo.getPassFir()+vo.getTotalNum());
-                detailVo.setPeopleTimes(detailVo.getPeopleTimes()+vo.getTotalNum());
-                detailVo.setPassTotal(detailVo.getPassTotal()+vo.getTotalNum());
+                detailVo.setPassFir(detailVo.getPassFir() + vo.getTotalNum());
+                detailVo.setPeopleTimes(detailVo.getPeopleTimes() + vo.getTotalNum());
+                detailVo.setPassTotal(detailVo.getPassTotal() + vo.getTotalNum());
                 break;
             case "2":
                 //第一次不合格
-                detailVo.setPeopleTimes(detailVo.getPeopleTimes()+vo.getTotalNum());
+                detailVo.setPeopleTimes(detailVo.getPeopleTimes() + vo.getTotalNum());
                 break;
             case "3":
                 //第二次合格
-                detailVo.setPassSec(detailVo.getPassSec()+vo.getTotalNum());
-                detailVo.setPeopleTimes(detailVo.getPeopleTimes()+vo.getTotalNum()*2);
-                detailVo.setPassTotal(detailVo.getPassTotal()+vo.getTotalNum());
+                detailVo.setPassSec(detailVo.getPassSec() + vo.getTotalNum());
+                detailVo.setPeopleTimes(detailVo.getPeopleTimes() + vo.getTotalNum() * 2);
+                detailVo.setPassTotal(detailVo.getPassTotal() + vo.getTotalNum());
                 break;
             case "4":
                 //第二次不合格
-                detailVo.setPeopleTimes(detailVo.getPeopleTimes()+vo.getTotalNum()*2);
+                detailVo.setPeopleTimes(detailVo.getPeopleTimes() + vo.getTotalNum() * 2);
                 break;
             default:
                 break;
@@ -239,7 +240,7 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
     /**
      * 根据考试结果处理数据
      *
-     * @param vo           签证官
+     * @param vo            签证官
      * @param totalDto      总签证官
      * @param passDto       通过签证官
      * @param unPassDto     联合国通过签证官
@@ -247,63 +248,63 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      * @param secPassDto    证券交易委员会通过签证官
      * @param totalTimesDto 总时间签证官
      */
-    private void handleByResult(W2RecordsVo vo,PassRateTotalDto totalDto,PassRateTotalDto passDto,PassRateTotalDto unPassDto,PassRateTotalDto firPassDto,PassRateTotalDto secPassDto,PassRateTotalDto totalTimesDto){
+    private void handleByResult(W2RecordsVo vo, PassRateTotalDto totalDto, PassRateTotalDto passDto, PassRateTotalDto unPassDto, PassRateTotalDto firPassDto, PassRateTotalDto secPassDto, PassRateTotalDto totalTimesDto) {
         //总人数
         totalDto.setTotal(vo.getTotalNum());
-        updateByCert(vo.getKscx(),totalDto,vo.getTotalNum());
+        updateByCert(vo.getKscx(), totalDto, vo.getTotalNum());
         //根据考试结果判断
-        switch (vo.getKsjg()){
+        switch (vo.getKsjg()) {
             case "1":
                 //第一次合格
-                updateByCert(vo.getKscx(),firPassDto,vo.getTotalNum());
-                updateByCert(vo.getKscx(),passDto,vo.getTotalNum());
-                updateByCert(vo.getKscx(),totalTimesDto,vo.getTotalNum());
+                updateByCert(vo.getKscx(), firPassDto, vo.getTotalNum());
+                updateByCert(vo.getKscx(), passDto, vo.getTotalNum());
+                updateByCert(vo.getKscx(), totalTimesDto, vo.getTotalNum());
                 passDto.setTotal(vo.getTotalNum());
                 firPassDto.setTotal(vo.getTotalNum());
                 totalTimesDto.setTotal(vo.getTotalNum());
                 break;
             case "2":
                 //第一次不合格
-                updateByCert(vo.getKscx(),unPassDto,vo.getTotalNum());
-                updateByCert(vo.getKscx(),totalTimesDto,vo.getTotalNum());
+                updateByCert(vo.getKscx(), unPassDto, vo.getTotalNum());
+                updateByCert(vo.getKscx(), totalTimesDto, vo.getTotalNum());
                 unPassDto.setTotal(vo.getTotalNum());
                 totalTimesDto.setTotal(vo.getTotalNum());
 
                 break;
             case "3":
                 //第二次合格
-                updateByCert(vo.getKscx(),secPassDto,vo.getTotalNum());
-                updateByCert(vo.getKscx(),passDto,vo.getTotalNum());
-                updateByCert(vo.getKscx(),totalTimesDto,vo.getTotalNum()*2);
+                updateByCert(vo.getKscx(), secPassDto, vo.getTotalNum());
+                updateByCert(vo.getKscx(), passDto, vo.getTotalNum());
+                updateByCert(vo.getKscx(), totalTimesDto, vo.getTotalNum() * 2);
                 passDto.setTotal(vo.getTotalNum());
                 secPassDto.setTotal(vo.getTotalNum());
-                totalTimesDto.setTotal(vo.getTotalNum()*2);
+                totalTimesDto.setTotal(vo.getTotalNum() * 2);
 
                 break;
             case "4":
                 //第二次不合格
-                updateByCert(vo.getKscx(),unPassDto,vo.getTotalNum());
-                updateByCert(vo.getKscx(),totalTimesDto,vo.getTotalNum()*2);
+                updateByCert(vo.getKscx(), unPassDto, vo.getTotalNum());
+                updateByCert(vo.getKscx(), totalTimesDto, vo.getTotalNum() * 2);
                 unPassDto.setTotal(vo.getTotalNum());
-                totalTimesDto.setTotal(vo.getTotalNum()*2);
+                totalTimesDto.setTotal(vo.getTotalNum() * 2);
 
                 break;
             default:
                 break;
         }
     }
+
     /**
      * 根据证型跟新相应证型的数据
      *
-     * @param Kscx         kscx
-     * @param totalDto      vo
-
+     * @param Kscx     kscx
+     * @param totalDto vo
      */
-    private void updateByCert(String Kscx,PassRateTotalDto totalDto,int times){
+    private void updateByCert(String Kscx, PassRateTotalDto totalDto, int times) {
         Class<? extends PassRateTotalDto> aClass = totalDto.getClass();
 
         try {
-            aClass.getMethod("set"+Kscx,int.class).invoke(totalDto,times);
+            aClass.getMethod("set" + Kscx, int.class).invoke(totalDto, times);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -341,7 +342,8 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
 //                break;
 //        }
     }
-    private LambdaQueryWrapper<W2Records> buildQueryWrapper(W2RecordsBo bo,Boolean orderBy) {
+
+    private LambdaQueryWrapper<W2Records> buildQueryWrapper(W2RecordsBo bo, Boolean orderBy) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<W2Records> lqw = Wrappers.lambdaQuery();
 //        QueryWrapper lqw = Wrappers.query();
@@ -351,26 +353,26 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
         lqw.like(StringUtils.isNotBlank(bo.getZjhm()), W2Records::getZjhm, bo.getZjhm());
         lqw.eq(StringUtils.isNotBlank(bo.getKscx()), W2Records::getKscx, bo.getKscx());
         lqw.eq(StringUtils.isNotBlank(bo.getKsyy()), W2Records::getKsyy, bo.getKsyy());
-        lqw.and(params.get("beginKsrq1") != null && params.get("endKsrq1") != null,qw->{
+        lqw.and(params.get("beginKsrq1") != null && params.get("endKsrq1") != null, qw -> {
 //            qw.between( W2Records::getKsrq1 ,DateUtil.parse(params.get("beginKsrq1").toString()), DateUtil.parse(params.get("endKsrq1").toString() + " 23:59:59")).or().between( W2Records::getKsrq2 ,DateUtil.parse(params.get("beginKsrq1").toString()), DateUtil.parse(params.get("endKsrq1").toString() + " 23:59:59"));
 
-            qw.between( W2Records::getKsrq ,DateUtil.parse(params.get("beginKsrq1").toString()), DateUtil.parse(params.get("endKsrq1").toString() + " 23:59:59"));
+            qw.between(W2Records::getKsrq, DateUtil.parse(params.get("beginKsrq1").toString()), DateUtil.parse(params.get("endKsrq1").toString() + " 23:59:59"));
         });
 //        lqw.between(params.get("beginKsrq1") != null && params.get("endKsrq1") != null,
 //            W2Records::getKsrq1 ,params.get("beginKsrq1"), params.get("endKsrq1"));
-        lqw.and(StringUtils.isNotBlank(bo.getKsy1()),qw->{
+        lqw.and(StringUtils.isNotBlank(bo.getKsy1()), qw -> {
             qw.like(W2Records::getKsy1, bo.getKsy1()).or().like(W2Records::getKsy2, bo.getKsy1());
         });
 //        lqw.like(StringUtils.isNotBlank(bo.getKsy1()), W2Records::getKsy1, bo.getKsy1());
         lqw.eq(StringUtils.isNotBlank(bo.getSfprint()), W2Records::getSfprint, bo.getSfprint());
 
-        if(StringUtils.isNotBlank(bo.getKsjg())){
+        if (StringUtils.isNotBlank(bo.getKsjg())) {
             lqw.in(W2Records::getKsjg, bo.getKsjg().split(","));
         }
         lqw.eq(bo.getLine() != null, W2Records::getLine, bo.getLine());
         lqw.eq(StringUtils.isNotBlank(bo.getJxdm()), W2Records::getJxdm, bo.getJxdm());
-        lqw.inSql(StringUtils.isNotBlank(bo.getSbbh()),W2Records::getKsbh,"SELECT KSBH FROM W2_FLOWREC WHERE SBBH = '"+bo.getSbbh()+"'");
-        lqw.orderByDesc(orderBy,W2Records::getId);
+        lqw.inSql(StringUtils.isNotBlank(bo.getSbbh()), W2Records::getKsbh, "SELECT KSBH FROM W2_FLOWREC WHERE SBBH = '" + bo.getSbbh() + "'");
+        lqw.orderByDesc(orderBy, W2Records::getId);
         return lqw;
     }
 
@@ -401,7 +403,7 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
     /**
      * 保存前的数据校验
      */
-    private void validEntityBeforeSave(W2Records entity){
+    private void validEntityBeforeSave(W2Records entity) {
         //TODO 做一些数据校验,如唯一约束
     }
 
@@ -410,82 +412,82 @@ public class W2RecordsServiceImpl implements IW2RecordsService {
      */
     @Override
     public Boolean deleteWithValidByIds(Collection<Long> ids, Boolean isValid) {
-        if(isValid){
+        if (isValid) {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchIds(ids) > 0;
     }
 
     @Override
-    public Integer selectCountByGakfdm1( String gakfdm) {
-        return  baseMapper.selectCountByGakfdm1(gakfdm);
+    public Integer selectCountByGakfdm1(String gakfdm) {
+        return baseMapper.selectCountByGakfdm1(gakfdm);
     }
 
     @Override
     public Integer selectCountByGakfdm2(String gakfdm) {
-        return  baseMapper.selectCountByGakfdm2(gakfdm);
+        return baseMapper.selectCountByGakfdm2(gakfdm);
     }
 
     @Override
     public Integer selectCountByKfxx1() {
-        return  baseMapper.selectCountByKfxx1();
+        return baseMapper.selectCountByKfxx1();
     }
 
     @Override
     public Integer selectCountByKfxx2() {
-        return  baseMapper.selectCountByKfxx2();
+        return baseMapper.selectCountByKfxx2();
     }
 
     @Override
     public List<String> selectSfzByZjhm() {
-        return  baseMapper.selectSfzByZjhm();
+        return baseMapper.selectSfzByZjhm();
     }
 
     @Override
-    public List<W2FlowVo> getFlowList(String bh, String ksrq){
+    public List<W2FlowVo> getFlowList(String zjhm, String ksrq) {
         // 当天的在rec表中  历史的在log中
-        if(ksrq.equals(DateUtils.getDate())){
-            return flowrecMapper.getFlowListByDay(bh, ksrq);
-        }else{
-            return flowlogMapper.getFlowListByDay(bh, ksrq);
+        if (ksrq.equals(DateUtils.getDate())) {
+            return flowrecMapper.getFlowListByDay(zjhm, ksrq);
+        } else {
+            return flowlogMapper.getFlowListByDay(zjhm, ksrq);
         }
     }
 
     // 误判申请
     @Override
     @Transactional
-    public Boolean resetRecord(RecordsResetDto dto){
+    public Boolean resetRecord(RecordsResetDto dto) {
         String updateSql = "";
         Long djc = 0l;
         ArrayList<Integer> kscsList = new ArrayList<>();
-        if(ArrayUtil.contains(new int[]{2,0}, dto.getWpxz())){
+        if (ArrayUtil.contains(new int[]{2, 0}, dto.getWpxz())) {
             updateSql += "kscj2 = '重考',ksrq2 = null,kssj2 = null,jssj2 = null,jgfs2 = 0";
             djc = 2l;
             kscsList.add(2);
         }
-        if(dto.getWpxz() == 0){
+        if (dto.getWpxz() == 0) {
             updateSql += ",";
 
         }
-        if(ArrayUtil.contains(new int[]{1,0}, dto.getWpxz())){
+        if (ArrayUtil.contains(new int[]{1, 0}, dto.getWpxz())) {
             updateSql += "kscj1 = '重考',ksrq1 = null,kssj1 = null,jssj1 = null,jgfs1 = 0";
             djc = 1l;
             kscsList.add(1);
         }
-        if(baseMapper.update(null,Wrappers.<W2Records>lambdaUpdate().setSql(updateSql)
-                .eq(W2Records::getId,dto.getId())
-        ) > 0){
+        if (baseMapper.update(null, Wrappers.<W2Records>lambdaUpdate().setSql(updateSql)
+                .eq(W2Records::getId, dto.getId())
+        ) > 0) {
             W2RecordsVo w2RecordsVo = baseMapper.selectVoById(dto.getId());
-            if(w2RecordsVo == null) throw new FailException("未找到该记录");
+            if (w2RecordsVo == null) throw new FailException("未找到该记录");
 
             //删除考试过程表信息
-            flowlogMapper.delete(Wrappers.<W2Flowlog>lambdaQuery().eq(W2Flowlog::getKsbh, w2RecordsVo.getKsbh()).eq(W2Flowlog::getZjhm, w2RecordsVo.getZjhm()).in(W2Flowlog::getKscs,kscsList));
-            flowrecMapper.delete(Wrappers.<W2Flowrec>lambdaQuery().eq(W2Flowrec::getKsbh, w2RecordsVo.getKsbh()).eq(W2Flowrec::getZjhm, w2RecordsVo.getZjhm()).in(W2Flowrec::getKscs,kscsList));
+            flowlogMapper.delete(Wrappers.<W2Flowlog>lambdaQuery().eq(W2Flowlog::getKsbh, w2RecordsVo.getKsbh()).eq(W2Flowlog::getZjhm, w2RecordsVo.getZjhm()).in(W2Flowlog::getKscs, kscsList));
+            flowrecMapper.delete(Wrappers.<W2Flowrec>lambdaQuery().eq(W2Flowrec::getKsbh, w2RecordsVo.getKsbh()).eq(W2Flowrec::getZjhm, w2RecordsVo.getZjhm()).in(W2Flowrec::getKscs, kscsList));
 
             // 查询排队历史表信息
             LambdaQueryWrapper<W2Queuhis> hisLqw = Wrappers.<W2Queuhis>lambdaQuery().eq(W2Queuhis::getKsbh, w2RecordsVo.getKsbh()).eq(W2Queuhis::getZjhm, w2RecordsVo.getZjhm());
             W2QueuhisVo w2QueuhisVo = queuhisMapper.selectVoOne(hisLqw);
-            if(w2QueuhisVo == null) throw new FailException("缺少该考生历史排队信息");
+            if (w2QueuhisVo == null) throw new FailException("缺少该考生历史排队信息");
             // 删除该考生排队历史信息
             queuhisMapper.delete(hisLqw);
 

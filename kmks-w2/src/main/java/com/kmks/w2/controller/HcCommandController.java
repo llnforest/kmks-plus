@@ -54,7 +54,7 @@ public class HcCommandController extends BaseController {
 
     @RequestMapping("/test1")
     @DSTransactional
-    public R<Void> test(){
+    public R<Void> test() {
         W2KcxxBo w2KcxxBo = new W2KcxxBo();
         w2KcxxBo.setId(5l);
         w2KcxxBo.setKscx("C1");
@@ -70,32 +70,27 @@ public class HcCommandController extends BaseController {
     }
 
     @RequestMapping("/test2")
-    public R<Void> test2(){
+    public R<Void> test2() {
         kcxxService.queryById(1l);
         configDeviceService.queryById(1l);
         return R.ok();
     }
 
     @RequestMapping("/text")
-    public R<Void> text(){
-        HashMap<String, String> map = new HashMap<>();
-        map.put("106_6","106");
-        map.put("6_6","6");
-        if(map.containsKey("6_6")){
-            log.info("ok");
-        }
+    public R<Void> text() {
 
-//        HCNetTool.load();
-//        HCNetTool.init();
-//        HCNetTool.login("192.168.1.200",(short) 8000,"admin","ghgd12345");
-//
+        HCNetTool.load();
+        HCNetTool.init();
+        HCNetTool.login("192.168.100.242", (short) 8000, "admin", "ghgd12345");
+
 //        HCNetTool.setOsdText();
 //        HCNetTool.setVideo();
-//
-//        HCNetTool.logout();
+
+        HCNetTool.logout();
         return R.ok();
     }
-//
+
+    //
 //    @RequestMapping("/showImg")
 //    public R<Void> showImg(){
 //        HCNetTool.load();
@@ -107,26 +102,26 @@ public class HcCommandController extends BaseController {
 //        HCNetTool.logout();
 //        return R.ok();
 //    }
-//    @RequestMapping("/uploadImg")
-//    public R<Void> uploadImg(){
-//        HCNetTool.load();
-//        HCNetTool.init();
-//        HCNetTool.login("192.168.1.200",(short) 8000,"admin","ghgd12345");
-//
-//        HCNetTool.uploadImg();
-//        try {
-//            HCNetTool.getUploadStatus(0l);
-//            Thread.sleep(1000);
-//        }catch (Exception e){
-//            log.info("异常：{}",e.getMessage());
-//        }
-////        HCNetTool.setImgInfo();
-//        HCNetTool.showImg();
+    @RequestMapping("/uploadImg")
+    public R<Void> uploadImg() {
+        HCNetTool.load();
+        HCNetTool.init();
+        HCNetTool.login("192.168.100.242", (short) 8000, "admin", "ghgd12345");
+
+        HCNetTool.uploadImg();
+        try {
+            HCNetTool.getUploadStatus(0l);
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            log.info("异常：{}", e.getMessage());
+        }
+//        HCNetTool.setImgInfo();
+        HCNetTool.showImg();
 
 
-//        HCNetTool.logout();
-//        return R.ok();
-//    }
+        HCNetTool.logout();
+        return R.ok();
+    }
 //
 //    @RequestMapping("/getUploadStatus")
 //    public R<Void> getUploadStatus(){

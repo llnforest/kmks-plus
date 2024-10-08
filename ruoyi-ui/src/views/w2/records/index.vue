@@ -266,8 +266,8 @@
             <template slot-scope="scope">
               <el-image
                 style="width: 60px; height: 60px;"
-                :src="getComponentImg(scope.row.zp)"
-                :preview-src-list="[getComponentImg(scope.row.zp)]"
+                :src="imgData[scope.row.id]"
+                :preview-src-list="[imgData[scope.row.id]]"
               />
             </template>
           </el-table-column>
@@ -354,6 +354,7 @@ import {selectSchool} from "@/api/w2/school";
 import {kcxxList} from "@/api/w2/kcxx";
 import {getTodayDateRange} from "@/utils/date";
 import BackVideo from "@/views/w2/video/backVideo";
+import {getImgData} from "@/api/w2/image";
 
 export default {
   name: "Records",
@@ -425,6 +426,7 @@ export default {
       schoolList: [],
       cdxmbhList: [],
       kcxxList: [],
+      imgData: {},
     };
   },
   created() {
@@ -605,8 +607,10 @@ export default {
       this.title = "考试过程明细";
       const id = row.id || this.ids
       if (!row.id) row = this.queuingList.filter(item => item.id == id)[0]
-      getFlowList({bh: row.ksbh, ksrq: row.ksrq.split(" ")[0]}).then(response => {
-        console.log(response.data);
+      getFlowList({zjhm: row.zjhm, ksrq: row.ksrq.split(" ")[0]}).then(response => {
+        response.data.forEach(item => {
+          this.getImg(item.id, item.zp);
+        })
         this.processList = response.data
       });
     },
@@ -722,31 +726,11 @@ export default {
         ...this.queryParams
       }, `records_${new Date().getTime()}.xlsx`)
     },
-    getComponentImg(zp) {
-      zp = 'd:\\webservice\\files\\20191021\\211021198705215828\\211021198705215828_1_03_2001.jpg';
-      const xhr = new XMLHttpRequest();
-      let base64Image;
-      xhr.onload = () => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          base64Image = reader.result;
-        };
-        reader.readAsDataURL(xhr.response);
-      };
-      xhr.open('GET', zp);
-      xhr.responseType = 'blob';
-      xhr.send();
-      return base64Image;
-      // // zp = 'd:\\webservice\\files\\20191021';
-      // try{
-      //   return require(`${zp}`);
-      //   console.log(require(zp))
-      //   console.log(require('d:\\webservice\\files\\20191021\\211021198705215828\\211021198705215828_1_03_2001.jpg'))
-      // }catch(e){
-      //   console.log(zp);
-      //   console.log(e)
-      //   return '';
-      // }
+    /** 获取图片 **/
+    getImg(id, zp) {
+      getImgData({url: zp}).then(response => {
+        this.$set(this.imgData, id, "data:image/jpeg;base64," + response.data);
+      });
     }
   }
 };

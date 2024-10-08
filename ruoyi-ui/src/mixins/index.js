@@ -26,7 +26,7 @@ export const rightClick = {
       return this.$store.getters.configCourses.split(",").includes(course)
     },
     isJgType(jgType) {
-      return this.$store.getters.configCourses == jgType
+      return this.$store.getters.configJgType == jgType
     },
     // 表格右击的功能
     rightClick(row, column, event) {

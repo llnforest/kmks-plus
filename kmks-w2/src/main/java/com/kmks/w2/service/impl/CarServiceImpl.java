@@ -359,7 +359,7 @@ public class CarServiceImpl implements ICarService {
         ScoreResultDto scoreResultDto = handleScoreResult(queuingInfo.getKskm(), queuingInfo.getDjc(), queuingInfo.getScore());
         if (queuingInfo.getScore() != getScore) {
             throw new FailException("考试结束与过程分数不一致");
-        } else if (scoreResultDto.getKsjg().equals("1") && !StringUtils.isBlank(queuingInfo.getKsxm())) {
+        } else if (scoreResultDto.getKsjg().equals("1") && !queuingInfo.getKsxm().equals(configService.selectConfigByKey(CacheNames.PROJECT_IDS_EXPECT_KEY) + "," + queuingInfo.getWcxm())) {
             throw new FailException("考试合格却存在未考项目");
         }
 

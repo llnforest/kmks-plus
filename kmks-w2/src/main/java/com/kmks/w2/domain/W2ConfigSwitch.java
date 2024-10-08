@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.math.BigDecimal;
@@ -19,12 +20,11 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @date 2023-05-04
  */
 @Data
-@KeySequence(value = "SEQ_ORA_INTEGER_KEY")
 @EqualsAndHashCode(callSuper = false)
 @TableName("w2_config_switch")
 public class W2ConfigSwitch {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * 项目代码

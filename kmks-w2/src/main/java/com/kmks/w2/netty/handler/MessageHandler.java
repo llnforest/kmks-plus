@@ -70,7 +70,6 @@ public class MessageHandler {
         // 处理调度中心页面展示数据
         try {
             W2KcxxVo w2KcxxVo = carService.carOnLine(message[1]);
-            TcpUtils.response(channel, message[0], true, new ArrayList<>());
 
             //发送至合码器
             //考车信息
@@ -95,7 +94,7 @@ public class MessageHandler {
                 dispatchCenterMap.put(message[1], dispatchCenterDto);
             }
             TcpUtils.addCarChannel(message[1], channel);
-            TcpUtils.response(channel, message[0], true, new ArrayList<String>());
+            TcpUtils.response(channel, message[0], true, new ArrayList<>());
         } catch (FailException e) {
             handleException(channel, message, e);
         }
